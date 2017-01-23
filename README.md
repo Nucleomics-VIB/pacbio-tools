@@ -34,7 +34,7 @@ The bash script **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** tak
 ### **explain-LocalContextFlags.html**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The html file **[explain-LocalContextFlags.html](/smrtlink-tools/bam_subset_smrt.sh)** explains explain **LocalContext Flags** present in PacBio BAM data as a binary value in plain english. The content of this page is fully taken and adapted from a similar page dedicated to explaining SAM flags and hosted **[here](<a href="http://picard.sourceforge.net/explain-flags.html)**. Please cite the PICARD source and not our version when using this code.
+The html file **[explain-LocalContextFlags.html](/smrtlink-tools/bam_subset_smrt.sh)** explains explain **LocalContext Flags** present in PacBio BAM data as a binary value in plain english. The content of this page is fully taken and adapted from a similar page dedicated to explaining SAM flags and hosted **<a href="http://picard.sourceforge.net/explain-flags.html">here</a>**. Please cite the PICARD source and not our version when using this code.
 ```bash
 Open a local copy of the file using your favorite web browser to use it
 ```
