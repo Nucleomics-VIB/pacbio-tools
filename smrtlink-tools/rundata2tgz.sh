@@ -18,7 +18,7 @@ usage='# Usage: rundata2tgz.sh
 ## input files
 # [required: -i <run-folder> (containing the flow-cell folder)]
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
-# [-o <output folder (default to <$SMRT_DOWNLOADS>]
+# [-o <output folder (default to <$GCDADA>]
 # [-h for this help]'
 
 while getopts "i:f:o:h" opt; do
@@ -111,7 +111,7 @@ if [ $? -eq 0 ]; then
 	echo "# archive was created successfully, now checksumming"
 	md5sum ${archive_path}/${archive_file} > ${archive_path}/${archive_file}_md5.txt && \
 	echo; echo "# checksum saved as: ${archive_path}/${archive_file}_md5.txt" && \
-	ls -lah ${archive_path}/${archive_file}* ; cat ${archive_path}/${archive_file}_md5.txt
+	du -a -h --max-depth=1 ${archive_path}/${archive_file}* | sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
     echo "# something went wrong, please have a check!"
 fi
