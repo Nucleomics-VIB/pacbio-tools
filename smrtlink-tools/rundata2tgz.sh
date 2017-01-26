@@ -4,9 +4,12 @@
 # script name: rundata2tgz.sh
 # Requirements:
 # run this script on a unix system with mounted Sequel primary storage (SMRT_Link in our case)
+# run folders are expected in the SMRT_DATA root (define it)
 # pigz required to speed up archiving files
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/01/23; v1.0
+#
+# 2017-01-26: create archive starting ar run folder depth (remove leading path that should be $SMRT_DATA); v1.01
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -16,7 +19,7 @@ version="1.0, 2017_01_23"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
-# [required: -i <run-folder> (containing the flow-cell folder)]
+# [required: -i <run-folder> (name of the run folder containing the flow-cell folder)]
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
 # [-o <output folder (default to <$GCDADA>]
 # [-h for this help]'
@@ -80,14 +83,14 @@ testvariabledef "${runfolder}" "-i"
 
 # check runfolder
 run_folder=${runfolder}
-testfolderexist "${run_folder}" "-i <path-to-run-folder>"
+testfolderexist "$SMRT_DATA/${run_folder}" "-i <run-folder-name (in $SMRT_DATA)>"
 
 # set to default if not provided
 flow_cell=${flowcell:-"1_A01"}
 
 # check flow-cell folder
 flowcell_path=${run_folder}/${flow_cell}
-testfolderexist "${flowcell_path}" "-i"
+testfolderexist "$SMRT_DATA/${flowcell_path}" "-i"
 
 # check output folder
 archive_path=${outpath:-"$GCDATA"}
@@ -96,12 +99,13 @@ testfolderwritable "${archive_path}" "-o <output_folder>"
 # archive name
 archive_file=$(basename ${run_folder})-$(basename ${flowcell_path}).tgz
 
-# create archive
+# create archive (dereference/follow symlinks)
 echo "# creating archive from: ${run_folder}/${flow_cell}"
 tar --use-compress-program="pigz" \
 	--exclude "*.h5" \
 	--exclude "*.baz" \
 	--exclude "*.log" \
+	-C $SMRT_DATA \
 	-h -cvf \
 	${archive_path}/${archive_file} \
 	${run_folder}/${flow_cell}
