@@ -12,13 +12,20 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - 
 
+**[bam_utils](#bam_utils)**
+
+- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
+
 ## smrtlink-tools
 *[[back-to-top](#top)]*  
 
 ### **bam_subset_smrt.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash script **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** takes arandom subset from a BAM data and user defined %value. It uses a random seed for each extarction to unsure that several runs will not overlap tool much at read level.
+### **bam_subset_smrt.sh**
+*[bam_utils](#bam_utils)*
+
+The bash file **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
 ```bash
 # Usage: bam_subset_smrt.sh -b <input.bam>
 # script version 1.0, 2017_01_18
@@ -42,7 +49,7 @@ Open a local copy of the file using your favorite web browser to use it
 ### **rundata2tgz.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after aSequel run on teh storage share. It ignores accessory files preseznt after a manual transfer.
+The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after aSequel run on the storage share. It ignores accessory files preseznt after a manual transfer.
 ```bash
 # Usage: rundata2tgz.sh
 # script version 1.0, 2017_01_23
@@ -54,6 +61,36 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 ```
 
 
+## [bam_utils]
+*[[back-to-top](#top)]*  
+
+
+### **bam2sizedist.sh**
+*[bam_utils](#bam_utils)*
+
+The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
+```bash
+# parse a PB BAM file
+# extract molecule ID, read length, barcode information, and polymerase coordinates
+# save results to a text table (TSV) for stats in R
+```
+
+### **bam2sizedist.sh**
+*[bam_utils](#bam_utils)*
+
+The perl file **[bam_size-filter.pl](/bam_utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
+```bash
+Aim: Filter a BAM file by read length
+#  print filtered read lengths to file
+#  (also output kept reads to BAM if -b is set)
+## Usage: bam_size-filter.pl <-i bam-file>
+# optional <-m minsize>
+# optional <-x maxsize>
+# optional <-b to also create a BAM output (default only text file of lengths)>
+# <-h to display this help>
+```
+
+```
 *[[back-to-top](#top)]*  
 
 <hr>
