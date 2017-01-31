@@ -12,6 +12,10 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - 
 
+**[bam_utils](#bam_utils)**
+
+- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)** -
+
 ## smrtlink-tools
 *[[back-to-top](#top)]*  
 
@@ -52,7 +56,33 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-o <output folder (default to <$SMRT_DOWNLOADS>]
 # [-h for this help]
 ```
+## bam_utils
+*[[back-to-top](#top)]*  
 
+### **bam_subset_smrt.sh**
+*[[bam_utils](#bam_utils)]*
+
+The bash script **[bam2sizedist.sh](bam_utils/bam2sizedist.sh)** exports BAM read size and barcode information.
+```bash
+# parse a PB BAM file
+# extract molecule ID, read length, barcode information, and polymerase coordinates
+# save results to a text table (TSV) for stats in R
+```
+
+### **bam_size-filter.pl**
+*[[bam_utils](#bam_utils)]*
+
+The perl script **[bam_size-filter.pl](bam_utils/bam_size-filter.pl)** filters BAM records exports and saves length information (and optionally BAM data) to file(s).
+```bash
+Aim: Filter a BAM file by read length
+#  print filtered read lengths to file
+#  (also output kept reads to BAM if -b is set)
+## Usage: bam_size-filter.pl <-i bam-file>
+# optional <-m minsize>
+# optional <-x maxsize>
+# optional <-b to also create a BAM output (default only text file of lengths)>
+# <-h to display this help>
+```
 
 *[[back-to-top](#top)]*  
 
