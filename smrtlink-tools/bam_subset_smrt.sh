@@ -1,17 +1,13 @@
 #!/bin/bash
 
 # bam_subset_smrt.sh
-# create a random subset from a BAM file
-# => use each time a new seed to reduce sample overlap
-# index and upload the resulting data to SMRT Link
-#
+# create arandom subset of a BAM file and upload it back to SMRT Link
+# 
 # Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # required:
-# SMRT Link server installed with access as encoded below
-# Pacbio commands locally available
 # Samtools locally installed
 
 ## edit the following paths to point to the right executables (no check done!)
