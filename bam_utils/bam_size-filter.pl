@@ -5,7 +5,9 @@ use File::Basename;
 use Getopt::Std;
 
 # bam_size-filter.pl
-# filter BAM polymerase read data for min and/or max polymerase read-size 
+# filter BAM read data for min and/or max read-length
+# save filtered reads to new BAM file (optional)
+# output filtered lengths to a text file for stats
 #
 # Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.1
 #
