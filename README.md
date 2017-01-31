@@ -57,7 +57,10 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-h for this help]
 ```
 
-**[bam_utils](#bam_utils)**
+
+## [bam_utils]
+*[[back-to-top](#top)]*  
+
 
 ### **bam2sizedist.sh**
 *[bam_utils](#bam_utils)*
