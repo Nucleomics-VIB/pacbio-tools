@@ -14,11 +14,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[bam_utils](#bam_utils)**
 
-<<<<<<< HEAD
 - **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
-=======
-- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)** -
->>>>>>> origin/master
 
 ## smrtlink-tools
 *[[back-to-top](#top)]*  
