@@ -14,7 +14,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[bam_utils](#bam_utils)**
 
-- **[bam2sizedist.sh](#bam2sizedistsh)** - 
+- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)** - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** -
 
 ## smrtlink-tools
 *[[back-to-top](#top)]*  
@@ -57,15 +57,48 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-h for this help]
 ```
 
-**[bam-utils](#bam-utils)**
+**[bam_utils](#bam_utils)**
 
 ### **bam2sizedist.sh**
-*[bam-utils](#bam-utils)*
+*[bam_utils](#bam_utils)*
 
 The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
 ```bash
+# parse a PB BAM file
+# extract molecule ID, read length, barcode information, and polymerase coordinates
+# save results to a text table (TSV) for stats in R
 ```
 
+### **bam2sizedist.sh**
+*[bam_utils](#bam_utils)*
+
+The perl file **[bam_size-filter.pl](/bam_utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
+```bash
+Aim: Filter a BAM file by read length
+#  print filtered read lengths to file
+#  (also output kept reads to BAM if -b is set)
+## Usage: bam_size-filter.pl <-i bam-file>
+# optional <-m minsize>
+# optional <-x maxsize>
+# optional <-b to also create a BAM output (default only text file of lengths)>
+# <-h to display this help>
+```
+
+### **bam_subset_smrt.sh**
+*[bam_utils](#bam_utils)*
+
+The bash file **[bam_subset_smrt.sh](/bam_utils/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
+```bash
+# Usage: bam_subset_smrt.sh -b <input.bam>
+# script version 1.0, 2017_01_18
+# [optional: -o <output_prefix|sample_SS_XXpc>]
+# [optional: -s <seed|1>]
+# [optional: -f <fraction in %|10>]
+# [optional: -t <threads|32>]
+# [optional: -S <SMRT-server|"${smrthostname}">]
+# [optional: -p <SMRT-port|9091>]
+# [-h for this help]
+```
 *[[back-to-top](#top)]*  
 
 <hr>
