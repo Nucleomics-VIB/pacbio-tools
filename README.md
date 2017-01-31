@@ -12,6 +12,8 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - 
 
+**[bam_utils](#bam_utils)**
+
 - **[bam2sizedist.sh](#bam2sizedistsh)** - 
 
 ## smrtlink-tools
