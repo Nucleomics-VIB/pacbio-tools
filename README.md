@@ -92,7 +92,7 @@ Aim: Filter a BAM file by read length
 
 
 ### **bam2sizedist.sh**
-*[bam_utils](#bam_utils)*
+*[[bam_utils](#bam_utils)]*
 
 The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
 ```bash
@@ -102,7 +102,7 @@ The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
 ```
 
 ### **bam2sizedist.sh**
-*[bam_utils](#bam_utils)*
+*[[bam_utils](#bam_utils)]*
 
 The perl file **[bam_size-filter.pl](/bam_utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
 ```bash
@@ -116,7 +116,6 @@ Aim: Filter a BAM file by read length
 # <-h to display this help>
 ```
 
-```
 *[[back-to-top](#top)]*  
 
 <hr>
