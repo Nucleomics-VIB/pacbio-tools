@@ -5,10 +5,9 @@ use File::Basename;
 use Getopt::Std;
 
 # bam_size-filter.pl
-# reconstitute polymerase reads from subreads.bam and scraps.bam
-# filter BAM polymerase read data for min and max polymerase read-size 
+# filter BAM polymerase read data for min and/or max polymerase read-size 
 #
-# Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.0
+# Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.1
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -22,15 +21,15 @@ use Getopt::Std;
 # disable buffering to get output during long process (loop)
 $|=1; 
 
-getopts('i:m:bh');
-our ( $opt_i, $opt_m, $opt_b, $opt_h );
+getopts('i:m:x:bh');
+our ( $opt_i, $opt_m, $opt_x, $opt_b, $opt_h );
 
 my $usage = "Aim: Filter a BAM file by read length
-  keep only reads <= <max> size (-m) [keep all if m=-1]
-  print their length to file
-  (also output subset BAM if -b is set)
-## Usage: bam_size-filter.pl <-i bam-file> <-m limit>
-# if m = -1, the whole BAM will be kept
+#  print filtered read lengths to file
+#  (also output kept reads to BAM if -b is set)
+## Usage: bam_size-filter.pl <-i bam-file>
+# optional <-m minsize>
+# optional <-x maxsize>
 # optional <-b to also create a BAM output (default only text file of lengths)>
 # <-h to display this help>";
 
@@ -39,47 +38,67 @@ my $usage = "Aim: Filter a BAM file by read length
 ####################
 
 my $infile = $opt_i || die $usage . "\n";
-my $max = $opt_m || die $usage . "\n";
+my $minlen = $opt_m;
+my $maxlen = $opt_x;
+# at least one set
+( defined($opt_m) || defined($opt_x) ) || die "# set min, max or both!\n".$usage."\n";
 my $makebam;
-defined($opt_b) || undef($makebam);
+defined($opt_b) && ( $makebam = 1 );
 defined($opt_h) && die $usage . "\n";
 
-my $label=$max>0 ? "_lt".$max : "_all";
-my $outname=basename($infile, ".bam").$label.".bam";
-my $lenfile=basename($infile, ".bam").$label."_lengths.txt";
+my $minlabel = defined($minlen) ? "_gt".$minlen : "";
+my $maxlabel = defined($maxlen) ? "_lt".$maxlen : "";
+my $outname=basename($infile, ".bam").$minlabel.$maxlabel.".bam";
+my $lenfile=basename($infile, ".bam").$minlabel.$maxlabel."_lengths.txt";
 
 # create handler for data parsing
 open BAM,"samtools view -h $infile |";
-defined($makebam) && open OUTBAM,"| samtools view -bS -h - > $outname";
+( $makebam == 1 ) && open OUTBAM,"| samtools view -bS -h - > $outname";
 open LENDIST,"> $lenfile";
 
 my $countgood=0;
 my $countbad=0;
+my $countshort=0;
+my $countlong=0;
 
 while(<BAM>){
-
-if (/^(\@)/) {
-	defined($makebam) && print OUTBAM $_;
-	next;
-	}
+	# header
+	if (/^(\@)/) {
+		defined($makebam) && print OUTBAM $_;
+		next;
+		}
 	
-my @fields=split("\t", $_);
-my $readlen=length($fields[9]);
+	my @fields=split("\t", $_);
+	my $readlen=length($fields[9]);
 
-# filter by length or no filter is -1
-if ( $readlen <= $max || $max==-1 ) {
-	defined($makebam) && print OUTBAM $_ . "\n";
+	# filter short
+	if ( defined($minlen) ) {
+		if ( $readlen < $minlen ) {
+			$countshort++;
+			next;
+			}
+		}
+
+	# filter long
+	if ( defined($maxlen) ) {
+		if ( $readlen > $maxlen ) {
+			$countlong++;
+			next;
+			}
+		}
+
+	# in range by default
+	( $makebam == 1 ) && print OUTBAM $_ . "\n";
 	print LENDIST $readlen . "\n";
 	$countgood++;
-	} else {
-	$countbad++;
-	}
-# end BAM data
 }
 
 print STDOUT "# kept $countgood reads\n";
 print STDOUT "# filtered out $countbad reads\n";
-if ( defined($makebam) ){
+print STDOUT "# reads shorter than min $countshort\n";
+print STDOUT "# reads longer than max $countlong\n";
+
+if ( $makebam == 1 ) {
 	print STDOUT "# results are stored in $outname and $lenfile\n";
 	} else {
 	print STDOUT "# results are stored in $lenfile\n";
