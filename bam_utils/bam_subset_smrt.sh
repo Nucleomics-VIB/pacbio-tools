@@ -1,16 +1,14 @@
 #!/bin/bash
 
-# bam_size-filter.sh
-# reconstitute polymerase reads from subreads.bam and scraps.bam
-# filter BAM polymerase read data for min and max polymerase read-size 
-#
+# bam_subset_smrt.sh
+# create arandom subset of a BAM file and upload it back to SMRT Link
+# 
 # Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # required:
 # Samtools locally installed
-# GNU awk for parsing
 
 ## edit the following paths to point to the right executables (no check done!)
 # samtools 1.3_x preferred to the standard 0.19 for speed
