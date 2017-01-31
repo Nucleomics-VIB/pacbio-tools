@@ -9,7 +9,7 @@ use Getopt::Std;
 # save filtered reads to new BAM file (optional)
 # output filtered lengths to a text file for stats
 #
-# Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.1
+# Stéphane Plaisance - VIB-NC-BITS Jan-31-2017 v1.1
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 

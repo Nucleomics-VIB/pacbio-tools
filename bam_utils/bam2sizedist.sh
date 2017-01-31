@@ -1,18 +1,17 @@
 #!/bin/bash
 
-# bam2sizedist.sh
+# bam2sizedist.sh: 
+# parse a PB BAM file
+# extract molecule ID, read length, barcode information, and polymerase coordinates
+# save results to a text table (TSV) for stats in R
 #
-# Stéphane Plaisance - VIB-NC-BITS Jan-18-2017 v1.0
+# Stéphane Plaisance - VIB-NC-BITS Jan-31-2017 v1.1
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # required:
-# Samtools locally installed
-# GNU awk for parsing
-
-## edit the following paths to point to the right executables (no check done!)
-# samtools 1.3_x preferred to the standard 0.19 for speed
-samtools1=$BIOTOOLS/samtools/bin/samtools
+# Samtools for parsing bam
+# GNU awk for parsing sam data
 
 if [ -z "${1}" ]
 then
@@ -21,6 +20,10 @@ then
 else
 	inbam=$1
 fi
+
+# check if requirements are present
+$( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
+$( hash awk 2>/dev/null ) || ( echo "# awk not found in PATH"; exit 1 )
 
 samtools view ${inbam} | \
 awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len"}
