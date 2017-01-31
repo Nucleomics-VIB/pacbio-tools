@@ -42,7 +42,7 @@ Open a local copy of the file using your favorite web browser to use it
 ### **rundata2tgz.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after aSequel run on teh storage share. It ignores accessory files preseznt after a manual transfer.
+The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after aSequel run on the storage share. It ignores accessory files preseznt after a manual transfer.
 ```bash
 # Usage: rundata2tgz.sh
 # script version 1.0, 2017_01_23
@@ -53,6 +53,14 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-h for this help]
 ```
 
+**[bam-utils](#bam-utils)**
+
+### **bam2sizedist.sh**
+*[bam-utils](#bam-utils)*
+
+The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
+```bash
+```
 
 *[[back-to-top](#top)]*  
 
