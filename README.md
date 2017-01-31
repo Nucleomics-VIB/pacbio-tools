@@ -14,7 +14,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[bam_utils](#bam_utils)**
 
-- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)** - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** -
+- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
 
 ## smrtlink-tools
 *[[back-to-top](#top)]*  
@@ -22,7 +22,10 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 ### **bam_subset_smrt.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash script **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** takes arandom subset from a BAM data and user defined %value. It uses a random seed for each extarction to unsure that several runs will not overlap tool much at read level.
+### **bam_subset_smrt.sh**
+*[bam_utils](#bam_utils)*
+
+The bash file **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
 ```bash
 # Usage: bam_subset_smrt.sh -b <input.bam>
 # script version 1.0, 2017_01_18
@@ -87,20 +90,6 @@ Aim: Filter a BAM file by read length
 # <-h to display this help>
 ```
 
-### **bam_subset_smrt.sh**
-*[bam_utils](#bam_utils)*
-
-The bash file **[bam_subset_smrt.sh](/bam_utils/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
-```bash
-# Usage: bam_subset_smrt.sh -b <input.bam>
-# script version 1.0, 2017_01_18
-# [optional: -o <output_prefix|sample_SS_XXpc>]
-# [optional: -s <seed|1>]
-# [optional: -f <fraction in %|10>]
-# [optional: -t <threads|32>]
-# [optional: -S <SMRT-server|"${smrthostname}">]
-# [optional: -p <SMRT-port|9091>]
-# [-h for this help]
 ```
 *[[back-to-top](#top)]*  
 
