@@ -8,11 +8,11 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 ### Table of Contents
 
-**[smrtlink-tools](#smrtlink-tools)**
+**[[smrtlink-tools](#smrtlink-tools)]**
 
 - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - 
 
-**[bam_utils](#bam_utils)**
+**[[bam_utils](#bam_utils)]**
 
 - **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
 
@@ -23,7 +23,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 *[[smrtlink-tools](#smrtlink-tools)]*
 
 ### **bam_subset_smrt.sh**
-*[bam_utils](#bam_utils)*
+*[[bam_utils](#bam_utils)]*
 
 The bash file **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
 ```bash
