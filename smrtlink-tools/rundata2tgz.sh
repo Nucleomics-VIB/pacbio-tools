@@ -10,12 +10,12 @@
 # Stephane Plaisance (VIB-NC+BITS) 2017/01/23; v1.0
 #
 # 2017-01-26: create archive starting ar run folder depth (remove leading path that should be $SMRT_DATA); v1.01
+# requires pigz for fast compression
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.0, 2017_01_23"
-
+version="1.1, 2017_01_31"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
@@ -23,6 +23,8 @@ usage='# Usage: rundata2tgz.sh
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
 # [-o <output folder (default to <$GCDADA>]
 # [-h for this help]'
+
+$( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
 while getopts "i:f:o:h" opt; do
   case $opt in
