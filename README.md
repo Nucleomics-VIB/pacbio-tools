@@ -59,6 +59,15 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-o <output folder (default to <$SMRT_DOWNLOADS>]
 # [-h for this help]
 ```
+### **smrtlink_init.sh**
+*[[smrtlink-tools](#smrtlink-tools)]*
+
+The bash file **[smrtlink_init.sh](/smrtlink-tools/smrtlink_init.sh)** creates a launcher for the SMRT Link service (not tested).
+```bash
+# please use at your own risks
+# info on how to set this can be found on the web
+```
+
 ## bam_utils
 *[[back-to-top](#top)]*  
 
