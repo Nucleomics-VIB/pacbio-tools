@@ -126,7 +126,7 @@ Aim: Filter a BAM file by read length
 ## general-tools
 *[[back-to-top](#top)]*  
 
-### **[pb_STARlong.sh]**
+### **pb_STARlong.sh**
 *[[general-tools](#general-tools)]*
 
 The bash script **[pb_STARlong.sh](general_tools/pb_STARlong.sh)** run adapted STARlong command with PacBio reads (Fasta).
