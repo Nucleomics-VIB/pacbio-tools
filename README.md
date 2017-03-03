@@ -10,11 +10,11 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[[smrtlink-tools](#smrtlink-tools)]**
 
-- **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - - **[smrtlink_init.sh](#smrtlink_initsh)** -
+- **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - **[smrtlink_init.sh](#smrtlink_initsh)** -
 
 **[[bam-utils](#bam-utils)]**
 
-- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
+- **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)** - 
 
 **[[general-tools](#general-tools)]**
 
