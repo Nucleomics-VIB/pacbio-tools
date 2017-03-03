@@ -18,7 +18,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[[general-tools](#general-tools)]**
 
-- **[pb_STARlong.sh](#pbSTARlongsh)** - 
+- **[pb_STARlong.sh](#pb_STARlongsh)** - 
 
 
 ## smrtlink-tools
