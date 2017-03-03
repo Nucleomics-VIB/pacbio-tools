@@ -33,8 +33,8 @@ PARAMS="--runMode alignReads \
 version="1.0, 2017_03_03"
 
 usage='# Usage: pb_STARlong.sh 
-	-q <query sequences (reads)> 
-	-d <STAR_database-folder>
+# -q <query sequences (reads)> 
+# -d <STAR_database-folder>
 # optional -t <threads> (default 8)>
 # script version '${version}'
 # [-h for this help]'
