@@ -16,6 +16,11 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 - **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
 
+**[[general_tools](#general_tools)]**
+
+- **[pb_STARlong.sh](#pb_STARlongsh)** - 
+
+
 ## smrtlink-tools
 *[[back-to-top](#top)]*  
 
@@ -96,10 +101,6 @@ Aim: Filter a BAM file by read length
 # <-h to display this help>
 ```
 
-## [bam_utils]
-*[[back-to-top](#top)]*  
-
-
 ### **bam2sizedist.sh**
 *[[bam_utils](#bam_utils)]*
 
@@ -123,6 +124,22 @@ Aim: Filter a BAM file by read length
 # optional <-x maxsize>
 # optional <-b to also create a BAM output (default only text file of lengths)>
 # <-h to display this help>
+```
+
+## bam_utils
+*[[back-to-top](#top)]*  
+
+### **bam_subset_smrt.sh**
+*[[bam_utils](#bam_utils)]*
+
+The bash script **[pb_STARlong.sh](bam_utils/pb_STARlong.sh)** run adapted STARlong command with PacBio reads (Fasta).
+```bash
+# Usage: pb_STARlong.sh 
+	-q <query sequences (reads)> 
+	-d <STAR_database-folder>
+# optional -t <threads> (default 8)>
+# script version 1.0, 2016_08_16
+# [-h for this help]
 ```
 
 *[[back-to-top](#top)]*  
