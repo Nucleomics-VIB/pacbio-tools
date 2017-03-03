@@ -12,7 +12,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 - **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - - **[smrtlink_init.sh](#smrtlink_initsh)** -
 
-**[[bam_utils](#bam_utils)]**
+**[[bam-utils](#bam-utils)]**
 
 - **[bam2sizedist.sh](#bam2sizedistsh)** - **[bam_size-filter.pl](#bam_size-filterpl)**
 
@@ -25,7 +25,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 *[[back-to-top](#top)]*  
 
 ### **bam_subset_smrt.sh**
-*[[bam_utils](#bam_utils)]*
+*[[smrtlink-tools](#smrtlink-tools)]*
 
 The bash file **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
 ```bash
@@ -70,13 +70,13 @@ The bash file **[smrtlink_init.sh](/smrtlink-tools/smrtlink_init.sh)** creates a
 # info on how to set this can be found on the web
 ```
 
-## bam_utils
+## bam-utils
 *[[back-to-top](#top)]*  
 
 ### **bam_subset_smrt.sh**
-*[[bam_utils](#bam_utils)]*
+*[[bam-utils](#bam-utils)]*
 
-The bash script **[bam2sizedist.sh](bam_utils/bam2sizedist.sh)** exports BAM read size and barcode information.
+The bash script **[bam2sizedist.sh](bam-utils/bam2sizedist.sh)** exports BAM read size and barcode information.
 ```bash
 # parse a PB BAM file
 # extract molecule ID, read length, barcode information, and polymerase coordinates
@@ -84,9 +84,9 @@ The bash script **[bam2sizedist.sh](bam_utils/bam2sizedist.sh)** exports BAM rea
 ```
 
 ### **bam_size-filter.pl**
-*[[bam_utils](#bam_utils)]*
+*[[bam-utils](#bam-utils)]*
 
-The perl script **[bam_size-filter.pl](bam_utils/bam_size-filter.pl)** filters BAM records exports and saves length information (and optionally BAM data) to file(s).
+The perl script **[bam_size-filter.pl](bam-utils/bam_size-filter.pl)** filters BAM records exports and saves length information (and optionally BAM data) to file(s).
 ```bash
 Aim: Filter a BAM file by read length
 #  print filtered read lengths to file
@@ -99,9 +99,9 @@ Aim: Filter a BAM file by read length
 ```
 
 ### **bam2sizedist.sh**
-*[[bam_utils](#bam_utils)]*
+*[[bam-utils](#bam-utils)]*
 
-The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
+The bash file **[bam2sizedist.sh](/bam-utils/bam2sizedist.sh)** .
 ```bash
 # parse a PB BAM file
 # extract molecule ID, read length, barcode information, and polymerase coordinates
@@ -109,9 +109,9 @@ The bash file **[bam2sizedist.sh](/bam_utils/bam2sizedist.sh)** .
 ```
 
 ### **bam2sizedist.sh**
-*[[bam_utils](#bam_utils)]*
+*[[bam-utils](#bam-utils)]*
 
-The perl file **[bam_size-filter.pl](/bam_utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
+The perl file **[bam_size-filter.pl](/bam-utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
 ```bash
 Aim: Filter a BAM file by read length
 #  print filtered read lengths to file
