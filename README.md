@@ -25,9 +25,6 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 *[[back-to-top](#top)]*  
 
 ### **bam_subset_smrt.sh**
-*[[smrtlink-tools](#smrtlink-tools)]*
-
-### **bam_subset_smrt.sh**
 *[[bam_utils](#bam_utils)]*
 
 The bash file **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** creates a  random subset from a BAM data and uploads the resulting file to the SMRT server as a new dataset.
@@ -126,10 +123,10 @@ Aim: Filter a BAM file by read length
 # <-h to display this help>
 ```
 
-## bam_utils
+## general_tools
 *[[back-to-top](#top)]*  
 
-### **bam_subset_smrt.sh**
+### **[pb_STARlong.sh**
 *[[bam_utils](#bam_utils)]*
 
 The bash script **[pb_STARlong.sh](bam_utils/pb_STARlong.sh)** run adapted STARlong command with PacBio reads (Fasta).
@@ -141,6 +138,10 @@ The bash script **[pb_STARlong.sh](bam_utils/pb_STARlong.sh)** run adapted STARl
 # script version 1.0, 2016_08_16
 # [-h for this help]
 ```
+
+
+
+
 
 *[[back-to-top](#top)]*  
 
