@@ -129,7 +129,8 @@ Aim: Filter a BAM file by read length
 ### **pb_STARlong.sh**
 *[[general-tools](#general-tools)]*
 
-The bash script **[pb_STARlong.sh](general-tools/pb_STARlong.sh)** run adapted STARlong command with PacBio reads (Fasta).
+The bash script **[pb_STARlong.sh](general-tools/pb_STARlong.sh)** run adapted STARlong command with PacBio reads (Fasta). Teh arguments used in this script were obtained from the dedicated Github page https://github.com/PacificBiosciences/cDNA_primer/wiki/Bioinfx-study:-Optimizing-STAR-aligner-for-Iso-Seq-data.
+
 ```bash
 # Usage: pb_STARlong.sh 
 # -q <query sequences (reads)> 
