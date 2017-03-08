@@ -108,13 +108,25 @@ The bash file **[bam2sizedist.sh](/bam-utils/bam2sizedist.sh)** .
 # save results to a text table (TSV) for stats in R
 ```
 
-### **bam2sizedist.sh**
+### **bam2sizedist.sh**# please provide mandatory arguments -q and -d!
+# Usage: pb_STARlong.sh 
+# -q <query sequences (reads)> 
+# -d <STAR_database-folder>
+# optional -t <threads> (default 8)>
+# script version 1.0, 2017_03_03
+# [-h for this help]
 *[[bam-utils](#bam-utils)]*
 
 The perl file **[bam_size-filter.pl](/bam-utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
 ```bash
 Aim: Filter a BAM file by read length
-#  print filtered read lengths to file
+#  print filtered read lengths to# please provide mandatory arguments -q and -d!
+# Usage: pb_STARlong.sh 
+# -q <query sequences (reads)> 
+# -d <STAR_database-folder>
+# optional -t <threads> (default 8)>
+# script version 1.0, 2017_03_03
+# [-h for this help] file
 #  (also output kept reads to BAM if -b is set)
 ## Usage: bam_size-filter.pl <-i bam-file>
 # optional <-m minsize>
@@ -132,11 +144,12 @@ Aim: Filter a BAM file by read length
 The facilitating bash script **[pb_STARlong.sh](general-tools/pb_STARlong.sh)** runs a preconfigured STARlong command with PacBio reads (Fasta). The arguments used in this script were reproduced from the dedicated Github page https://github.com/PacificBiosciences/cDNA_primer/wiki/Bioinfx-study:-Optimizing-STAR-aligner-for-Iso-Seq-data and can be amended when changes are necessary.
 
 ```bash
+# please provide mandatory arguments -q and -d!
 # Usage: pb_STARlong.sh 
 # -q <query sequences (reads)> 
 # -d <STAR_database-folder>
 # optional -t <threads> (default 8)>
-# script version 1.0, 2016_08_16
+# script version 1.0, 2017_03_03
 # [-h for this help]
 ```
 
