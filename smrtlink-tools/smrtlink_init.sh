@@ -30,7 +30,7 @@ case "$1" in
    su ${SMRT_USER} -c ${SMRT_ROOT}/admin/bin/services-start
    ;;
  *)
-   echo "Usage: smrtlink {start|stop|restart}" >&2
+   echo "Usage: smrtlink {status|start|stop|restart}" >&2
    exit 3
    ;;
 esac
