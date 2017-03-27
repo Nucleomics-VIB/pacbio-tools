@@ -71,13 +71,11 @@ while(<IN>){
 	my @fields=split('\t', $_);
 	my ($chr, $start, $ID, $ref, $alt, $qual, $filter, $info) = @fields[ 0..7 ];
 	chomp($info);
-	# remove D and I from Alt and fetch Ref for insertions
-	## deletion call
-	$alt =~ s/^D[0-9]+//g;
 
 	# replace 0 by PASS for info
 	$filter = $filter eq "0" ? "PASS" : $filter;
-	
+
+	# remove D and I from Alt and fetch Ref for insertions
 	## insertion call, fetch the base before the insertion
 	if ($alt =~ /^I/) {
 		if ($start>0) {
@@ -92,7 +90,13 @@ while(<IN>){
 			$alt =~ s/^I//g;
 		}
 	}
+	
+	## deletion call
+	$alt =~ s/^D[0-9]+//g;
+	# replace empty <alt> by'.'
 	$alt = length($alt)>0 ? $alt : ".";
-	# print vcf call
+	
+	# print vcf call in format 4.x
+	# the last two fields are hard-coded in this haploid-only version
 	print OUT join("\t", $chr, $start, $ID, $ref, $alt, $qual, $filter, $info, "GT",'1')."\n";
 }
