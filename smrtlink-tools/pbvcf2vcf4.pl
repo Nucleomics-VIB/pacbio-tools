@@ -85,7 +85,7 @@ while(<IN>){
 			$ref=$q[1] || die "# problem fetching the reference base at $chr:$start!";
 			chomp($ref);
 			$alt =~ s/^I//g;
-			} else {
+		} else {
 			# handle exception when insertion is before 1st base (telomere)		
 			$ref = "N";
 			$alt =~ s/^I//g;
@@ -93,5 +93,5 @@ while(<IN>){
 	}
 	$alt = length($alt)>0 ? $alt : ".";
 	# print vcf call
-	print OUT join("\t", $chr, $start, $ID, $ref, $alt, $qual, $filter, $info, "GT",'1/1')."\n";
+	print OUT join("\t", $chr, $start, $ID, $ref, $alt, $qual, $filter, $info, "GT",'1')."\n";
 }
