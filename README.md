@@ -111,7 +111,7 @@ Aim: Filter a BAM file by read length
 ### **bam2sizedist.sh**
 *[[bam-utils](#bam-utils)]*
 
-The bash file **[bam2sizedist.sh](/bam-utils/bam2sizedist.sh)** .
+The bash file **[bam2sizedist.sh](/bam-utils/bam2sizedist.sh)** extracts molecule ID, read length, barcode information, and polymerase coordinates and saves results to a text table (TSV) for stats in R.
 ```bash
 # parse a PB BAM file
 # extract molecule ID, read length, barcode information, and polymerase coordinates
