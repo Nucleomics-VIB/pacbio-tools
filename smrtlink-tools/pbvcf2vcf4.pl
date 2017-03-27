@@ -9,6 +9,8 @@ use POSIX qw(strftime);
 # currently only for haploid data
 #
 # Stephane Plaisance BITS-VIB, 2017-03-23 v1.0
+# v1.1: added contigs in header to get fully compliant VCF
+my $version="1.1";
 
 # requires samtools
 grep { -x "$_/samtools"}split /:/,$ENV{PATH} || \
@@ -26,7 +28,6 @@ grep { -x "$_/awk"}split /:/,$ENV{PATH} || \
 # followed by samtools faidx cleaned-pb_assembly.fasta
 #########################################################################################
 
-my $version="1.1";
 my $comment="# !!! this code is currently only valid for haploid calls";
 print $comment."\n";
 
