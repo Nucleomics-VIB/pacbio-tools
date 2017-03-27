@@ -86,11 +86,17 @@ usage: pbvcf2vcf4.pl <pacbio_vcf3.3.vcf> <indexed-fasta-reference>
 ### **bam_subset_smrt.sh**
 *[[bam-utils](#bam-utils)]*
 
-The bash script **[bam2sizedist.sh](bam-utils/bam2sizedist.sh)** exports BAM read size and barcode information.
+The bash script **[bam_subset_smrt.sh](bam-utils/bam_subset_smrt.sh)** exports BAM read size and barcode information.
 ```bash
-# parse a PB BAM file
-# extract molecule ID, read length, barcode information, and polymerase coordinates
-# save results to a text table (TSV) for stats in R
+# Usage: bam_subset_smrt.sh -b <input.bam>
+# script version 1.0, 2017_01_18
+# [optional: -o <output_prefix|sample_SS_XXpc>]
+# [optional: -s <seed|1>]
+# [optional: -f <fraction in %|10>]
+# [optional: -t <threads|32>]
+# [optional: -S <SMRT-server|"${smrthostname}">]
+# [optional: -p <SMRT-port|9091>]
+# [-h for this help]
 ```
 
 ### **bam_size-filter.pl**
