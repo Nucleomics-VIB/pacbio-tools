@@ -118,13 +118,7 @@ The bash file **[bam2sizedist.sh](/bam-utils/bam2sizedist.sh)** .
 # save results to a text table (TSV) for stats in R
 ```
 
-### **bam2sizedist.sh**# please provide mandatory arguments -q and -d!
-# Usage: pb_STARlong.sh 
-# -q <query sequences (reads)> 
-# -d <STAR_database-folder>
-# optional -t <threads> (default 8)>
-# script version 1.0, 2017_03_03
-# [-h for this help]
+### **bam_size-filter.sh**# 
 *[[bam-utils](#bam-utils)]*
 
 The perl file **[bam_size-filter.pl](/bam-utils/bam_size-filter.pl)** filters BAM records by min and max length. It output all filtered lengths to file for stats and can also create a BAM output (optional).
