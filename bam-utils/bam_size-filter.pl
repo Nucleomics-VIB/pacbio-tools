@@ -15,6 +15,7 @@ use Getopt::Std;
 
 # required:
 # Samtools locally installed
+print "samtools installed" if grep { -x "$_/samtools"}split /:/,$ENV{PATH};
 
 ############################
 # handle command parameters
