@@ -83,22 +83,6 @@ usage: pbvcf2vcf4.pl <pacbio_vcf3.3.vcf> <indexed-fasta-reference>
 ## bam-utils
 *[[back-to-top](#top)]*  
 
-### **bam_subset_smrt.sh**
-*[[bam-utils](#bam-utils)]*
-
-The bash script **[bam_subset_smrt.sh](bam-utils/bam_subset_smrt.sh)** exports BAM read size and barcode information.
-```bash
-# Usage: bam_subset_smrt.sh -b <input.bam>
-# script version 1.0, 2017_01_18
-# [optional: -o <output_prefix|sample_SS_XXpc>]
-# [optional: -s <seed|1>]
-# [optional: -f <fraction in %|10>]
-# [optional: -t <threads|32>]
-# [optional: -S <SMRT-server|"${smrthostname}">]
-# [optional: -p <SMRT-port|9091>]
-# [-h for this help]
-```
-
 ### **bam_size-filter.pl**
 *[[bam-utils](#bam-utils)]*
 
