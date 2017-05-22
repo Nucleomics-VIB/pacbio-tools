@@ -9,7 +9,7 @@
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/01/23; v1.0
 #
-# 2017-01-26: create archive starting ar run folder depth (remove leading path that should be $SMRT_DATA); v1.01
+# 2017-01-26: create archive starting at run folder depth (remove leading path that should be $SMRT_DATA); v1.01
 # requires pigz for fast compression
 #
 # visit our Git: https://github.com/Nucleomics-VIB
