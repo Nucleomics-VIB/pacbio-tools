@@ -19,10 +19,10 @@ grep { -x "$_/awk"}split /:/,$ENV{PATH} || \
 	die "#awk not found in PATH and required!";
 
 #### Important note: ####################################################################
-# PacBio VCF calls have modified contig names lacking the '|arrow' (or other method) part
-# requires a fasta file with header lacking '|arrow' or similar
-# to clean these, create a new version of the assembly using sed
-# cat pb_assembly.fasta | sed -e 's/|arrow//g' > cleaned-pb_assembly.fasta
+# PacBio VCF calls have modified contig names lacking the '|arrow' (or other post-processing tag) present in the original data
+# we therefore need a fasta file with matching headers
+# to obtain such file, one can create a new version of the assembly using sed
+# cat pb_assembly.fasta | sed -e 's/|.*$//g' > cleaned-pb_assembly.fasta
 # followed by samtools faidx cleaned-pb_assembly.fasta
 #########################################################################################
 
