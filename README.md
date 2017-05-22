@@ -73,7 +73,7 @@ The bash file **[smrtlink_init.sh](/smrtlink-tools/smrtlink_init.sh)** creates a
 ### **pbvcf2vcf4.pl**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash file **[pbvcf2vcf4.pl](/smrtlink-tools/pbvcf2vcf4.pl)** creates a VCF version 4.x copy of ta SMRT vcf 3.3 file. The original format does not comply to VCF standards and the original GFF output does not help. The code requires the reference assembly file adn its faidx index to add contig lines to the output and extract sequence at INS positions. The current code does only support haploid calls.
+The bash file **[pbvcf2vcf4.pl](/smrtlink-tools/pbvcf2vcf4.pl)** creates a VCF version 4.x copy of the SMRT vcf 3.3 file. The original format does not comply to VCF standards and the original GFF output does not help. The code requires the reference assembly file and its faidx index to add contig lines to the output and extract sequence at INS positions. The current code does only support haploid calls. This code is experimental and not finished.
 
 ```bash
 # !!! this code is currently only valid for haploid calls
