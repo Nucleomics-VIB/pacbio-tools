@@ -102,3 +102,6 @@ while(<IN>){
 	# the last two fields are hard-coded in this haploid-only version
 	print OUT join("\t", $chr, $start, $ID, $ref, $alt, $qual, $filter, $info, "GT",'1')."\n";
 }
+
+close OUT;
+exit 0;

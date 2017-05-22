@@ -28,6 +28,8 @@ grep { -x "$_/awk"}split /:/,$ENV{PATH} || \
 # followed by samtools faidx cleaned-pb_assembly.fasta
 #########################################################################################
 
+my $comment="# !!! this code is under development and may contain errors";
+print $comment."\n";
 my $comment="# !!! this code is currently only valid for haploid calls";
 print $comment."\n";
 
