@@ -121,3 +121,13 @@ if [ $? -eq 0 ]; then
 else
     echo "# something went wrong, please have a check!"
 fi
+
+# checking the md5sum
+echo
+if [ $? -eq 0 ]; then
+	echo "# verifying the checksum against the archive"
+	md5sum -c ${archive_path}/${archive_file}_md5.txt && \
+	2>&1 | tee -a ${archive_path}/${archive_file}_md5-test.txt
+else
+    echo "# something went wrong, please have a check!"
+fi
