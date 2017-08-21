@@ -51,7 +51,7 @@ Open a local copy of the file using your favorite web browser to use it
 ### **rundata2tgz.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after aSequel run on the storage share. It ignores accessory files preseznt after a manual transfer.
+The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after a Sequel run on the storage share. The script creagtes a md5sum fiel and verifies that the checksum is valid. The script should be ran for each subforlder present in a run folder (eg: 1_A01, 2_B01, ...).
 ```bash
 # Usage: rundata2tgz.sh
 # script version 1.0, 2017_01_23
