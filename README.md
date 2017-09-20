@@ -51,16 +51,18 @@ Open a local copy of the file using your favorite web browser to use it
 ### **rundata2tgz.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after a Sequel run on the storage share. The script creagtes a md5sum fiel and verifies that the checksum is valid. The script should be ran for each subforlder present in a run folder (eg: 1_A01, 2_B01, ...).
+The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar-gz archive from a local folder generated after a Sequel run on the storage share. The script creates a md5sum file and verifies that the checksum is valid. This script should be ran for each subfolder present in a run folder (eg: 1_A01, 2_B01, ...).
 ```bash
 # Usage: rundata2tgz.sh
-# script version 1.0, 2017_01_23
+# script version 1.1.1, 2017_09_20
 ## input files
-# [required: -i <run-folder> (containing the flow-cell folder)]
+# [required: -i <run-folder> (name of the run folder containing the flow-cell folder)]
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
-# [-o <output folder (default to <$SMRT_DOWNLOADS>]
+# [-o <output folder (default to <$GCDADA>]
+# [-l <show the list of runs currently present on the server>]
 # [-h for this help]
 ```
+
 ### **smrtlink_init.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
