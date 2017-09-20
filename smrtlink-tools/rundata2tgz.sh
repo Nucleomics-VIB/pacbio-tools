@@ -117,7 +117,7 @@ tar --use-compress-program="pigz" \
 echo
 if [ $? -eq 0 ]; then
 	echo "# archive was created successfully, now checksumming"
-	md5sum ${archive_path}/${archive_file} > ${archive_path}/${archive_file}_md5.txt && \
+	md5sum ${archive_path}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" > ${archive_path}/${archive_file}_md5.txt && \
 	echo; echo "# checksum saved as: ${archive_path}/${archive_file}_md5.txt" && \
 	du -a -h --max-depth=1 ${archive_path}/${archive_file}* | sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
