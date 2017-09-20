@@ -15,22 +15,24 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1, 2017_01_31"
+version="1.1.1, 2017_09_20"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
 # [required: -i <run-folder> (name of the run folder containing the flow-cell folder)]
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
 # [-o <output folder (default to <$GCDADA>]
+# [-l <show the list of runs currently present on the server>]
 # [-h for this help]'
 
 $( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
-while getopts "i:f:o:h" opt; do
+while getopts "i:f:o:lh" opt; do
   case $opt in
     i) runfolder=${OPTARG} ;;
     f) flowcell=${OPTARG} ;;
     o) outpath=${OPTARG} ;;
+    l) ls $SMRT_DATA/r*; exit 0;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
