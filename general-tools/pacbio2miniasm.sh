@@ -78,6 +78,7 @@ eval ${cmd}
 
 # continue on success
 if [ $? -eq 0 ]; then
+
 # assemble from alignments
 cmd="miniasm -f ${reads} ${outdir}/overlaps.paf.gz \	
 	> ${outdir}/${outpref}.gfa"
@@ -89,13 +90,15 @@ eval ${cmd}
 else
 echo "# all to all alignment failed, please check"
 exit 1
+
 fi
 
 # continue on success
 if [ $? -eq 0 ]; then
+
 # convert to fasta
-cmd="awk '/^S/{print ">"$2"\n"$3}' ${outdir}/${outpref}.gfa \
-	| fold > ${outdir}/${outpref}.fasta"
+awk '/^S/{print ">"$2"\n"$3}' ${outdir}/${outpref}.gfa \
+	| fold > ${outdir}/${outpref}.fasta
 
 echo
 echo "# ${cmd}"
@@ -105,9 +108,9 @@ eval ${cmd}
 echo
 echo "# all done."
 else
-echo
 echo "# miniasm assembly step failed, please check"
 exit 1
+
 fi
 
 exit 0
