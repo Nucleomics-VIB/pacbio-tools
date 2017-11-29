@@ -133,7 +133,7 @@ else
     echo "# something went wrong, please have a check!"
 fi
 
-# checking the md5sum
+# checking the md5sum 
 echo
 if [ $? -eq 0 ]; then
 	echo "# verifying the checksum against the archive"

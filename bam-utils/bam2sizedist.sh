@@ -38,4 +38,3 @@ awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len
 			print hd[2],co[1],co[2],"na","na","na",length($10)
 			}
 	}' > ${inbam%%.bam}_length-dist.txt
-			
