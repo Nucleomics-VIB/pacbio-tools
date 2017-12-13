@@ -16,6 +16,9 @@
 $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
 $( hash bam2bam 2>/dev/null ) || ( echo "# pacBio bam2bam not found in PATH"; exit 1 )
 
+# number of parallel threads (x2 -b and -j)
+thr=8
+
 if [ -z "${1}" ]
 then
 	echo "# provide a sequel <name>.scraps.bam 
@@ -26,7 +29,7 @@ else
 fi
 
 # test file is a scratch.bam
-filename=$(basename ${scraps})
+filename=$(basename ${scraps%.scraps.bam})
 pre=${scraps%.scraps.bam}
 
 if [ ${filename:${#filename}-11} != ".scraps.bam" ]; then
@@ -45,7 +48,8 @@ if [ ! -f "${scraps}" ]; then
     exit 1
 fi
 
-cmd="bam2bam --zmw -o "b2b_"${pre} ${pre}.subreads.bam ${scraps}"
+cmd="bam2bam -j ${thr} -b ${thr} --zmw --noScraps \
+	-o "b2b_"${filename} ${pre}.subreads.bam ${scraps}"
 
 echo
 echo "# creating polymerase read BAM file"
@@ -60,16 +64,16 @@ fi
 
 echo
 echo "# counting polymerase reads and saving counts to ${pre}_length-dist.txt"
-samtools view "b2b_${pre}.zmws.bam" | \
-awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len"}
-	{split($1,hd,"/");
-	split(hd[3],co,"_");
-	if( $12 ~ /bc:B:S/ ){
-		split($12,bc,":"); 
-		split(bc[3],id,","); 
-		split($13,q,":"); 
-		print hd[2],co[1],co[2],id[2],id[3],q[3],length($10) 
+samtools view "b2b_${filename}.zmws.bam" | \
+	awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len"}
+		{split($1,hd,"/");
+		split(hd[3],co,"_");
+		if( $12 ~ /bc:B:S/ ){
+			split($12,bc,":"); 
+			split(bc[3],id,","); 
+			split($13,q,":"); 
+			print hd[2],co[1],co[2],id[2],id[3],q[3],length($10) 
 		} else {
 			print hd[2],co[1],co[2],"na","na","na",length($10)
-			}
-	}' > ${pre}_length-dist.txt
+		}
+	}' > "b2b_${filename}.zmws_length-dist.txt"
