@@ -18,7 +18,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[[general-tools](#general-tools)]**
 
-- **[pb_STARlong.sh](#pb_starlongsh)** - 
+- **arrow_polish_asm.sh(arrow_polish_asmsh)** - **[pb_STARlong.sh](#pb_starlongsh)** - 
 
 
 ## smrtlink-tools
