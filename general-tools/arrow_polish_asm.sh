@@ -7,7 +7,7 @@
 # SMRT tools installed (blasr, arrow, ...)
 # draft assembly fasta present
 # Sequel reads in BAM format (should be generated from RSII hd5 data first)
-# samtools cat ../reads/m*.subreads.bam > 3SC.subreads.bam
+# merging from several smrt-cells: samtools cat ../reads/m*.subreads.bam > merged.subreads.bam
 # readings in https://github.com/PacificBiosciences/PacBioFileFormats/wiki/BAM-recipes
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/12/13; v1.0
@@ -69,7 +69,7 @@ fi
 binpath=${smrtbinpath:-${SMRT_APPS}}
 
 # check if requirements are present
-$( hash ${binpath}/blasr 2>/dev/null ) || ( echo "# blasr not found in ${binpath}"; exit 1 )
+$( hash ${binpath}/pbalign 2>/dev/null ) || ( echo "# pbalign not found in ${binpath}"; exit 1 )
 $( hash ${binpath}/arrow 2>/dev/null ) || ( echo "# arrow not found in ${binpath}"; exit 1 )
 
 # files and folders
@@ -80,11 +80,9 @@ mkdir -p ${destfolder} || ( echo "# could not create destination folder"; exit 1
 # from here down, redirect all outputs to log file
 exec > >(tee -a ${destfolder}/arrow-polished-${draftname%.*}-log.txt) 2>&1
 
-# 1) map reads to the draft assembly with blasr
-cmd="${binpath}/blasr ${sequelreads} ${draftassembly} \
-	--nproc ${threads} \
-	--out ${destfolder}/blasr.bam \
-	--bam"
+# 1) map reads to the draft assembly with pbalign:blasr
+cmd="${binpath}/pbalign --algorithm blasr --nproc ${threads} \
+	${sequelreads} ${draftassembly} ${destfolder}/blasr.bam"
 
 echo "# mapping reads with: ${cmd}"
 eval ${cmd}
@@ -95,8 +93,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # 2) Use arrow for polishing the assembly using following command:
-cmd="${binpath}/arrow \
-	${destfolder}/blasr.bam \
+cmd="${binpath}/arrow ${destfolder}/blasr.bam \
 	--referenceFilename ${draftassembly} \
 	-o ${destfolder}/arrow-polished-${draftname%.*}.fasta \
 	-o ${destfolder}/arrow-polished-${draftname%.*}.gff \
