@@ -132,6 +132,20 @@ Aim: Filter a BAM file by read length
 ## general-tools
 *[[back-to-top](#top)]*  
 
+### **arrow_polish_asm.sh**
+*[[general-tools](#general-tools)]*
+
+The facilitating bash script **[arrow_polish_asm.sh](general-tools/arrow_polish_asm.sh)** maps Sequel reads to a draft assembly and used the mapped reads to correct basecall errors in teh assembly Fasta draft.
+
+```bash
+# Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel reads (bam)> 
+# [optional: -p <smrt_bin path> (suggested: /opt/pacbio/smrtlink/smrtcmds/bin)
+# [optional: -o <result folder>]
+# [optional: -t <available threads|1>]
+# [optional: -h <this help text>]
+# script version 1.0, 2017_12_13
+```
+
 ### **pb_STARlong.sh**
 *[[general-tools](#general-tools)]*
 
