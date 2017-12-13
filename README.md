@@ -135,7 +135,7 @@ Aim: Filter a BAM file by read length
 ### **arrow_polish_asm.sh**
 *[[general-tools](#general-tools)]*
 
-The facilitating bash script **[arrow_polish_asm.sh](general-tools/arrow_polish_asm.sh)** maps Sequel reads to a draft assembly and used the mapped reads to correct basecall errors in teh assembly Fasta draft.
+The facilitating bash script **[arrow_polish_asm.sh](general-tools/arrow_polish_asm.sh)** maps Sequel reads to a draft Fasta assembly and uses the mapped reads to correct basecall errors and produce a polished version of the assembly.
 
 ```bash
 # Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel reads (bam)> 
