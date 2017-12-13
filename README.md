@@ -18,7 +18,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[[general-tools](#general-tools)]**
 
-- **[pb_STARlong.sh](#pb_starlongsh)** - 
+- **[arrow_polish_asm.sh](#arrow_polish_asmsh)** - **[pb_STARlong.sh](#pb_starlongsh)** - 
 
 
 ## smrtlink-tools
@@ -131,6 +131,20 @@ Aim: Filter a BAM file by read length
 
 ## general-tools
 *[[back-to-top](#top)]*  
+
+### **arrow_polish_asm.sh**
+*[[general-tools](#general-tools)]*
+
+The facilitating bash script **[arrow_polish_asm.sh](general-tools/arrow_polish_asm.sh)** maps Sequel reads to a draft Fasta assembly and uses the mapped reads to correct basecall errors and produce a polished version of the assembly.
+
+```bash
+# Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel reads (bam)> 
+# [optional: -p <smrt_bin path> (suggested: /opt/pacbio/smrtlink/smrtcmds/bin)
+# [optional: -o <result folder>]
+# [optional: -t <available threads|1>]
+# [optional: -h <this help text>]
+# script version 1.0, 2017_12_13
+```
 
 ### **pb_STARlong.sh**
 *[[general-tools](#general-tools)]*
