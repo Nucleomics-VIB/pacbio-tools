@@ -9,6 +9,7 @@
 # Sequel reads in BAM format (should be generated from RSII hd5 data first)
 # merging from several smrt-cells: samtools cat ../reads/m*.subreads.bam > merged.subreads.bam
 # readings in https://github.com/PacificBiosciences/PacBioFileFormats/wiki/BAM-recipes
+# more: https://github.com/PacificBiosciences/GenomicConsensus/blob/master/doc/FAQ.rst
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/12/13; v1.0
 #
