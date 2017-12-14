@@ -5,11 +5,11 @@
 # Requirements:
 # run on a unix computer installed with SMRTLink and Picard
 # SMRT tools installed (blasr, arrow, ...)
-# bamtools for bam merging when necessary or use a fofiles as input for blasr
 # Picard tools for sorting and indexing the mappings
 # draft assembly fasta present
 # Sequel reads in BAM format (should be generated from RSII hd5 data first)
 # merging from several smrt-cells: samtools cat ../reads/m*.subreads.bam > merged.subreads.bam
+# alt: bamtools for bam merging when necessary or use a fofiles as input for blasr
 # readings in https://github.com/PacificBiosciences/PacBioFileFormats/wiki/BAM-recipes
 # more: https://github.com/PacificBiosciences/GenomicConsensus/blob/master/doc/FAQ.rst
 #
@@ -82,7 +82,8 @@ currpath=$(pwd)
 # check if requirements are present
 $( hash ${binpath}/blasr 2>/dev/null ) || ( echo "# blasr not found in ${binpath}"; exit 1 )
 $( hash ${binpath}/arrow 2>/dev/null ) || ( echo "# arrow not found in ${binpath}"; exit 1 )
-$( hash java -jar ${picard}/picard.jar 2>/dev/null ) || ( echo "# picard.jar not found in ${picard} (or not correctly installed)"; exit 1 )
+$( hash java -jar ${picard}/picard.jar 2>/dev/null ) || \
+	( echo "# picard.jar not found in ${picard} (or not correctly installed)"; exit 1 )
 
 # files and folders
 draftname=$(basename ${draftassembly})
