@@ -82,7 +82,7 @@ currpath=$(pwd)
 # check if requirements are present
 $( hash ${binpath}/blasr 2>/dev/null ) || ( echo "# blasr not found in ${binpath}"; exit 1 )
 $( hash ${binpath}/arrow 2>/dev/null ) || ( echo "# arrow not found in ${binpath}"; exit 1 )
-$( hash java -jar ${picard}/picard.jar 2>/dev/null ) || ( echo "# picard.ar not found in ${picard} (or not correctly installed)"; exit 1 )
+$( hash java -jar ${picard}/picard.jar 2>/dev/null ) || ( echo "# picard.jar not found in ${picard} (or not correctly installed)"; exit 1 )
 
 # files and folders
 draftname=$(basename ${draftassembly})
