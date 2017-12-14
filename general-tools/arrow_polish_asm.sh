@@ -20,7 +20,7 @@
 # check parameters for your system
 version="1.0, 2017_12_13"
 
-usage='# Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel reads (bam)>
+usage='# Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel_reads (bam)>
 # [optional: -c <min coverage for analysis|5>]
 # [optional: -C <max coverage for analysis|100>]
 # [optional: -p <smrt_bin path> (found at: '$SMRT_APPS')
