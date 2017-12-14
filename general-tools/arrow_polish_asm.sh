@@ -26,7 +26,7 @@ usage='# Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel reads (bam)>
 # [optional: -p <smrt_bin path> (found at: '$SMRT_APPS')
 # [optional: -P <picard.jar path> (found at: '$PICARD')
 # [optional: -o <result folder>]
-# [optional: -t <available threads|4>]
+# [optional: -t <threads|4>]
 # [optional: -h <this help text>]
 # script version '${version}
 
@@ -95,9 +95,10 @@ exec > >(tee -a ${destfolder}/arrow-polished-${draftname%.*}-log.txt) 2>&1
 
 # 1) map reads to the draft assembly with pbalign:blasr
 
+thr=${threads:-4}
 cmd="${binpath}/blasr ${sequelreads} ${draftassembly} \
 	--bam \
-	--nproc ${threads} \
+	--nproc ${thr} \
 	--out ${destfolder}/blasr.bam"
 
 echo "# mapping reads with: ${cmd}"
@@ -114,7 +115,7 @@ cmd="java -jar $PICARD/picard.jar SortSam \
 	I=${destfolder}/blasr.bam \
 	O=${destfolder}/sorted_blasr.bam \
 	SO=coordinate \
-	MAX_RECORDS_IN_RAM=50000 \
+	MAX_RECORDS_IN_RAM=100000 \
 	TMP_DIR=${currpath} \
 	CREATE_INDEX=true \
 	VALIDATION_STRINGENCY=LENIENT"
@@ -128,7 +129,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 else
 	# delete original mappings to recover disk space
-	# rm ${destfolder}/blasr.bam
+	rm ${destfolder}/blasr.bam
 	
 	# also create pbindex (.pbi)
 	cmd="pbindex ${destfolder}/sorted_blasr.bam"
