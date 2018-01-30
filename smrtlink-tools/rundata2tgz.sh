@@ -11,11 +11,11 @@
 #
 # 2017-01-26: create archive starting at run folder depth (remove leading path that should be $SMRT_DATA); v1.01
 # requires pigz for fast compression
-#
+# 2018-01-26: edit listing the repo and add metadata.xml file;  v1.1.3
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1.2, 2017_10_09"
+version="1.1.3, 2018_01_26"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
@@ -33,9 +33,9 @@ while getopts "i:f:o:S:lh" opt; do
     i) runfolder=${OPTARG} ;;
     f) flowcell=${OPTARG} ;;
     o) outpath=${OPTARG} ;;
-    l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:"; 
-       ls ${dataroot:-"$SMRT_DATA"}/r*; 
-       exit 0 ;;
+    l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
+        tree -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
+        exit 0 ;;
     S) dataroot=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -121,6 +121,12 @@ tar --use-compress-program="pigz" \
 	${archive_path}/${archive_file} \
 	${run_folder}/${flow_cell}
 
+if [[ $strname =~ 3(.+)r ]]; then
+    strresult=${BASH_REMATCH[1]}
+else
+    echo "unable to parse string $strname"
+fi
+
 echo
 if [ $? -eq 0 ]; then
 	echo "# archive was created successfully, now checksumming"
@@ -131,6 +137,7 @@ if [ $? -eq 0 ]; then
 		sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
     echo "# something went wrong, please have a check!"
+    exit 1
 fi
 
 # checking the md5sum 
@@ -142,4 +149,21 @@ if [ $? -eq 0 ]; then
 	 cd -
 else
     echo "# something went wrong, please have a check!"
+    exit 1
+fi
+
+# also copy metadata file
+echo
+echo "# copying the run.metadata.xml file"
+
+metadata=$(find "${data_folder}/${run_folder}/${flow_cell}" -regex ".*\..*.run.metadata.xml" -print )
+mname=$(basename "${metadata}")
+cp ${metadata} ${archive_path}/${archive_file%.tgz}${mname} && touch ${archive_path}/FLAG_READY4COPY_${archive_file%.tgz}.txt
+
+echo
+if [ $? -eq 0 ]; then
+        echo "# run.metadata.xml and flag files copied successfully"
+else
+        echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
+        exit 1
 fi
