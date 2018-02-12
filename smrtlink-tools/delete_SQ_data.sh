@@ -34,7 +34,9 @@ then
   else
     echo "# folder not found in the Sequel data path:"
     ls ${datapath}
+    exit 1
   fi
 else
-  "not done, aborting!"
+  echo "# not done, aborting!"
+  exit 0
 fi

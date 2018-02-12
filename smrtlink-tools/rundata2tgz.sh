@@ -125,6 +125,7 @@ if [[ $strname =~ 3(.+)r ]]; then
     strresult=${BASH_REMATCH[1]}
 else
     echo "unable to parse string $strname"
+    exit 1
 fi
 
 echo
