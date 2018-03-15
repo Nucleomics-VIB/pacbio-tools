@@ -30,7 +30,7 @@ else
 fi
 
 # test file is a scratch.bam
-if [ ${filename:${#filename}-11} != ".scraps.bam" ]; then
+if [ "${filename:${#filename}-11}" != ".scraps.bam" ]; then
         echo "# name does not match <runID>.scraps.bam"
         exit 1
 fi
