@@ -61,7 +61,7 @@ eval ${cmd}
 # check for failure
 if [ $? -ne 0 ]; then
 	echo "# the bam2bam command failed, please check your inputs"
-	exit 0
+	exit 1
 fi
 
 echo
