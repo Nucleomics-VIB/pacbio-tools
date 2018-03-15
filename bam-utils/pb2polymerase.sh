@@ -5,6 +5,7 @@
 # produce read counts for all polymerase (zmw) reads
 #
 # Stéphane Plaisance - VIB-NC-BITS Jan-31-2017 v1.1
+# added threads as $2 and fixed error Mar-15-2018 v1.2
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -17,7 +18,7 @@ $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 
 $( hash bam2bam 2>/dev/null ) || ( echo "# pacBio bam2bam not found in PATH"; exit 1 )
 
 # number of parallel threads (x2 -b and -j)
-thr=8
+thr=${2:-8}
 
 if [ -z "${1}" ]
 then
@@ -29,13 +30,13 @@ else
 fi
 
 # test file is a scratch.bam
+if [ ${filename:${#filename}-11} != ".scraps.bam" ]; then
+        echo "# name does not match <runID>.scraps.bam"
+        exit 1
+fi
+
 filename=$(basename ${scraps%.scraps.bam})
 pre=${scraps%.scraps.bam}
-
-if [ ${filename:${#filename}-11} != ".scraps.bam" ]; then
-	echo "# name does not match <runID>.scraps.bam"
-	exit 1
-fi
 
 # check for both inputs
 if [ ! -f "${pre}.subreads.bam" ]; then
