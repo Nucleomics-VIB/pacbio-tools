@@ -22,35 +22,36 @@ thr=${2:-8}
 
 if [ -z "${1}" ]
 then
-	echo "# provide a sequel <name>.scraps.bam 
+	echo "# provide a sequel <name>.scraps.bam <threads|8>
 	NB: a <name>.subreads.bam BAM files is required at the same location)"
 	exit 1
 else
 	scraps=$1
 fi
 
-# test file is a scratch.bam
-if [ "${filename:${#filename}-11}" != ".scraps.bam" ]; then
+# play with names
+filename=${scraps%.scraps.bam}
+title=$(basename ${filename})
+
+# test file is a scraps.bam
+if [ "${scraps:${#scraps}-11}" != ".scraps.bam" ]; then
         echo "# name does not match <runID>.scraps.bam"
         exit 1
 fi
 
-filename=$(basename ${scraps%.scraps.bam})
-pre=${scraps%.scraps.bam}
-
 # check for both inputs
-if [ ! -f "${pre}.subreads.bam" ]; then
-    echo "${pre}.subreads.bam file not found!";
-    exit 1
-fi
-
 if [ ! -f "${scraps}" ]; then
     echo "${scraps} file not found!";
     exit 1
 fi
 
+if [ ! -f "${filename}.subreads.bam" ]; then
+    echo "${filename}.subreads.bam file not found!";
+    exit 1
+fi
+
 cmd="bam2bam -j ${thr} -b ${thr} --zmw --noScraps \
-	-o "b2b_"${filename} ${pre}.subreads.bam ${scraps}"
+	-o "b2b_"${title} ${filename}.subreads.bam ${scraps}"
 
 echo
 echo "# creating polymerase read BAM file"
@@ -64,8 +65,8 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo "# counting polymerase reads and saving counts to ${pre}_length-dist.txt"
-samtools view "b2b_${filename}.zmws.bam" | \
+echo "# counting polymerase reads and saving counts to ${title}_length-dist.txt"
+samtools view "b2b_${title}.zmws.bam" | \
 	awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len"}
 		{split($1,hd,"/");
 		split(hd[3],co,"_");
@@ -77,4 +78,4 @@ samtools view "b2b_${filename}.zmws.bam" | \
 		} else {
 			print hd[2],co[1],co[2],"na","na","na",length($10)
 		}
-	}' > "b2b_${filename}.zmws_length-dist.txt"
+	}' > "b2b_${title}.zmws_length-dist.txt"
