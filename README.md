@@ -14,7 +14,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[[bam-utils](#bam-utils)]**
 
-- **pb2polymerase.sh**(pb2polymerasesh) - **SEQUELstats4one.sh**(SEQUELstats4onesh) - **sequel_read_lengths.R**(sequel_read_lengthsR)  - **[bam_size-filter.pl](#bam_size-filterpl)** - **[bam2sizedist.sh](#bam2sizedistsh)** -
+- **pb2polymerase.sh**(#pb2polymerasesh) - **SEQUELstats4one.sh**(#SEQUELstats4onesh) - **sequel_read_lengths.R**(#sequel_read_lengthsR)  - **[bam_size-filter.pl](#bam_size-filterpl)** - **[bam2sizedist.sh](#bam2sizedistsh)** -
 
 **[[general-tools](#general-tools)]**
 
