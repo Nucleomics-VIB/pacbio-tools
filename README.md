@@ -85,6 +85,15 @@ usage: pbvcf2vcf4.pl <pacbio_vcf3.3.vcf> <indexed-fasta-reference>
 ## bam-utils
 *[[back-to-top](#top)]*  
 
+### **pb2polymerase.sh**
+*[[bam-utils](#bam-utils)]*
+
+The shell wrapper **[pb2polymerase.sh](bam-utils/pb2polymerase.sh)** recreates polymerase reads from scraps and subreads using Pacbio **bam2bam**. Also reports polymerase lengths to be used in R for plotting.
+
+```bash
+Usage: pb2polymerase.sh <name>.scraps.bam> <threads|8>
+```
+
 ### **SEQUELstats4one.sh**
 *[[bam-utils](#bam-utils)]*
 
