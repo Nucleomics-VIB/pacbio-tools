@@ -85,7 +85,25 @@ usage: pbvcf2vcf4.pl <pacbio_vcf3.3.vcf> <indexed-fasta-reference>
 ## bam-utils
 *[[back-to-top](#top)]*  
 
-### **bam_size-filter.pl**
+### **SEQUELstats4one.sh**
+*[[bam-utils](#bam-utils)]*
+
+The shell wrapper **[SEQUELstats4one.sh](bam-utils/SEQUELstats4one.sh)** applies code fro mthe Welcome Sanger repo to a single smartcell dataset (thereby avoiding issues where bsub is not installed; read: https://github.com/VertebrateResequencing/SEQUELstats/issues/1)
+
+```bash
+Usage: SEQUELstats4one.sh <path to the Sequel BAM data>
+```
+
+### **sequel_read_lengths.R**
+*[[bam-utils](#bam-utils)]*
+
+The R script **[sequel_read_lengths.R](bam-utils/sequel_read_lengths.R)** reports subread and scrap read length distribution from a Sequel smartcell folder. It also plots polymerase lengths when they have been pre-processed using pb2polymerase.sh
+
+```bash
+Usage: sequel_read_lengths.R <path to the Sequel run data>
+```
+
+## **bam_size-filter.pl**
 *[[bam-utils](#bam-utils)]*
 
 The perl script **[bam_size-filter.pl](bam-utils/bam_size-filter.pl)** filters BAM records exports and saves length information (and optionally BAM data) to file(s).
