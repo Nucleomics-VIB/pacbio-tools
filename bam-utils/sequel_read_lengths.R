@@ -2,7 +2,8 @@
 
 # Analysze PacBio Sequel BAM data (subreads and scraps)
 # collect sequence lengths and make plots
-# usage: sequel_read_lengths.R <path to the data>
+# usage: sequel_read_lengths.R <path to the Sequel run data>
+# also plots polymerase lengths pre-processed with pb2polymerase.sh 
 #
 # Stephane Plaisance VIB-NC March-15-2018 v1.0
 
