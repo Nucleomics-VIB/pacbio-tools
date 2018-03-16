@@ -63,13 +63,13 @@ if (!exists("subreads")){
 }
 
 # get read lengths from two bam files
-cat(paste0("# reading subreads from: ",userpath, "/" ,subreads),"\n")
+cat(paste0("# reading subreads from: ", userpath, "/" , subreads), "\n")
 sub <- as.numeric(system(paste0("/opt/biotools/samtools/bin/samtools view ", 
 	userpath, "/", subreads, " | /usr/bin/awk '{print length($10)}'"), intern = TRUE))
 
 write.table(sub, file="subread_lengths.txt", row.names = FALSE, col.names = FALSE)
 
-cat(paste0("# reading scraps from: ",userpath, "/" ,scraps),"\n")
+cat(paste0("# reading scraps from: ", userpath, "/" , scraps), "\n")
 scr <- as.numeric(system(paste0("/opt/biotools/samtools/bin/samtools view ", 
 	userpath, "/", scraps, " | /usr/bin/awk '{print length($10)}'"), intern = TRUE))
 
