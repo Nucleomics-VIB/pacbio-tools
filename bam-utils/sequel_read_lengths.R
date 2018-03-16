@@ -156,7 +156,7 @@ if (exists("polymerase")){
   cat(paste0("# reading polymerase reads from: ", polymerase,"\n"))
   polycounts <- paste0(userpath, "/", polymerase)
   poly <- read_csv(polycounts, col_types = cols())
-  hist(poly$len, breaks=50000, xlim=c(0,50000), 
+  hist(poly$len, breaks=500, xlim=c(0,50000), 
        main="Polymerase read lengths",
        xlab="")
   stats4 <- floor(lenstats(poly$len))
