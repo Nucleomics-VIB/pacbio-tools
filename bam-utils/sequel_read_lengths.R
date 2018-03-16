@@ -153,7 +153,7 @@ popViewport(3)
 
 # seventh plot: polymerase reads if produced and present as *.zmws_length-dist.txt
 if (exists("polymerase")){
-  cat(paste0("# reading polymerase reads from: ", polymerase,"\n"))
+  cat(paste0("# reading polymerase reads from: ", userpath, "/", polymerase, "\n"))
   polycounts <- paste0(userpath, "/", polymerase)
   poly <- read_csv(polycounts, col_types = cols())
   hist(poly$len, breaks=500, xlim=c(0,50000), 
