@@ -2,13 +2,13 @@
 
 # Analysze PacBio Sequel BAM data (subreads and scraps)
 # collect sequence lengths and make plots
-# usage: sequel_read_lengths.R <path to the Sequel run data>
-# also plots polymerase lengths pre-processed with pb2polymerase.sh 
+# usage: sequel_read_lengths.R <path to the data>
 #
 # Stephane Plaisance VIB-NC March-15-2018 v1.0
 
 # R libraries
 suppressPackageStartupMessages(library("grid"))
+suppressPackageStartupMessages(library("gridBase"))
 suppressPackageStartupMessages(library("gridExtra"))
 suppressPackageStartupMessages(library("readr"))
 
@@ -76,7 +76,9 @@ scr <- as.numeric(system(paste0("/opt/biotools/samtools/bin/samtools view ",
 write.table(scr, file="scap_lengths.txt", row.names = FALSE, col.names = FALSE)
 
 # compute and plot
-# analyze scraps
+pdf(file="Sequel_read-lengths.pdf")
+# , width=10, height=6, onefile=TRUE
+par(mar=c(2,2,1,1))
 
 layout(
   matrix(
@@ -84,42 +86,93 @@ layout(
     nc=3, byrow = TRUE
   )
 )
-#layout.show(6)
+#layout.show(8)
 
-pdf(file="Sequel_read-lengths.pdf", width=10, height=6, onefile=TRUE)
-par(mar=c(2,2,1,1))
+mytheme <- gridExtra::ttheme_default(
+  core = list(fg_params=list(cex = 0.8)),
+  colhead = list(fg_params=list(cex = 0.8)),
+  rowhead = list(fg_params=list(cex = 0.8)))
 
-# all scraps reads
-hist(scr, breaks=500, xlim=c(0,50000), main="Scraps read lengths")
+# first plot: all scraps reads
+hist(scr, breaks=500, xlim=c(0,50000), 
+     main="Scraps read lengths",
+     xlab="lengths (bps)")
 stats <- floor(lenstats(scr))
 abline(v=stats['N50'], col='blue')
-plot.new()
-grid.table(as.data.frame(stats))
 
-# scraps subset > 1kb
+# second plot: table 
+frame()
+# Grid regions of current base plot (ie from frame)
+vps <- baseViewports()
+pushViewport(vps$inner, vps$figure, vps$plot)
+# Table grob
+grob <- tableGrob(as.data.frame(stats), theme = mytheme)  
+grid.draw(grob)
+
+popViewport(3)
+#grid.table(as.data.frame(stats))
+
+# third plot: scraps subset > 1kb
 gt500k <- scr[scr>1000]
-hist(gt500k, breaks=500, xlim=c(0,50000), main="Scraps read lengths (>1k)")
+hist(gt500k, breaks=500, xlim=c(0,50000), 
+     main="Scraps read lengths (>1k)",
+     xlab="")
 stats2 <- floor(lenstats(gt500k))
 abline(v=stats2['N50'], col='blue')
-plot.new()
-grid.table(as.data.frame(stats2))
 
-# subreads
-hist(sub, breaks=100, xlim=c(0,50000), main="Subread lengths")
+# fourth plot: table 
+frame()
+# Grid regions of current base plot (ie from frame)
+vps <- baseViewports()
+pushViewport(vps$inner, vps$figure, vps$plot)
+# Table grob
+grob <- tableGrob(as.data.frame(stats2), theme = mytheme)
+grid.draw(grob)
+
+popViewport(3)
+#grid.table(as.data.frame(stats2))
+
+# fifth plot: subreads
+hist(sub, breaks=100, xlim=c(0,50000), 
+     main="Subread lengths",
+     xlab="")
 stats3 <- floor(lenstats(sub))
 abline(v=stats3['N50'], col='blue')
-plot.new()
-grid.table(as.data.frame(stats3))
 
-# polymerase reads if produced and present as *.zmws_length-dist.txt
+# sixth plot: table
+frame()
+# Grid regions of current base plot (ie from frame)
+vps <- baseViewports()
+pushViewport(vps$inner, vps$figure, vps$plot)
+# Table grob
+grob <- tableGrob(as.data.frame(stats3), theme = mytheme)
+grid.draw(grob)
+
+popViewport(3)
+#grid.table(as.data.frame(stats3))
+
+# seventh plot: polymerase reads if produced and present as *.zmws_length-dist.txt
 if (exists("polymerase")){
   cat(paste0("# reading polymerase reads from: ", polymerase,"\n"))
-  polymerase <- read_csv(polymerase)
-  hist(polymerase$len, breaks=50000, xlim=c(0,50000), main="Polymerase read lengths")
-  stats4 <- floor(lenstats(polymerase$len))
+  polycounts <- paste0(userpath, "/", polymerase)
+  poly <- read_csv(polycounts, col_types = cols())
+  hist(poly$len, breaks=50000, xlim=c(0,50000), 
+       main="Polymerase read lengths",
+       xlab="")
+  stats4 <- floor(lenstats(poly$len))
   abline(v=stats4['N50'], col='blue')
-  plot.new()
-  grid.table(as.data.frame(stats4))
+  
+  # eighth plot: table
+  frame()
+  # Grid regions of current base plot (ie from frame)
+  vps <- baseViewports()
+  pushViewport(vps$inner, vps$figure, vps$plot)
+  # Table grob
+  grob <- tableGrob(as.data.frame(stats4), theme = mytheme)
+  grid.draw(grob)
+  
+  popViewport(3)
+#  grid.table(as.data.frame(stats4))
 }
 
 close <- dev.off()
