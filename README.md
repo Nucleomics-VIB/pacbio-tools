@@ -76,7 +76,6 @@ The bash file **[smrtlink_init.sh](/smrtlink-tools/smrtlink_init.sh)** creates a
 *[[smrtlink-tools](#smrtlink-tools)]*
 
 The bash file **[pbvcf2vcf4.pl](/smrtlink-tools/pbvcf2vcf4.pl)** creates a VCF version 4.x copy of the SMRT vcf 3.3 file. The original format does not comply to VCF standards and the original GFF output does not help. The code requires the reference assembly file and its faidx index to add contig lines to the output and extract sequence at INS positions. The current code does only support haploid calls. This code is experimental and not finished.
-
 ```bash
 # !!! this code is currently only valid for haploid calls
 usage: pbvcf2vcf4.pl <pacbio_vcf3.3.vcf> <indexed-fasta-reference>
@@ -89,7 +88,6 @@ usage: pbvcf2vcf4.pl <pacbio_vcf3.3.vcf> <indexed-fasta-reference>
 *[[bam-utils](#bam-utils)]*
 
 The shell wrapper **[pb2polymerase.sh](bam-utils/pb2polymerase.sh)** recreates polymerase reads from scraps and subreads using Pacbio **bam2bam**. Also reports polymerase lengths to be used in R for plotting.
-
 ```bash
 Usage: pb2polymerase.sh <name>.scraps.bam> <threads|8>
 ```
@@ -98,7 +96,6 @@ Usage: pb2polymerase.sh <name>.scraps.bam> <threads|8>
 *[[bam-utils](#bam-utils)]*
 
 The shell wrapper **[SEQUELstats4one.sh](bam-utils/SEQUELstats4one.sh)** applies code fro mthe Welcome Sanger repo to a single smartcell dataset (thereby avoiding issues where bsub is not installed; read: https://github.com/VertebrateResequencing/SEQUELstats/issues/1)
-
 ```bash
 Usage: SEQUELstats4one.sh <path to the Sequel BAM data>
 ```
@@ -107,7 +104,6 @@ Usage: SEQUELstats4one.sh <path to the Sequel BAM data>
 *[[bam-utils](#bam-utils)]*
 
 The R script **[sequel_read_lengths.R](bam-utils/sequel_read_lengths.R)** reports subread and scrap read length distribution from a Sequel smartcell folder. It also plots polymerase lengths when they have been pre-processed using pb2polymerase.sh
-
 ```bash
 Usage: sequel_read_lengths.R <path to the Sequel run data>
 ```
@@ -163,7 +159,6 @@ Aim: Filter a BAM file by read length
 *[[general-tools](#general-tools)]*
 
 The facilitating bash script **[arrow_polish_asm.sh](general-tools/arrow_polish_asm.sh)** maps Sequel reads to a draft Fasta assembly and uses the mapped reads to correct basecall errors and produce a polished version of the assembly.
-
 ```bash
 # Usage: arrow_polish_asm.sh -a <fasta assembly> -b <sequel reads (bam)> 
 # [optional: -p <smrt_bin path> (suggested: /opt/pacbio/smrtlink/smrtcmds/bin)
@@ -177,7 +172,6 @@ The facilitating bash script **[arrow_polish_asm.sh](general-tools/arrow_polish_
 *[[general-tools](#general-tools)]*
 
 The facilitating bash script **[pb_STARlong.sh](general-tools/pb_STARlong.sh)** runs a preconfigured STARlong command with PacBio reads (Fasta). The arguments used in this script were reproduced from the dedicated Github page https://github.com/PacificBiosciences/cDNA_primer/wiki/Bioinfx-study:-Optimizing-STAR-aligner-for-Iso-Seq-data and can be amended when changes are necessary.
-
 ```bash
 # Usage: pb_STARlong.sh 
 # -q <query sequences (reads)> 
