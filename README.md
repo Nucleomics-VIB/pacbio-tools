@@ -10,7 +10,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 **[[smrtlink-tools](#smrtlink-tools)]**
 
-- **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - **[smrtlink_init.sh](#smrtlink_initsh)** - **[pbvcf2vcf4.pl](#pbvcf2vcf4pl)** -
+- **[bam_subset_smrt.sh](#bam_subset_smrtsh)** - **[explain-LocalContextFlags.html](#explain-localcontextflagshtml)** - **[rundata2tgz.sh](#rundata2tgzsh)** - **[jobdata2tgz.sh](#jobdata2tgzsh)** - **[smrtlink_init.sh](#smrtlink_initsh)** - **[pbvcf2vcf4.pl](#pbvcf2vcf4pl)** -
 
 **[[bam-utils](#bam-utils)]**
 
@@ -60,6 +60,21 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
 # [-o <output folder (default to <$GCDADA>]
 # [-l <show the list of runs currently present on the server>]
+# [-h for this help]
+```
+
+### **jobdata2tgz.sh**
+*[[smrtlink-tools](#smrtlink-tools)]*
+
+The bash file **[jobdata2tgz.sh](/smrtlink-tools/jobdata2tgz.sh)** creates a tar-gz archive from a job folder generated after a SMRTLink run on the storage share. The script creates a md5sum file and verifies that the checksum is valid (rem: .las files are excluded from the archive)
+```bash
+# Usage: jobdata2tgz.sh
+# script version 1.0, 2018_04_13
+## input files
+# [required: -i <job-folder> (name of the run folder containing the SMRTLink job)]
+# [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
+# [-S <JOB data root (default to <$SMRT_DATA/000>)]
+# [-l <show the list of jobs currently present on the server>]
 # [-h for this help]
 ```
 
