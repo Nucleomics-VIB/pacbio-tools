@@ -63,6 +63,21 @@ The bash file **[rundata2tgz.sh](/smrtlink-tools/rundata2tgz.sh)** creates a tar
 # [-h for this help]
 ```
 
+### **jobdata2tgz.sh**
+*[[smrtlink-tools](#smrtlink-tools)]*
+
+The bash file **[jobdata2tgz.sh](/smrtlink-tools/jobdata2tgz.sh)** creates a tar-gz archive from a job folder generated after a SMRTLink run on the storage share. The script creates a md5sum file and verifies that the checksum is valid (rem: .las files are excluded from the archive)
+```bash
+# Usage: jobdata2tgz.sh
+# script version 1.0, 2018_04_13
+## input files
+# [required: -i <job-folder> (name of the run folder containing the SMRTLink job)]
+# [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
+# [-S <JOB data root (default to <$SMRT_DATA/000>)]
+# [-l <show the list of jobs currently present on the server>]
+# [-h for this help]
+```
+
 ### **smrtlink_init.sh**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
