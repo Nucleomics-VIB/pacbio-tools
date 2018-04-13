@@ -1,40 +1,37 @@
 #!/bin/bash
 
-# create archive from Sequel RUN
-# script name: rundata2tgz.sh
+# create archive from Sequel JOB
+# script name: jobdata2tgz.sh
 # Requirements:
 # run this script on a unix system with mounted Sequel primary storage (SMRT_Link in our case)
 # run folders are expected in the SMRT_DATA root (define it)
 # pigz required to speed up archiving files
 #
-# Stephane Plaisance (VIB-NC+BITS) 2017/01/23; v1.0
+# Stephane Plaisance (VIB-NC+BITS) 2018/04/13; v1.0
 #
-# 2017-01-26: create archive starting at run folder depth (remove leading path that should be $SMRT_DATA); v1.01
+# adapted from rundata2tgz.sh
 # requires pigz for fast compression
-# 2018-01-26: edit listing the repo and add metadata.xml file;  v1.1.3
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1.3, 2018_01_26"
-usage='# Usage: rundata2tgz.sh
+version="1.0, 2018_04_13"
+usage='# Usage: jobdata2tgz.sh
 # script version '${version}'
 ## input files
-# [required: -i <run-folder> (name of the run folder containing the flow-cell folder)]
-# [-f <flowcell name (default <1_A01> for a single-cell run)>]
+# [required: -i <job-folder> (name of the run folder containing the SMRTLink job)]
 # [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
-# [-S <data root (default to <$SMRT_DATA>)]
-# [-l <show the list of runs currently present on the server>]
+# [-S <JOB data root (default to <$SMRT_DATA/000>)]
+# [-l <show the list of jobs currently present on the server>]
 # [-h for this help]'
 
 $( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
-while getopts "i:f:o:S:lh" opt; do
+while getopts "i:o:S:lh" opt; do
   case $opt in
-    i) runfolder=${OPTARG} ;;
-    f) flowcell=${OPTARG} ;;
+    i) jobfolder=${OPTARG} ;;
     o) outpath=${OPTARG} ;;
-    l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
-        tree -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
+    l) echo "# Data currently in ${dataroot:-"$SMRT_DATA/000"}:";
+        ls ${dataroot:-"$SMRT_DATA/000"};
         exit 0 ;;
     S) dataroot=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
@@ -87,39 +84,30 @@ fi
 #############################
 
 # check input defined
-testvariabledef "${runfolder}" "-i"
+testvariabledef "${jobfolder}" "-i"
 
 # check data folder
-data_folder=${dataroot:-"$SMRT_DATA"}
+data_folder=${dataroot:-"$SMRT_DATA/000"}
 
 # check runfolder
-run_folder=${runfolder}
-testfolderexist "${data_folder}/${run_folder}" "-i <run-folder-name (in ${data_folder})>"
-
-# set to default if not provided
-flow_cell=${flowcell:-"1_A01"}
-
-# check flow-cell folder
-flowcell_path=${run_folder}/${flow_cell}
-testfolderexist "${data_folder}/${flowcell_path}" "-i"
+job_folder=${jobfolder}
+testfolderexist "${data_folder}/${job_folder}" "-i <job-folder-name (in ${data_folder})>"
 
 # check output folder
 archive_path=${outpath:-"$GCDATA"}
 testfolderwritable "${archive_path}" "-o <output_folder>"
 
 # archive name
-archive_file=$(basename ${run_folder})-$(basename ${flowcell_path}).tgz
+archive_file="job_"$(basename ${job_folder}).tgz
 
 # create archive (dereference/follow symlinks)
-echo "# creating archive from: ${data_folder}/${run_folder}/${flow_cell}"
+echo "# creating archive from: ${data_folder}/${job_folder}"
 tar --use-compress-program="pigz" \
-	--exclude "*.h5" \
-	--exclude "*.baz" \
-	--exclude "*.log" \
+	--exclude "*.las" \
 	-C ${data_folder} \
 	-h -cvf \
 	${archive_path}/${archive_file} \
-	${run_folder}/${flow_cell}
+	${job_folder}
 
 if [[ $strname =~ 3(.+)r ]]; then
     strresult=${BASH_REMATCH[1]}
@@ -151,20 +139,4 @@ if [ $? -eq 0 ]; then
 else
     echo "# something went wrong, please have a check!"
     exit 1
-fi
-
-# also copy metadata file
-echo
-echo "# copying the run.metadata.xml file"
-
-metadata=$(find "${data_folder}/${run_folder}/${flow_cell}" -regex ".*\..*.run.metadata.xml" -print )
-mname=$(basename "${metadata}")
-cp ${metadata} ${archive_path}/${archive_file%.tgz}${mname} && touch ${archive_path}/FLAG_READY4COPY_${archive_file%.tgz}.txt
-
-echo
-if [ $? -eq 0 ]; then
-        echo "# run.metadata.xml and flag files copied successfully"
-else
-        echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
-        exit 1
 fi
