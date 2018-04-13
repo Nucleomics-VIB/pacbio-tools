@@ -109,15 +109,8 @@ tar --use-compress-program="pigz" \
 	${archive_path}/${archive_file} \
 	${job_folder}
 
-if [[ $strname =~ 3(.+)r ]]; then
-    strresult=${BASH_REMATCH[1]}
-else
-    echo "unable to parse string $strname"
-    exit 1
-fi
-
-echo
 if [ $? -eq 0 ]; then
+	echo
 	echo "# archive was created successfully, now checksumming"
 	md5sum ${archive_path}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" \
 		> ${archive_path}/${archive_file}_md5.txt && \
@@ -125,18 +118,20 @@ if [ $? -eq 0 ]; then
 		du -a -h --max-depth=1 ${archive_path}/${archive_file}* | \
 		sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
+    echo
     echo "# something went wrong, please have a check!"
     exit 1
 fi
 
 # checking the md5sum 
-echo
 if [ $? -eq 0 ]; then
+	echo
 	echo "# verifying the checksum against the archive"
 	cd ${archive_path} && md5sum -c ${archive_file}_md5.txt 2>&1 | \
 	 tee -a ${archive_file}_md5-test.txt && \
 	 cd -
 else
+    echo
     echo "# something went wrong, please have a check!"
     exit 1
 fi

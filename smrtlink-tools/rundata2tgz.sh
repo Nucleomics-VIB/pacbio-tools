@@ -121,15 +121,8 @@ tar --use-compress-program="pigz" \
 	${archive_path}/${archive_file} \
 	${run_folder}/${flow_cell}
 
-if [[ $strname =~ 3(.+)r ]]; then
-    strresult=${BASH_REMATCH[1]}
-else
-    echo "unable to parse string $strname"
-    exit 1
-fi
-
-echo
 if [ $? -eq 0 ]; then
+	echo
 	echo "# archive was created successfully, now checksumming"
 	md5sum ${archive_path}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" \
 		> ${archive_path}/${archive_file}_md5.txt && \
@@ -137,18 +130,20 @@ if [ $? -eq 0 ]; then
 		du -a -h --max-depth=1 ${archive_path}/${archive_file}* | \
 		sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
-    echo "# something went wrong, please have a check!"
+	echo
+	echo "# something went wrong, please have a check!"
     exit 1
 fi
 
 # checking the md5sum 
-echo
 if [ $? -eq 0 ]; then
+	echo
 	echo "# verifying the checksum against the archive"
 	cd ${archive_path} && md5sum -c ${archive_file}_md5.txt 2>&1 | \
 	 tee -a ${archive_file}_md5-test.txt && \
 	 cd -
 else
+	echo
     echo "# something went wrong, please have a check!"
     exit 1
 fi
@@ -161,10 +156,11 @@ metadata=$(find "${data_folder}/${run_folder}/${flow_cell}" -regex ".*\..*.run.m
 mname=$(basename "${metadata}")
 cp ${metadata} ${archive_path}/${archive_file%.tgz}${mname} && touch ${archive_path}/FLAG_READY4COPY_${archive_file%.tgz}.txt
 
-echo
 if [ $? -eq 0 ]; then
+        echo
         echo "# run.metadata.xml and flag files copied successfully"
 else
+        echo
         echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
         exit 1
 fi
