@@ -27,17 +27,17 @@ usage='# Usage: jobdata2tgz.sh
 $( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
 while getopts "i:o:S:lh" opt; do
-  case $opt in
-    i) jobfolder=${OPTARG} ;;
-    o) outpath=${OPTARG} ;;
-    l) echo "# Data currently in ${dataroot:-"$SMRT_DATA/000"}:";
-        ls ${dataroot:-"$SMRT_DATA/000"};
-        exit 0 ;;
-    S) dataroot=${OPTARG} ;;
-    h) echo "${usage}" >&2; exit 0 ;;
-    \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
-    *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
-  esac
+	case $opt in
+		i) jobfolder=${OPTARG} ;;
+		o) outpath=${OPTARG} ;;
+		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA/000"}:";
+			ls ${dataroot:-"$SMRT_DATA/000"};
+			exit 0 ;;
+		S) dataroot=${OPTARG} ;;
+		h) echo "${usage}" >&2; exit 0 ;;
+		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
+		*) echo "this command requires arguments, try -h" >&2; exit 1 ;;
+	esac
 done
 
 #########################
@@ -47,9 +47,9 @@ function testvariabledef ()
 {
 if [ -z "${1}" ]
 then
-   echo "! # argument ${2} needs a value!"
-   echo "${usage}"
-   exit 1
+	echo "! # argument ${2} needs a value!"
+	echo "${usage}"
+	exit 1
 else
 	return 0
 fi
@@ -118,9 +118,9 @@ if [ $? -eq 0 ]; then
 		du -a -h --max-depth=1 ${archive_path}/${archive_file}* | \
 		sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
-    echo
-    echo "# something went wrong, please have a check!"
-    exit 1
+	echo
+	echo "# something went wrong, please have a check!"
+	exit 1
 fi
 
 # checking the md5sum 
@@ -128,10 +128,10 @@ if [ $? -eq 0 ]; then
 	echo
 	echo "# verifying the checksum against the archive"
 	cd ${archive_path} && md5sum -c ${archive_file}_md5.txt 2>&1 | \
-	 tee -a ${archive_file}_md5-test.txt && \
-	 cd -
+	tee -a ${archive_file}_md5-test.txt && \
+	cd -
 else
-    echo
-    echo "# something went wrong, please have a check!"
-    exit 1
+	echo
+	echo "# something went wrong, please have a check!"
+	exit 1
 fi

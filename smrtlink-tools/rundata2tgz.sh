@@ -29,18 +29,18 @@ usage='# Usage: rundata2tgz.sh
 $( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
 while getopts "i:f:o:S:lh" opt; do
-  case $opt in
-    i) runfolder=${OPTARG} ;;
-    f) flowcell=${OPTARG} ;;
-    o) outpath=${OPTARG} ;;
-    l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
-        tree -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
-        exit 0 ;;
-    S) dataroot=${OPTARG} ;;
-    h) echo "${usage}" >&2; exit 0 ;;
-    \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
-    *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
-  esac
+	case $opt in
+		i) runfolder=${OPTARG} ;;
+		f) flowcell=${OPTARG} ;;
+		o) outpath=${OPTARG} ;;
+		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
+			tree -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
+			exit 0 ;;
+		S) dataroot=${OPTARG} ;;
+		h) echo "${usage}" >&2; exit 0 ;;
+		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
+		*) echo "this command requires arguments, try -h" >&2; exit 1 ;;
+	esac
 done
 
 #########################
@@ -132,7 +132,7 @@ if [ $? -eq 0 ]; then
 else
 	echo
 	echo "# something went wrong, please have a check!"
-    exit 1
+	exit 1
 fi
 
 # checking the md5sum 
@@ -144,8 +144,8 @@ if [ $? -eq 0 ]; then
 	 cd -
 else
 	echo
-    echo "# something went wrong, please have a check!"
-    exit 1
+	echo "# something went wrong, please have a check!"
+	exit 1
 fi
 
 # also copy metadata file
@@ -157,10 +157,10 @@ mname=$(basename "${metadata}")
 cp ${metadata} ${archive_path}/${archive_file%.tgz}${mname} && touch ${archive_path}/FLAG_READY4COPY_${archive_file%.tgz}.txt
 
 if [ $? -eq 0 ]; then
-        echo
-        echo "# run.metadata.xml and flag files copied successfully"
+	echo
+	echo "# run.metadata.xml and flag files copied successfully"
 else
-        echo
-        echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
-        exit 1
+	echo
+	echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
+	exit 1
 fi
