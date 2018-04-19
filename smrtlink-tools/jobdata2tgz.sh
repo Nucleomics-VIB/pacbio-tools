@@ -5,7 +5,8 @@
 # Requirements:
 # run this script on a unix system with mounted Sequel primary storage (SMRT_Link in our case)
 # run folders are expected in the SMRT_DATA root (define it)
-# pigz required to speed up archiving files
+# optional: pigz required to speed up archiving files
+# standard with gzip and one thread
 #
 # Stephane Plaisance (VIB-NC+BITS) 2018/04/13; v1.0
 #
@@ -14,22 +15,22 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.0, 2018_04_13"
+version="1.1, 2018_04_13"
 usage='# Usage: jobdata2tgz.sh
 # script version '${version}'
 ## input files
 # [required: -i <job-folder> (name of the run folder containing the SMRTLink job)]
 # [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
 # [-S <JOB data root (default to <$SMRT_DATA/000>)]
+# [-p <use pigz (default is to use gzip)>)]
 # [-l <show the list of jobs currently present on the server>]
 # [-h for this help]'
 
-$( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
-
-while getopts "i:o:S:lh" opt; do
+while getopts "i:o:S:plh" opt; do
 	case $opt in
 		i) jobfolder=${OPTARG} ;;
 		o) outpath=${OPTARG} ;;
+		p) usepigz=1 ;;
 		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA/000"}:";
 			ls ${dataroot:-"$SMRT_DATA/000"};
 			exit 0 ;;
@@ -83,6 +84,13 @@ fi
 # test inputs
 #############################
 
+# check compressor
+if [ -n "$usepigz" ]; then
+	$( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
+else
+	$( hash gzip 2>/dev/null ) || ( echo "# gzip not found in PATH"; exit 1 )
+fi
+
 # check input defined
 testvariabledef "${jobfolder}" "-i"
 
@@ -102,12 +110,19 @@ archive_file="job_"$(basename ${job_folder}).tgz
 
 # create archive (dereference/follow symlinks)
 echo "# creating archive from: ${data_folder}/${job_folder}"
-tar --use-compress-program="pigz" \
-	--exclude "*.las" \
-	-C ${data_folder} \
-	-h -cvf \
-	${archive_path}/${archive_file} \
-	${job_folder}
+
+if [ -n "$usepigz" ]; then
+	tar -C ${data_folder} \
+		-cvf \
+		- \
+		${job_folder} | \
+		pigz -p 8 > ${archive_path}/${archive_file}
+else
+	tar -C ${data_folder} \
+		-czvf \
+		${archive_path}/${archive_file} \
+		${job_folder}
+fi
 
 if [ $? -eq 0 ]; then
 	echo
