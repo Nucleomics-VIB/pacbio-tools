@@ -5,7 +5,7 @@
 # Requirements:
 # run this script on a unix system with mounted Sequel primary storage (SMRT_Link in our case)
 # run folders are expected in the SMRT_DATA root (define it)
-# optional: pigz required to speed up archiving files
+# optional: pigz required to speed up archiving files together with pv to monitor the process
 # standard with gzip and one thread
 #
 # Stephane Plaisance (VIB-NC+BITS) 2018/04/13; v1.0
@@ -87,6 +87,7 @@ fi
 # check compressor
 if [ -n "$usepigz" ]; then
 	$( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
+	$( hash pv 2>/dev/null ) || ( echo "# pv not found in PATH"; exit 1 )
 else
 	$( hash gzip 2>/dev/null ) || ( echo "# gzip not found in PATH"; exit 1 )
 fi
@@ -112,10 +113,12 @@ archive_file="job_"$(basename ${job_folder}).tgz
 echo "# creating archive from: ${data_folder}/${job_folder}"
 
 if [ -n "$usepigz" ]; then
+	# use pigz for speed and pv to monitor the process
 	tar -C ${data_folder} \
-		-cvf \
+		-cf \
 		- \
 		${job_folder} | \
+		pv -p -s $(du -sk "${data_folder}/${job_folder}" | cut -f 1)k | \
 		pigz -p 8 > ${archive_path}/${archive_file}
 else
 	tar -C ${data_folder} \
