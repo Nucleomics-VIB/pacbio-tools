@@ -86,8 +86,8 @@ fi
 
 # check compressor
 if [ -n "$usepigz" ]; then
-	$( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
-	$( hash pv 2>/dev/null ) || ( echo "# pv not found in PATH"; exit 1 )
+	$( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH, please install"; exit 1 )
+	$( hash pv 2>/dev/null ) || ( echo "# pv not found in PATH, please install"; exit 1 )
 else
 	$( hash gzip 2>/dev/null ) || ( echo "# gzip not found in PATH"; exit 1 )
 fi
