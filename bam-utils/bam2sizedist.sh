@@ -25,6 +25,12 @@ fi
 $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
 $( hash awk 2>/dev/null ) || ( echo "# awk not found in PATH"; exit 1 )
 
+# read_name: m54094_180411_025859/4260449/16464_22394
+#                 {movieName}/{holeNumber}/{qStart}_{qEnd}
+# h[1] = movieName = deviceID_yymmdd_hhmmss (m54094_180411_025859)
+# h[2] = ZMWID (4260449)
+# h[3] = qS_qE (16464_22394)
+
 samtools view ${inbam} | \
 awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len"}
 	{split($1,hd,"/");
@@ -37,4 +43,4 @@ awk 'BEGIN{FS="\t"; OFS=","; print "Mol.ID","start","end","FBC","RBC","BCQ","len
 		} else {
 			print hd[2],co[1],co[2],"na","na","na",length($10)
 			}
-	}' > ${inbam%%.bam}_length-dist.txt
+	}' > $(basename ${inbam%%.bam})_length-dist.txt

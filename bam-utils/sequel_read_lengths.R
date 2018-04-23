@@ -1,6 +1,7 @@
 #!/usr/bin/RScript
 
 # Analysze PacBio Sequel BAM data (subreads and scraps)
+# also analyse polymerase reads if produced by pb2polymerase.sh
 # collect sequence lengths and make plots
 # usage: sequel_read_lengths.R <path to the data>
 #
@@ -19,6 +20,9 @@ if (length(args)==0) {
   stop("At least one argument must be supplied (input path).\n", call.=FALSE)
 } else if (length(args)==1) {
   userpath <- args[1]
+  # remove training '/'
+  userpath <- normalizePath(userpath)
+  # gsub("/$", "", userpath)
 }
 
 # custom function
@@ -52,7 +56,7 @@ polymerase <- list.files(path=userpath, pattern = ".zmws_length-dist.txt$")
 # test if found
 if (!exists("scraps")){
   sink("stderr.txt")
-  cat("ERROR: The scaps BAM file is not found at his path\n")
+  cat("ERROR: The scraps BAM file is not found at his path\n")
   quit(save="no",status=1,runLast=FALSE)
 }
 
@@ -73,7 +77,7 @@ cat(paste0("# reading scraps from: ", userpath, "/" , scraps), "\n")
 scr <- as.numeric(system(paste0("/opt/biotools/samtools/bin/samtools view ", 
 	userpath, "/", scraps, " | /usr/bin/awk '{print length($10)}'"), intern = TRUE))
 
-write.table(scr, file="scap_lengths.txt", row.names = FALSE, col.names = FALSE)
+write.table(scr, file="scrap_lengths.txt", row.names = FALSE, col.names = FALSE)
 
 # compute and plot
 pdf(file="Sequel_read-lengths.pdf")
