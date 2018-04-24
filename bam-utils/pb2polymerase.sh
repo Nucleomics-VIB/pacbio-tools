@@ -103,5 +103,6 @@ samtools view "out_${title}.zmws.bam" | \
 # delete output if -k not set
 if [ -z "${keep}" ]
 then
-	rm "out_${title}*"
+	rm out_${title}*
+	
 fi
