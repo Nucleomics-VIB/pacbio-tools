@@ -34,7 +34,7 @@ while getopts "i:f:o:S:lh" opt; do
 		f) flowcell=${OPTARG} ;;
 		o) outpath=${OPTARG} ;;
 		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
-			tree -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
+			tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
 			exit 0 ;;
 		S) dataroot=${OPTARG} ;;
 		h) echo "${usage}" >&2; exit 0 ;;

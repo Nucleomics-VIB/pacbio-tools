@@ -50,7 +50,7 @@ then
     su -c "rm -rf ${folderpath}/* && touch ${folderpath}/deleted_${date}" ${pbuser}
   else
     echo "# folder not found in the Sequel data path:"
-    tree -I "000" -L 2 ${datapath}
+    tree -a -I "000" -L 2 ${datapath}
     exit 1
   fi
 else
