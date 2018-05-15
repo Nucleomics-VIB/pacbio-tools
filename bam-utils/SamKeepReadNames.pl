@@ -3,20 +3,24 @@
 use strict;
 use warnings;  
 
+# autoflush
+$|=1;
+
 # script: SamKeepReadNames.pl
 # parse a SAM file and a list of polymerase names (excluding coordinates)
-# save matching reads to a stdout
+# save matching reads to stdout
 # REM: can be used to extract control reads from a subread file for downstream CCS analysis
 
 my $usage = "Usage $0 <input.sam> <FOFN>\n";
 my $infile = shift;
 my $fofn = shift or die $usage;
 
+# store read names in array
 open (LIST, $fofn) || die "cannot open file ".$fofn."!";
 my @list;
 my $count;
+my $match;
 
-# store read names in array
 while (my $id = <LIST>) {
 	$count++;
 	chomp($id);
@@ -24,10 +28,10 @@ while (my $id = <LIST>) {
 	}
 close LIST;
 
-print STDERR "$count names found\n";
+print STDERR "$count read names loaded\n";
 
 # parse and filter SAM
-open BAM,"samtools view -h $infile | ";
+open (BAM, "samtools view -F 256 -h $infile | ") || die "cannot open file ".$infile." with samtools!";
 
 while(<BAM>){
 	## keep header lines (if you used -h in the samools command)
@@ -43,5 +47,7 @@ while(<BAM>){
 	#print STDOUT $poly."\n";
 	if ( grep( /^$poly$/, @list ) ) {
   		print STDOUT $_;
+  		$match++;
+  		$match =~ /100$/ && print STDERR "+";
 	}
 }
