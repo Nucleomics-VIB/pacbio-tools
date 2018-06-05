@@ -12,10 +12,12 @@
 # 2017-01-26: create archive starting at run folder depth (remove leading path that should be $SMRT_DATA); v1.01
 # requires pigz for fast compression
 # 2018-01-26: edit listing the repo and add metadata.xml file;  v1.1.3
+# 2018-06-05: also save subreads.bam next to archive;  v1.1.4
+
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1.3, 2018_01_26"
+version="1.1.4, 2018_06_05"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
@@ -23,16 +25,18 @@ usage='# Usage: rundata2tgz.sh
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
 # [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
 # [-S <data root (default to <$SMRT_DATA>)]
+# [-b <also copy subreads.bam (default=NOT)]
 # [-l <show the list of runs currently present on the server>]
 # [-h for this help]'
 
 $( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
-while getopts "i:f:o:S:lh" opt; do
+while getopts "i:f:o:S:lbh" opt; do
 	case $opt in
 		i) runfolder=${OPTARG} ;;
 		f) flowcell=${OPTARG} ;;
 		o) outpath=${OPTARG} ;;
+		b) bamcopy=1 ;;
 		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
 			tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
 			exit 0 ;;
@@ -148,6 +152,26 @@ else
 	exit 1
 fi
 
+
+# optionally copy the subread.bam file
+if [ $bamcopy == 1 ]; then
+	echo
+	echo "# copying the subreads.bam file"
+
+	subreads=$(find "${data_folder}/${run_folder}/${flow_cell}" -name "*.subreads.bam" -print )
+	bname=$(basename "${subreads}")
+	cp ${subreads} ${archive_path}/${archive_file%.tgz}_${bname}
+
+	if [ $? -eq 0 ]; then
+		echo
+		echo "# subreads.bam file saved as ${archive_path}/${archive_file%.tgz}_${bname}"
+	else
+		echo
+		echo "# something went wrong while copying subreads.bam, please have a check!"
+		exit 1
+	fi
+fi
+
 # also copy metadata file
 echo
 echo "# copying the run.metadata.xml file"
@@ -164,3 +188,4 @@ else
 	echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
 	exit 1
 fi
+
