@@ -135,7 +135,7 @@ if [ $? -eq 0 ]; then
 		sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
 else
 	echo
-	echo "# something went wrong, please have a check!"
+	echo "# something went wrong while creating archive, please have a check!"
 	exit 1
 fi
 
@@ -148,7 +148,7 @@ if [ $? -eq 0 ]; then
 	 cd -
 else
 	echo
-	echo "# something went wrong, please have a check!"
+	echo "# something went wrong while checking md5sum, please have a check!"
 	exit 1
 fi
 
