@@ -44,6 +44,7 @@ picdir=paste0(jobdir, "/html/images/pbreports.tasks.ccs_report")
 out.width <- '.49\\linewidth'
 digits=3
 options(scipen = 999)
+script.version="©SP/NC 2018-06-06, v1.0.1"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
@@ -104,6 +105,7 @@ print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floa
 \vskip 5in
 
 \footnotesize
+`r script.version`  
 printed: `r format(Sys.time(), "%a %b %d %X %Y")`
 \normalsize
 
