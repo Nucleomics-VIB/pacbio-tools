@@ -1,0 +1,277 @@
+---
+title: "VIB Nucleomics Core^[VIB - Nucleomics Core, nucleomics@vib.be] - SEQUEL HGAP4 report"
+fontsize: 10pt
+geometry: top=1cm, bottom=1cm, left=2.5cm, right=1.5cm, includeheadfoot=true
+papersize: a4paper
+bibliography: data/bibliography.bib
+output:
+  rmarkdown::pdf_document:
+    toc: false
+    number_sections: false
+    fig_caption: false
+    fig_width: 3
+    fig_height: 3
+    includes:  
+      in_header: data/preamble.tex
+---
+
+```{r setup, include=FALSE}
+library("knitr")
+# set default parameters [echo=TRUE to include code]
+opts_chunk$set(message=FALSE, 
+               warning=FALSE, 
+               eval=FALSE,
+               echo=FALSE,
+               include=TRUE,
+               fig.cap="",
+               fig_caption=FALSE,
+               fig.show="asis",
+               cache=FALSE,
+               comment = NA)
+
+#opts_chunk$set(comment="", message=FALSE,tidy.opts=list(keep.blank.line=TRUE, width.cutoff=120),options(width=100), #cache=TRUE,fig.align='center',fig.height=6, fig.width=10,fig.path='figure/beamer-',fig.show='hold',size='footnotesize', cache=TRUE)
+
+suppressPackageStartupMessages(library("jsonlite"))
+suppressPackageStartupMessages(library("readr"))
+suppressPackageStartupMessages(library("xtable"))
+suppressPackageStartupMessages(library("stringr"))
+
+# globals
+out.width <- '.49\\linewidth'
+out.width2 <- '.4\\linewidth'
+out.width3 <- '.2\\linewidth'
+digits=2
+options(scipen = 999)
+script.version="©SP/NC 2018-06-06, v1.0.0"
+
+# find job folders for a given run
+# grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
+```
+
+```{r define paths, eval=TRUE}
+base="/data/pacbio/sequel/000/"
+jobid="000042"
+jobdir=paste0(base, jobid)
+
+# job options
+task.options <- paste0(jobdir, "/workflow/options-task.json")
+
+# pbscala-job.stdout
+#PbsmrtpipeJobOptions(Some(NC_Exp2837_S5_7pM-HGAP4_30m)
+file <- paste0(jobdir, "/pbscala-job.stdout")
+title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
+
+# json reports
+reportlist <- list(
+  falcon_ns.tasks.task_report_preassembly_yield = paste0(jobdir,
+    "/tasks/falcon_ns.tasks.task_report_preassembly_yield-0/preassembly_yield.json"),
+  pbreports.tasks.coverage_report_hgap = paste0(jobdir,
+    "/tasks/pbreports.tasks.coverage_report_hgap-0/coverage_report.json"),
+  pbreports.tasks.mapping_stats_hgap = paste0(jobdir,
+    "/tasks/pbreports.tasks.mapping_stats_hgap-0/mapping_stats_hgap.json"),
+  pbreports.tasks.polished_assembly = paste0(jobdir,
+    "/tasks/pbreports.tasks.polished_assembly-0/polished_assembly_report.json")
+)
+
+# pictures
+picdirbase=paste0(jobdir, "/html/images")
+picdirs <- list(
+  polished_assembly = paste0(picdirbase, "/pbreports.tasks.polished_assembly/"), 
+  mapping_stats_hgap = paste0(picdirbase, "/pbreports.tasks.mapping_stats_hgap/"), 
+  coverage_report_hgap = paste0(picdirbase, "/pbreports.tasks.coverage_report_hgap/")
+)
+
+polished_assembly_pics <- paste0(picdirs$polished_assembly,
+  setdiff(
+  list.files(path = picdirs$polished_assembly, pattern = ".png"),
+  list.files(path = picdirs$polished_assembly, pattern = "_thumb")
+  )
+)
+
+mapping_stats_hgap_pics <- paste0(picdirs$mapping_stats_hgap,
+  setdiff(
+  list.files(path = picdirs$mapping_stats_hgap, pattern = ".png"),
+  list.files(path = picdirs$mapping_stats_hgap, pattern = "_thumb")
+  )
+)
+
+coverage_report_hgap_pics <- paste0(picdirs$coverage_report_hgap,
+  setdiff(
+  list.files(path = picdirs$coverage_report_hgap, pattern = ".png"),
+  list.files(path = picdirs$coverage_report_hgap, pattern = "_thumb")
+  )
+)
+
+coverage_report_hgap_pic_names <- gsub(".png", "",
+  setdiff(
+  list.files(path = picdirs$coverage_report_hgap, pattern = ".png"),
+  list.files(path = picdirs$coverage_report_hgap, pattern = "_thumb")
+  )
+)
+```
+# JobTitle: `r title`
+
+# Polished Assembly
+
+```{r polished_assembly, eval=TRUE}
+jason.file=reportlist$pbreports.tasks.polished_assembly
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+# reformat values
+data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
+polished_assembly <- as.data.frame(data$attributes[,c(3, 2)])
+colnames(polished_assembly) <- c("Value", "Analysis Metric")
+print(xtable(polished_assembly, align=c("r", "r", "l")), file="/tmp/polished_assembly.tex", label='', floating=FALSE, include.rownames=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{1}{\input{/tmp/polished_assembly}}}
+\end{table}
+
+## Contig Coverage vs. Confidence
+
+```{r polished_assembly_plot, eval=TRUE, fig.width=3, fig.show='hold', fig.align='left', results = 'asis'}
+cat(paste('\n![](', polished_assembly_pics[1],'){ width=75% }\n',sep="") )
+```
+
+\vskip 0.5in
+
+\footnotesize
+`r script.version`  
+printed: `r format(Sys.time(), "%a %b %d %X %Y")`
+\normalsize
+
+![logo](data/NC_logo.png) more at **<http://www.nucleomics.be>**
+
+\newpage
+
+# Realignment to Draft Assembly
+
+```{r mapping_stats_hgap, eval=TRUE}
+jason.file=reportlist$pbreports.tasks.mapping_stats_hgap
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+# reformat values
+data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
+mapping_stats_hgap <- as.data.frame(data$attributes[,c(3, 2)])
+colnames(mapping_stats_hgap) <- c("Value", "Analysis Metric")
+print(xtable(mapping_stats_hgap, align=c("r", "r", "l")), file="/tmp/mapping_stats_hgap.tex", label='', floating=FALSE, include.rownames=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{1}{\input{/tmp/mapping_stats_hgap}}}
+\end{table}
+
+## Mapped Polymerase Read Length - Realigned Subread Concordance
+
+```{r realignment_plots1,  eval=TRUE, out.width=out.width2, fig.show='hold', fig.align='center'}
+knitr::include_graphics(mapping_stats_hgap_pics[c(2,3)])
+```
+## Realigned Subread Length - Realigned Concordance vs. Read Length
+
+```{r realignment_plots2,  eval=TRUE, out.width=out.width2, fig.show='hold', fig.align='center'}
+knitr::include_graphics(mapping_stats_hgap_pics[c(4,1)])
+```
+
+\newpage
+
+# Coverage
+
+```{r coverage_report_hgap, eval=TRUE}
+jason.file=reportlist$pbreports.tasks.coverage_report_hgap
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+# reformat values
+data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
+coverage_report_hgap <- as.data.frame(data$attributes[,c(3, 2)])
+colnames(coverage_report_hgap) <- c("Value", "Analysis Metric")
+print(xtable(coverage_report_hgap, align=c("r", "r", "l")), file="/tmp/coverage_report_hgap.tex", label='', floating=FALSE, include.rownames=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{1}{\input{/tmp/coverage_report_hgap}}}
+\end{table}
+
+## Coverage plots
+
+```{r coverage_plots1, eval=TRUE, fig.width=3, fig.show='hold', fig.align='left', results = 'asis'}
+cat(paste('\n![](', coverage_report_hgap_pics[1],'){ width=50% }\n',sep="") )
+```
+
+```{r coverage_plots2, eval=TRUE, fig.show='hold', fig.align='center', results = 'asis'}
+for(i in seq(2, length(coverage_report_hgap_pics), by = 3)) {
+  cat('\n')
+    titles <- coverage_report_hgap_pic_names[seq(i,i+2)]
+    titles <- titles[!is.na(titles)]
+    cat("\ \ \ \ \ \ \ ", paste0(titles, sep="\ \ \ \ \ \ \ \ \ "))
+    cat('\n')
+    cat(paste('\n![](', coverage_report_hgap_pics[i],'){ width=33% }', sep=""))
+ if (file.exists(coverage_report_hgap_pics[i+1])) {
+    cat(paste('![](', coverage_report_hgap_pics[i+1],'){ width=33% }', sep=""))
+  }
+ if (file.exists(coverage_report_hgap_pics[i+2])) {
+  cat(paste('![](', coverage_report_hgap_pics[i+2],'){ width=33% }\n', sep=""))
+  }
+}
+```
+
+```{r myfile-1-plot, eval=FALSE, echo = F, results = 'asis'}
+for(i in seq(2, length(coverage_report_hgap_pics), by = 2)) {
+   image_file<-paste('\n![](', coverage_report_hgap_pics[i],')\n',sep="") 
+   cat('\n')
+   cat(image_file)
+   cat('\n')
+}
+```
+
+\newpage
+
+# Preassembly
+
+```{r preassembly_yield, eval=TRUE}
+jason.file=reportlist$falcon_ns.tasks.task_report_preassembly_yield
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+preassembly <- as.data.frame(data$attributes[,c(3, 2)])
+preassembly[,1] <- format(as.numeric(preassembly[,1]), big.mark="'", digits=digits)
+colnames(preassembly) <- c("Value", "Analysis Metric")
+print(xtable(preassembly, align=c("r", "r", "l")), file="/tmp/preassembly.tex", label='', floating=FALSE, include.rownames=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{1}{\input{/tmp/preassembly}}}
+\end{table}
+
+\newpage
+
+# Analysis Parameters
+
+```{r options, eval=TRUE}
+jason.file=task.options
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+parameters <- t(as.data.frame(data))
+rownames(parameters) <- sub('.*\\.', '', rownames(parameters))
+colnames(parameters) <- "Value"
+print(xtable(parameters, align=rep("r", 2)), file="/tmp/parameters.tex", label='', floating=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{0.8}{\input{/tmp/parameters}}}
+\end{table}
+

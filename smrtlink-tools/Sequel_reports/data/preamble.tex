@@ -1,0 +1,22 @@
+\usepackage{subfig}
+
+\usepackage{graphicx}
+
+\usepackage{caption}
+\DeclareCaptionFormat{empty}{}
+\captionsetup{format=empty}
+
+\usepackage{float}
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+} {
+    \endorigfigure
+}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\rhead{\includegraphics[height=24pt]{data/NC_logo.png}}
+
+\usepackage{placeins}
