@@ -37,12 +37,12 @@ suppressPackageStartupMessages(library("xtable"))
 
 # globals
 base="/data/pacbio/sequel/000/"
-jobid="000075"
+jobid="000078"
 workdir=paste0(base, jobid, "/dataset-reports")
 out.width <- '.49\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-06, v1.0.1"
+script.version="©SP/NC 2018-06-06, v1.0.2"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
@@ -139,16 +139,20 @@ knitr::include_graphics(c(pic1,pic2))
 ```{r control, eval=TRUE, out.width=out.width, fig.show='hold', fig.align='center'}
 folder <- "control"
 jason.file=paste0(workdir, "/", folder,"/",folder,".json")
-if (! file.exists(jason.file)) {
-  knitr::opts_chunk$set(error = TRUE)
+if (file.exists(jason.file)) {
+  dat <- fromJSON(jason.file, flatten=TRUE)
+  df4 <- dat$attributes[,2:3]
+  colnames(df4) <- c("Analysis Metric", "value")
+  print(xtable(df4), file="/tmp/td.tex", floating=FALSE, include.rownames=FALSE)
+  pic1=paste0(workdir, "/", folder,"/","readlength_plot.png")
+  pic2=paste0(workdir, "/", folder,"/","concordance_plot.png")
+  knitr::include_graphics(c(pic1,pic2))
+} else {
+  # no control reads found for this run
+  df4 <- data.frame('Analysis Metric'=rep("na",4), value=rep("na",4))
+  print(xtable(df4), file="/tmp/td.tex", floating=FALSE, include.rownames=FALSE)
+  knitr::include_graphics(c("data/na.png", "data/na.png"))
 }
-dat <- fromJSON(jason.file, flatten=TRUE)
-df4 <- dat$attributes[,2:3]
-colnames(df4) <- c("Analysis Metric", "value")
-print(xtable(df4), file="/tmp/td.tex", floating=FALSE, include.rownames=FALSE)
-pic1=paste0(workdir, "/", folder,"/","readlength_plot.png")
-pic2=paste0(workdir, "/", folder,"/","concordance_plot.png")
-knitr::include_graphics(c(pic1,pic2))
 ```
 
 \begin{table}[ht]

@@ -32,22 +32,46 @@ opts_chunk$set(message=FALSE,
 #opts_chunk$set(comment="", message=FALSE,tidy.opts=list(keep.blank.line=TRUE, width.cutoff=120),options(width=100), #cache=TRUE,fig.align='center',fig.height=6, fig.width=10,fig.path='figure/beamer-',fig.show='hold',size='footnotesize', cache=TRUE)
 
 suppressPackageStartupMessages(library("jsonlite"))
+suppressPackageStartupMessages(library("XML"))
 suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("xtable"))
 
 # globals
 base="/data/pacbio/sequel/000/"
-jobid="000066"
+jobid="000068"
 jobdir=paste0(base, jobid)
 workdir=paste0(jobdir, "/tasks/pbreports.tasks.ccs_report-0")
 picdir=paste0(jobdir, "/html/images/pbreports.tasks.ccs_report")
 out.width <- '.49\\linewidth'
 digits=3
 options(scipen = 999)
-script.version="©SP/NC 2018-06-06, v1.0.1"
+script.version="©SP/NC 2018-06-06, v1.0.2"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
+```
+
+```{r sample name, eval=TRUE}
+entry.points <- paste0(jobdir, "/", "entry-points/")
+subreadset.xml <- list.files(path = entry.points, pattern = ".xml")[1]
+xml.file <- paste0(jobdir, "/", "entry-points/", subreadset.xml)
+if (! file.exists(xml.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- xmlParse(xml.file)
+xml_data <- xmlToList(data)
+title <- xml_data[['.attrs']][['Name']]
+```
+
+```{r options, eval=TRUE}
+jason.file=paste0(jobdir, "/", "preset.json")
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+presets <- fromJSON(jason.file, flatten=TRUE)
+ps <- presets$taskOptions
+options <- data.frame(row.names=ps[,1], value=ps[,2])
+print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floating=FALSE)
 ```
 
 ```{r summary, eval=TRUE}
@@ -62,7 +86,10 @@ info <- info[-1,]
 info <- data.frame(row.names=info[,1], value=format(as.numeric(paste(info[,2])), big.mark="'", digits=digits))
 print(xtable(info, align=rep("r",2)), file="/tmp/info.tex", label='', floating=FALSE)
 ```
-# CCS summary: `r movie.name`
+# CCS summary: `r title` - (min `r options$value[[1]]` passes)
+
+
+dataset: `r movie.name`
 
 \begin{table}[ht]
 \centering
@@ -85,17 +112,6 @@ knitr::include_graphics(c(pics[2], pics[3]))
 \newpage
 
 ## Run Options
-
-```{r options, eval=TRUE}
-jason.file=paste0(jobdir, "/", "preset.json")
-if (! file.exists(jason.file)) {
-  knitr::opts_chunk$set(error = TRUE)
-}
-presets <- fromJSON(jason.file, flatten=TRUE)
-ps <- presets$taskOptions
-options <- data.frame(row.names=ps[,1], value=ps[,2])
-print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floating=FALSE)
-```
 
 \begin{table}[ht]
 \centering
