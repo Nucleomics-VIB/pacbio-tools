@@ -42,7 +42,7 @@ out.width2 <- '.4\\linewidth'
 out.width3 <- '.2\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-06, v1.0.1"
+script.version="©SP/NC 2018-06-06, v1.0.2"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
@@ -109,7 +109,23 @@ coverage_report_hgap_pic_names <- gsub(".png", "",
   )
 )
 ```
+
+```{r options, eval=TRUE}
+jason.file=task.options
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+parameters <- t(as.data.frame(data))
+rownames(parameters) <- sub('.*\\.', '', rownames(parameters))
+colnames(parameters) <- "Value"
+print(xtable(parameters, align=rep("r", 2)), file="/tmp/parameters.tex", label='', floating=FALSE)
+target.size <- format(as.numeric(parameters[[3]])/1000000, big.mark="'", digits=3)
+```
+
 # JobTitle: `r title`
+
+target haploid asm size: `r target.size` Mb
 
 # Polished Assembly
 
@@ -137,7 +153,7 @@ print(xtable(polished_assembly, align=c("r", "r", "l")), file="/tmp/polished_ass
 cat(paste('\n![](', polished_assembly_pics[1],'){ width=75% }\n',sep="") )
 ```
 
-\vskip 0.5in
+\vskip 0.25in
 
 \footnotesize
 `r script.version`  
@@ -257,18 +273,6 @@ print(xtable(preassembly, align=c("r", "r", "l")), file="/tmp/preassembly.tex", 
 \newpage
 
 # Analysis Parameters
-
-```{r options, eval=TRUE}
-jason.file=task.options
-if (! file.exists(jason.file)) {
-  knitr::opts_chunk$set(error = TRUE)
-}
-data <- fromJSON(jason.file, flatten=TRUE)
-parameters <- t(as.data.frame(data))
-rownames(parameters) <- sub('.*\\.', '', rownames(parameters))
-colnames(parameters) <- "Value"
-print(xtable(parameters, align=rep("r", 2)), file="/tmp/parameters.tex", label='', floating=FALSE)
-```
 
 \begin{table}[ht]
 \centering
