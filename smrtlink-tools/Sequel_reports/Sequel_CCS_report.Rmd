@@ -45,7 +45,7 @@ picdir=paste0(jobdir, "/html/images/pbreports.tasks.ccs_report")
 out.width <- '.49\\linewidth'
 digits=3
 options(scipen = 999)
-script.version="©SP/NC 2018-06-06, v1.1.0"
+script.version="©SP/NC 2018-06-06, v1.1.1"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
