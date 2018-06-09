@@ -42,7 +42,7 @@ workdir=paste0(base, jobid, "/dataset-reports")
 out.width <- '.49\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-06, v1.0.3"
+script.version="©SP/NC 2018-06-09, v1.0.3"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
