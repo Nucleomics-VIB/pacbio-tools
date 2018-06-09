@@ -71,6 +71,7 @@ if (! file.exists(jason.file)) {
 presets <- fromJSON(jason.file, flatten=TRUE)
 ps <- presets$taskOptions
 options <- data.frame(row.names=ps[,1], value=ps[,2])
+clean <- rm("/tmp/options.tex")
 print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floating=FALSE)
 ```
 
@@ -84,6 +85,7 @@ info <- as.data.frame(data$tables$columns[[1]][,c(1,3)])
 movie.name=unlist(info[1,2])
 info <- info[-1,]
 info <- data.frame(row.names=info[,1], value=format(as.numeric(paste(info[,2])), big.mark="'", digits=digits))
+clean <- rm("/tmp/info.tex")
 print(xtable(info, align=rep("r",2)), file="/tmp/info.tex", label='', floating=FALSE)
 ```
 # CCS summary: `r title` - (min `r options$value[[1]]` passes)
@@ -145,10 +147,10 @@ zmw.yield$fraction <- sprintf("%1.2f%%",
 subread.yield <- data.frame(count=sums[11:19,], row.names=df$type[11:19])
 subread.yield$fraction <- sprintf("%1.2f%%", 
                         100*subread.yield$count/sum(subread.yield$count))
-
+clean <- rm("/tmp/zy.tex")
 print(xtable(zmw.yield, align=rep("r",3)), file="/tmp/zy.tex", label='', 
       floating=FALSE, include.rownames=TRUE)
-
+clean <- rm("/tmp/sy.tex")
 print(xtable(subread.yield, align=rep("r",3)), file="/tmp/sy.tex", lanel='', 
       floating=FALSE, include.rownames=TRUE)
 

@@ -89,7 +89,8 @@ dat2 <- fromJSON(jason.file, flatten=TRUE)
 df2 <- dat2$attributes[,2:3]
 colnames(df2) <- c("Analysis Metric", "value")
 pic2=paste0(workdir, "/", folder,"/","interAdapterDist0.png")
-
+clean <- rm("/tmp/ta.tex")
+clean <- rm("/tmp/tb.tex")
 print(xtable(df1), file="/tmp/ta.tex", label='', floating=FALSE, include.rownames=FALSE)
 print(xtable(df2), file="/tmp/tb.tex", lanel='', floating=FALSE, include.rownames=FALSE)
 
@@ -123,6 +124,7 @@ dat <- fromJSON(jason.file, flatten=TRUE)
 df3 <- dat$attributes[,2:3]
 df3[,2] <- format(as.numeric(df3[,2]), big.mark="'", digits=digits)
 colnames(df3) <- c("Analysis Metric", "value")
+clean <- rm("/tmp/tc.tex")
 print(xtable(df3, align=rep("r",3)), file="/tmp/tc.tex", floating=FALSE, include.rownames=FALSE)
 pic1=paste0(workdir, "/", folder,"/","readLenDist0.png")
 pic2=paste0(workdir, "/", folder,"/","insertLenDist0.png")
@@ -143,6 +145,7 @@ if (file.exists(jason.file)) {
   dat <- fromJSON(jason.file, flatten=TRUE)
   df4 <- dat$attributes[,2:3]
   colnames(df4) <- c("Analysis Metric", "value")
+  clean <- rm("/tmp/td.tex")
   print(xtable(df4), file="/tmp/td.tex", floating=FALSE, include.rownames=FALSE)
   pic1=paste0(workdir, "/", folder,"/","readlength_plot.png")
   pic2=paste0(workdir, "/", folder,"/","concordance_plot.png")
@@ -150,6 +153,7 @@ if (file.exists(jason.file)) {
 } else {
   # no control reads found for this run
   df4 <- data.frame('Analysis Metric'=rep("na",4), value=rep("na",4))
+  clean <- rm("/tmp/td.tex")
   print(xtable(df4), file="/tmp/td.tex", floating=FALSE, include.rownames=FALSE)
   knitr::include_graphics(c("data/na.png", "data/na.png"))
 }

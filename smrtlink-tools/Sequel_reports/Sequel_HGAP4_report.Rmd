@@ -119,6 +119,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 parameters <- t(as.data.frame(data))
 rownames(parameters) <- sub('.*\\.', '', rownames(parameters))
 colnames(parameters) <- "Value"
+clean <- rm("/tmp/parameters.tex")
 print(xtable(parameters, align=rep("r", 2)), file="/tmp/parameters.tex", label='', floating=FALSE)
 target.size <- format(as.numeric(parameters[[3]])/1000000, big.mark="'", digits=3)
 ```
@@ -139,6 +140,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
 polished_assembly <- as.data.frame(data$attributes[,c(3, 2)])
 colnames(polished_assembly) <- c("Value", "Analysis Metric")
+clean <- rm("/tmp/polished_assembly.tex")
 print(xtable(polished_assembly, align=c("r", "r", "l")), file="/tmp/polished_assembly.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
@@ -176,6 +178,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
 mapping_stats_hgap <- as.data.frame(data$attributes[,c(3, 2)])
 colnames(mapping_stats_hgap) <- c("Value", "Analysis Metric")
+clean <- rm("/tmp/mapping_stats_hgap.tex")
 print(xtable(mapping_stats_hgap, align=c("r", "r", "l")), file="/tmp/mapping_stats_hgap.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
@@ -209,6 +212,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
 coverage_report_hgap <- as.data.frame(data$attributes[,c(3, 2)])
 colnames(coverage_report_hgap) <- c("Value", "Analysis Metric")
+clean <- rm("/tmp/coverage_report_hgap.tex")
 print(xtable(coverage_report_hgap, align=c("r", "r", "l")), file="/tmp/coverage_report_hgap.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
@@ -262,6 +266,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 preassembly <- as.data.frame(data$attributes[,c(3, 2)])
 preassembly[,1] <- format(as.numeric(preassembly[,1]), big.mark="'", digits=digits)
 colnames(preassembly) <- c("Value", "Analysis Metric")
+clean <- rm("/tmp/preassembly.tex")
 print(xtable(preassembly, align=c("r", "r", "l")), file="/tmp/preassembly.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
