@@ -38,14 +38,14 @@ suppressPackageStartupMessages(library("xtable"))
 
 # globals
 base="/data/pacbio/sequel/000/"
-jobid="000068"
+jobid="000067"
 jobdir=paste0(base, jobid)
 workdir=paste0(jobdir, "/tasks/pbreports.tasks.ccs_report-0")
 picdir=paste0(jobdir, "/html/images/pbreports.tasks.ccs_report")
 out.width <- '.49\\linewidth'
 digits=3
 options(scipen = 999)
-script.version="©SP/NC 2018-06-06, v1.0.2"
+script.version="©SP/NC 2018-06-06, v1.1.0"
 
 # find job folders for a given run
 # grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
@@ -118,7 +118,57 @@ knitr::include_graphics(c(pics[2], pics[3]))
 \subfloat[]{\scalebox{0.9}{\input{/tmp/options}}}
 \end{table}
 
-\vskip 5in
+```{r ccs-report, eval=TRUE, out.width=out.width, fig.show='hold', fig.align='center'}
+tasks <- paste0(jobdir, "/", "tasks/")
+report.list <- list.files(path = tasks, 
+                          pattern = "ccs_report.txt", recursive=TRUE)
+
+first <- paste0(tasks, report.list[1])
+df <- read.table(first, header=FALSE, sep=",", fill=TRUE)
+df <- df[c(2:11, 13:21),1:2]
+colnames(df) <- c("type","count1")
+
+for ( c in 2:length(report.list) )
+{
+  report <- paste0(tasks, report.list[c])
+  dat <- read.table(report, header=FALSE, sep=",", fill=TRUE)
+  counts <- as.vector(dat[c(2:11, 13:21),2])
+  df <- cbind(df, counts)
+}
+
+sums <- data.frame(count=rowSums(df[,2:ncol(df)]))
+
+# split
+zmw.yield <- data.frame(count=sums[1:10,], row.names=df$type[1:10])
+zmw.yield$fraction <- sprintf("%1.2f%%", 
+                        100*zmw.yield$count/sum(zmw.yield$count))
+subread.yield <- data.frame(count=sums[11:19,], row.names=df$type[11:19])
+subread.yield$fraction <- sprintf("%1.2f%%", 
+                        100*subread.yield$count/sum(subread.yield$count))
+
+print(xtable(zmw.yield, align=rep("r",3)), file="/tmp/zy.tex", label='', 
+      floating=FALSE, include.rownames=TRUE)
+
+print(xtable(subread.yield, align=rep("r",3)), file="/tmp/sy.tex", lanel='', 
+      floating=FALSE, include.rownames=TRUE)
+
+```
+
+ZMW filtering
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{0.9}{\input{/tmp/zy}}}
+\end{table}
+
+Subread filtering 
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{0.9}{\input{/tmp/sy}}}
+\end{table}
+
+\vskip 0.5in
 
 \footnotesize
 `r script.version`  
