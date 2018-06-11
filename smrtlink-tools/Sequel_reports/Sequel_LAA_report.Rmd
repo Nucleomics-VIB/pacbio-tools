@@ -1,0 +1,165 @@
+---
+title: "VIB Nucleomics Core^[VIB - Nucleomics Core, nucleomics@vib.be] - SEQUEL LAA report"
+fontsize: 10pt
+geometry: top=1cm, bottom=1cm, left=2.5cm, right=1.5cm, includeheadfoot=true
+papersize: a4paper
+bibliography: data/bibliography.bib
+output:
+  rmarkdown::pdf_document:
+    toc: false
+    number_sections: false
+    fig_caption: false
+    fig_width: 3
+    fig_height: 3
+    includes:  
+      in_header: data/preamble.tex
+---
+
+```{r setup, include=FALSE}
+library("knitr")
+# set default parameters [echo=TRUE to include code]
+opts_chunk$set(message=FALSE, 
+               warning=FALSE, 
+               eval=FALSE,
+               echo=FALSE,
+               include=TRUE,
+               fig.cap="",
+               fig_caption=FALSE,
+               fig.show="asis",
+               cache=FALSE,
+               comment = NA)
+
+suppressPackageStartupMessages(library("jsonlite"))
+suppressPackageStartupMessages(library("XML"))
+suppressPackageStartupMessages(library("readr"))
+suppressPackageStartupMessages(library("xtable"))
+
+# globals
+base="/data/pacbio/sequel/000/"
+jobid="000083"
+jobdir=paste0(base, jobid)
+
+workdir1=paste0(jobdir, "/tasks/pbreports.tasks.amplicon_analysis_input-0")
+picdir1=paste0(jobdir, "/html/images/pbreports.tasks.amplicon_analysis_input")
+
+workdir2=paste0(jobdir, "/tasks/pbreports.tasks.amplicon_analysis_consensus-0")
+picdir2=paste0(jobdir, "/html/images/pbreports.tasks.amplicon_analysis_consensus")
+
+workdir3=paste0(jobdir, "/tasks/pblaa.tasks.laa-1")
+
+out.width <- '.49\\linewidth'
+digits=3
+options(scipen = 999)
+script.version="©SP/NC 2018-06-11, v1.0.0"
+```
+
+```{r sample name, eval=TRUE}
+entry.points <- paste0(jobdir, "/", "entry-points/")
+subreadset.xml <- list.files(path = entry.points, pattern = ".xml")[1]
+xml.file <- paste0(jobdir, "/", "entry-points/", subreadset.xml)
+if (! file.exists(xml.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- xmlParse(xml.file)
+xml_data <- xmlToList(data)
+title <- xml_data[['.attrs']][['Name']]
+bam <- xml_data[['ExternalResources']][['ExternalResource']][['.attrs']][['ResourceId']]
+
+file <- paste0(jobdir, "/pbscala-job.stdout")
+job.title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
+```
+
+```{r options, eval=TRUE}
+jason.file=paste0(jobdir, "/", "preset.json")
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+presets <- fromJSON(jason.file, flatten=TRUE)
+ps <- presets$taskOptions
+options <- data.frame(row.names=ps[,1], value=ps[,2])
+clean <- rm("/tmp/options.tex")
+print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floating=FALSE)
+```
+
+# `r job.title`
+
+sample: `r title`
+
+dataset: `r bam`
+
+## min length: `r options$value[[1]]`
+
+## Amplicon Input Molecule Summary
+
+```{r input.summary, eval=TRUE}
+jason.file=paste0(workdir1, "/", "amplicon_input_report.json")
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+input <- as.data.frame(data$tables$columns[[1]][,c(1,3)])
+input.summary <- data.frame(unlist(t(as.data.frame(input$values))),
+                            stringsAsFactors = FALSE)
+colnames(input.summary) <- input.summary[1,]
+input.summary <- input.summary[-1,]
+input.summary <- apply(input.summary, 2, as.numeric) 
+row.names(input.summary)<- input$header[2:length(input$header)]
+
+# reformat % with one decimal
+input.summary[grepl("%", rownames(input.summary)),] <- sprintf("%1.2f%%", 100*input.summary[grepl("%", rownames(input.summary)),])
+input.summary <- as.data.frame(t(as.matrix(input.summary)))
+
+clean <- rm("/tmp/input.summary.tex")
+print(xtable(input.summary, align=rep("r",7)), file="/tmp/input.summary.tex", label='', floating=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{1}{\input{/tmp/input.summary}}}
+\end{table}
+
+## Amplicon Consensus Summary
+
+```{r consensus.summary, eval=TRUE}
+jason.file=paste0(workdir2, "/", "consensus_report.json")
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+input <- as.data.frame(data$tables$columns[[1]][,c(1,3)])
+consensus.summary <- data.frame(unlist(t(as.data.frame(input$values))),
+                            stringsAsFactors = FALSE)
+row.names(consensus.summary)<- input$header
+consensus.summary <- as.data.frame(t(as.matrix(consensus.summary)))
+consensus.summary[c(1,2,5)] <- lapply(consensus.summary[c(1,2,5)] , as.integer)
+consensus.summary[4] <- lapply(100*consensus.summary[4] , sprintf, fmt="%1.3f%%")
+
+clean <- rm("/tmp/consensus.summary.tex")
+print(xtable(consensus.summary, align=rep("r",6)), 
+      file="/tmp/consensus.summary.tex", label='', 
+      floating=FALSE, include.rownames=FALSE)
+```
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{1}{\input{/tmp/consensus.summary}}}
+\end{table}
+
+\vskip 3in
+
+\footnotesize
+`r script.version`  
+printed: `r format(Sys.time(), "%a %b %d %X %Y")`
+\normalsize
+
+![logo](data/NC_logo.png) more at **<http://www.nucleomics.be>**
+
+\newpage
+
+## Run Options
+
+\begin{table}[ht]
+\centering
+\subfloat[]{\scalebox{0.9}{\input{/tmp/options}}}
+\end{table}
+
