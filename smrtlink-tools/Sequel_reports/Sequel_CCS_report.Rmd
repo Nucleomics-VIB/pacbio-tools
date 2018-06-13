@@ -42,13 +42,10 @@ jobid="000067"
 jobdir=paste0(base, jobid)
 workdir=paste0(jobdir, "/tasks/pbreports.tasks.ccs_report-0")
 picdir=paste0(jobdir, "/html/images/pbreports.tasks.ccs_report")
-out.width <- '.49\\linewidth'
+out.width <- '.45\\linewidth'
 digits=3
 options(scipen = 999)
-script.version="©SP/NC 2018-06-09, v1.1.1"
-
-# find job folders for a given run
-# grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
+script.version="©SP/NC 2018-06-09, v1.1.2"
 ```
 
 ```{r sample name, eval=TRUE}
@@ -60,7 +57,11 @@ if (! file.exists(xml.file)) {
 }
 data <- xmlParse(xml.file)
 xml_data <- xmlToList(data)
-title <- xml_data[['.attrs']][['Name']]
+sample <- xml_data[['.attrs']][['Name']]
+bam <- xml_data[['ExternalResources']][['ExternalResource']][['.attrs']][['ResourceId']]
+# get job name
+file <- paste0(jobdir, "/pbscala-job.stdout")
+job.title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
 ```
 
 ```{r options, eval=TRUE}
@@ -88,10 +89,13 @@ info <- data.frame(row.names=info[,1], value=format(as.numeric(paste(info[,2])),
 clean <- rm("/tmp/info.tex")
 print(xtable(info, align=rep("r",2)), file="/tmp/info.tex", label='', floating=FALSE)
 ```
-# CCS summary: `r title` - (min `r options$value[[1]]` passes)
+# `r job.title`
 
+sample: `r sample`
 
-dataset: `r movie.name`
+dataset: `r bam`
+
+min_passes: `r options$value[[1]]`; min_predicted_accuracy: `r options$value[[2]]`
 
 \begin{table}[ht]
 \centering
@@ -170,7 +174,7 @@ Subread filtering
 \subfloat[]{\scalebox{0.9}{\input{/tmp/sy}}}
 \end{table}
 
-\vskip 0.5in
+\vskip 1in
 
 \footnotesize
 `r script.version`  

@@ -62,9 +62,9 @@ if (! file.exists(xml.file)) {
 }
 data <- xmlParse(xml.file)
 xml_data <- xmlToList(data)
-title <- xml_data[['.attrs']][['Name']]
+sample <- xml_data[['.attrs']][['Name']]
 bam <- xml_data[['ExternalResources']][['ExternalResource']][['.attrs']][['ResourceId']]
-
+# get job name
 file <- paste0(jobdir, "/pbscala-job.stdout")
 job.title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
 ```
@@ -83,7 +83,7 @@ print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floa
 
 # `r job.title`
 
-sample: `r title`
+sample: `r sample`
 
 dataset: `r bam`
 
