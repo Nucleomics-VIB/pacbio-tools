@@ -15,6 +15,18 @@ output:
       in_header: data/preamble.tex
 ---
 
+```{r user setup, include=FALSE}
+base="/data/pacbio/sequel/000/"
+jobid="000042"
+# provide here a custom title to add to the title
+# eg " - my alias"
+alias <- ""
+
+############################################################
+# do not edit below this line unless you know what you do!!
+############################################################
+```
+
 ```{r setup, include=FALSE}
 library("knitr")
 # set default parameters [echo=TRUE to include code]
@@ -35,32 +47,60 @@ suppressPackageStartupMessages(library("jsonlite"))
 suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("xtable"))
 suppressPackageStartupMessages(library("stringr"))
+suppressPackageStartupMessages(library("XML"))
 
 # globals
 out.width <- '.49\\linewidth'
 out.width2 <- '.4\\linewidth'
 out.width3 <- '.2\\linewidth'
+out.width4 <- '.6\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-09, v1.0.3"
-
-# find job folders for a given run
-# grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
+script.version="©SP/NC 2018-06-09, v1.1.0"
+# root folder
+jobdir=paste0(base, jobid)
 ```
 
-```{r define paths, eval=TRUE}
-base="/data/pacbio/sequel/000/"
-jobid="000042"
-jobdir=paste0(base, jobid)
-
-# job options
-task.options <- paste0(jobdir, "/workflow/options-task.json")
-
-# pbscala-job.stdout
-#PbsmrtpipeJobOptions(Some(NC_Exp2837_S5_7pM-HGAP4_30m)
+```{r sample name, eval=TRUE}
+entry.points <- paste0(jobdir, "/", "entry-points/")
+subreadset.xml <- list.files(path = entry.points, pattern = ".xml")[1]
+xml.file <- paste0(jobdir, "/", "entry-points/", subreadset.xml)
+if (! file.exists(xml.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- xmlParse(xml.file)
+xml_data <- xmlToList(data)
+sample <- xml_data[['.attrs']][['Name']]
+bam <- xml_data[['ExternalResources']][['ExternalResource']][['.attrs']][['ResourceId']]
+# get job name
 file <- paste0(jobdir, "/pbscala-job.stdout")
-title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
+job.title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
+```
 
+```{r options, eval=TRUE}
+# job options
+jason.file=paste0(jobdir, "/workflow/options-task.json")
+if (! file.exists(jason.file)) {
+  knitr::opts_chunk$set(error = TRUE)
+}
+data <- fromJSON(jason.file, flatten=TRUE)
+parameters <- t(as.data.frame(data))
+rownames(parameters) <- sub('.*\\.', '', rownames(parameters))
+colnames(parameters) <- "Value"
+clean <- file.remove("/tmp/parameters.tex")
+print(xtable(parameters, align=rep("r", 2)), file="/tmp/parameters.tex", label='', floating=FALSE)
+target.size <- format(as.numeric(parameters[[3]])/1000000, big.mark="'", digits=3)
+```
+
+# `r paste0(job.title, " ", alias)`
+
+sample: `r sample`
+
+dataset: `r bam`
+
+target haploid asm size: `r target.size` Mb
+
+```{r paths, eval=TRUE}
 # json reports
 reportlist <- list(
   falcon_ns.tasks.task_report_preassembly_yield = paste0(jobdir,
@@ -110,24 +150,6 @@ coverage_report_hgap_pic_names <- gsub(".png", "",
 )
 ```
 
-```{r options, eval=TRUE}
-jason.file=task.options
-if (! file.exists(jason.file)) {
-  knitr::opts_chunk$set(error = TRUE)
-}
-data <- fromJSON(jason.file, flatten=TRUE)
-parameters <- t(as.data.frame(data))
-rownames(parameters) <- sub('.*\\.', '', rownames(parameters))
-colnames(parameters) <- "Value"
-clean <- rm("/tmp/parameters.tex")
-print(xtable(parameters, align=rep("r", 2)), file="/tmp/parameters.tex", label='', floating=FALSE)
-target.size <- format(as.numeric(parameters[[3]])/1000000, big.mark="'", digits=3)
-```
-
-# JobTitle: `r title`
-
-target haploid asm size: `r target.size` Mb
-
 # Polished Assembly
 
 ```{r polished_assembly, eval=TRUE}
@@ -140,7 +162,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
 polished_assembly <- as.data.frame(data$attributes[,c(3, 2)])
 colnames(polished_assembly) <- c("Value", "Analysis Metric")
-clean <- rm("/tmp/polished_assembly.tex")
+clean <- file.remove("/tmp/polished_assembly.tex")
 print(xtable(polished_assembly, align=c("r", "r", "l")), file="/tmp/polished_assembly.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
@@ -149,13 +171,13 @@ print(xtable(polished_assembly, align=c("r", "r", "l")), file="/tmp/polished_ass
 \subfloat[]{\scalebox{1}{\input{/tmp/polished_assembly}}}
 \end{table}
 
-## Contig Coverage vs. Confidence
+# Contig Coverage vs. Confidence
 
-```{r polished_assembly_plot, eval=TRUE, fig.width=3, fig.show='hold', fig.align='left', results = 'asis'}
-cat(paste('\n![](', polished_assembly_pics[1],'){ width=75% }\n',sep="") )
+```{r polished_assembly_plot, eval=TRUE, out.width=out.width4, fig.show='hold', fig.align='center'}
+knitr::include_graphics(polished_assembly_pics[1])
 ```
 
-\vskip 0.25in
+\vskip 0.0in
 
 \footnotesize
 `r script.version`  
@@ -178,7 +200,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
 mapping_stats_hgap <- as.data.frame(data$attributes[,c(3, 2)])
 colnames(mapping_stats_hgap) <- c("Value", "Analysis Metric")
-clean <- rm("/tmp/mapping_stats_hgap.tex")
+clean <- file.remove("/tmp/mapping_stats_hgap.tex")
 print(xtable(mapping_stats_hgap, align=c("r", "r", "l")), file="/tmp/mapping_stats_hgap.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
@@ -212,7 +234,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 data$attributes[,3] <- format(as.numeric(data$attributes[,3]), big.mark="'", digits=digits)
 coverage_report_hgap <- as.data.frame(data$attributes[,c(3, 2)])
 colnames(coverage_report_hgap) <- c("Value", "Analysis Metric")
-clean <- rm("/tmp/coverage_report_hgap.tex")
+clean <- file.remove("/tmp/coverage_report_hgap.tex")
 print(xtable(coverage_report_hgap, align=c("r", "r", "l")), file="/tmp/coverage_report_hgap.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 
@@ -266,7 +288,7 @@ data <- fromJSON(jason.file, flatten=TRUE)
 preassembly <- as.data.frame(data$attributes[,c(3, 2)])
 preassembly[,1] <- format(as.numeric(preassembly[,1]), big.mark="'", digits=digits)
 colnames(preassembly) <- c("Value", "Analysis Metric")
-clean <- rm("/tmp/preassembly.tex")
+clean <- file.remove("/tmp/preassembly.tex")
 print(xtable(preassembly, align=c("r", "r", "l")), file="/tmp/preassembly.tex", label='', floating=FALSE, include.rownames=FALSE)
 ```
 

@@ -15,6 +15,18 @@ output:
       in_header: data/preamble.tex
 ---
 
+```{r user setup, include=FALSE}
+base="/data/pacbio/sequel/000/"
+jobid="000078"
+# provide here a custom title to add to the title
+# eg " - my alias"
+alias <- ""
+
+############################################################
+# do not edit below this line unless you know what you do!!
+############################################################
+```
+
 ```{r setup, include=FALSE}
 library("knitr")
 # set default parameters [echo=TRUE to include code]
@@ -36,16 +48,11 @@ suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("xtable"))
 
 # globals
-base="/data/pacbio/sequel/000/"
-jobid="000078"
 workdir=paste0(base, jobid, "/dataset-reports")
 out.width <- '.49\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-09, v1.0.3"
-
-# find job folders for a given run
-# grep -Rwn . -e 'r54094_20180529_134859' | grep 'datastore.json'
+script.version="©SP/NC 2018-06-09, v1.1.0"
 ```
 
 ```{r path, eval=TRUE}
@@ -59,7 +66,8 @@ samplename <- df[1,2]
 sampledate <- df[1,1]
 samplepath <- df[1,4]
 ```
-# Sequel Run: `r samplename`
+
+# Sequel Run: `r paste0(samplename, " ", alias)`
 
 * saved on: `r sampledate`
 * data path:`r samplepath`

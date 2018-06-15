@@ -15,6 +15,18 @@ output:
       in_header: data/preamble.tex
 ---
 
+```{r user setup, include=FALSE}
+base="/data/pacbio/sequel/000/"
+jobid="000083"
+# provide here a custom title to add to the title
+# eg " - my alias"
+alias <- ""
+
+############################################################
+# do not edit below this line unless you know what you do!!
+############################################################
+```
+
 ```{r setup, include=FALSE}
 library("knitr")
 # set default parameters [echo=TRUE to include code]
@@ -35,8 +47,6 @@ suppressPackageStartupMessages(library("readr"))
 suppressPackageStartupMessages(library("xtable"))
 
 # globals
-base="/data/pacbio/sequel/000/"
-jobid="000083"
 jobdir=paste0(base, jobid)
 
 workdir1=paste0(jobdir, "/tasks/pbreports.tasks.amplicon_analysis_input-0")
@@ -50,7 +60,7 @@ workdir3=paste0(jobdir, "/tasks/pblaa.tasks.laa-1")
 out.width <- '.49\\linewidth'
 digits=3
 options(scipen = 999)
-script.version="©SP/NC 2018-06-11, v1.0.0"
+script.version="©SP/NC 2018-06-11, v1.1.0"
 ```
 
 ```{r sample name, eval=TRUE}
@@ -81,7 +91,7 @@ clean <- rm("/tmp/options.tex")
 print(xtable(options, align=rep("r",2)), file="/tmp/options.tex", label='', floating=FALSE)
 ```
 
-# `r job.title`
+# `r paste0(job.title, " ", alias)`
 
 sample: `r sample`
 
