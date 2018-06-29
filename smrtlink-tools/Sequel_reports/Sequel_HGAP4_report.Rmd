@@ -17,7 +17,7 @@ output:
 
 ```{r user setup, include=FALSE}
 base="/data/pacbio/sequel/000/"
-jobid="000042"
+jobid="000130"
 # provide here a custom title to add to the title
 # eg " - my alias"
 alias <- ""
@@ -56,7 +56,7 @@ out.width3 <- '.2\\linewidth'
 out.width4 <- '.6\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-09, v1.1.0"
+script.version="©SP/NC 2018-06-09, v1.1.1"
 # root folder
 jobdir=paste0(base, jobid)
 ```
@@ -74,7 +74,7 @@ sample <- xml_data[['.attrs']][['Name']]
 bam <- xml_data[['ExternalResources']][['ExternalResource']][['.attrs']][['ResourceId']]
 # get job name
 file <- paste0(jobdir, "/pbscala-job.stdout")
-job.title <- sub('.*PbsmrtpipeJobOptions\\(Some\\(([^)]*)\\),.*','\\1', readLines(file)[2])
+job.title <- gsub('.*PbsmrtpipeJobOptions\\(Some\\((.*)\\),None,pbsmrtpipe.*','\\1', readLines(file)[2], perl=TRUE)
 ```
 
 ```{r options, eval=TRUE}
