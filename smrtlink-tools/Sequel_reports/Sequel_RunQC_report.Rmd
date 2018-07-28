@@ -11,16 +11,16 @@ output:
     fig_caption: false
     fig_width: 3
     fig_height: 3
-    includes:  
+    includes:
       in_header: data/preamble.tex
 ---
 
 ```{r user setup, include=FALSE}
 base="/data/pacbio/sequel/000/"
-jobid="000078"
-# provide here a custom title to add to the title
+jobid="000075"
+# provide here a custom title use as document title
 # eg " - my alias"
-alias <- ""
+alias <- "NC_Exp2837_S1_4pM-Cell1_a"
 
 ############################################################
 # do not edit below this line unless you know what you do!!
@@ -30,8 +30,8 @@ alias <- ""
 ```{r setup, include=FALSE}
 library("knitr")
 # set default parameters [echo=TRUE to include code]
-opts_chunk$set(message=FALSE, 
-               warning=FALSE, 
+opts_chunk$set(message=FALSE,
+               warning=FALSE,
                eval=FALSE,
                echo=FALSE,
                include=TRUE,
@@ -52,7 +52,7 @@ workdir=paste0(base, jobid, "/dataset-reports")
 out.width <- '.49\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-09, v1.1.0"
+script.version="©SP/NC 2018-06-09, v1.1.1"
 ```
 
 ```{r path, eval=TRUE}
@@ -65,9 +65,15 @@ df <- info$files
 samplename <- df[1,2]
 sampledate <- df[1,1]
 samplepath <- df[1,4]
+
+if ( alias == "" ) {
+  run.title <- samplename
+  } else {
+  run.title <- alias
+  }
 ```
 
-# Sequel Run: `r paste0(samplename, " ", alias)`
+# Sequel Run: `r run.title`
 
 * saved on: `r sampledate`
 * data path:`r samplepath`
@@ -114,7 +120,7 @@ knitr::include_graphics(c(pic1, pic2))
 \vskip 0.75in
 
 \footnotesize
-`r script.version`  
+`r script.version`
 printed: `r format(Sys.time(), "%a %b %d %X %Y")`
 \normalsize
 
@@ -171,4 +177,3 @@ if (file.exists(jason.file)) {
 \centering
 \subfloat[]{\scalebox{0.9}{\input{/tmp/td}}}
 \end{table}
-
