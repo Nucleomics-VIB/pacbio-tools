@@ -281,6 +281,8 @@ for(i in seq(2, length(coverage_report_hgap_pics), by = 2)) {
 }
 ```
 
+REM: In the sake of space, only up to 25 contig covertage plots are included.
+
 \newpage
 
 # Preassembly

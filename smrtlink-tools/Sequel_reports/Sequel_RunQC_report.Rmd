@@ -52,7 +52,7 @@ workdir=paste0(base, jobid, "/dataset-reports")
 out.width <- '.49\\linewidth'
 digits=2
 options(scipen = 999)
-script.version="©SP/NC 2018-06-09, v1.1.1"
+script.version="©SP/NC 2018-07-30, v1.1.2"
 ```
 
 ```{r path, eval=TRUE}
