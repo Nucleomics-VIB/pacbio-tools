@@ -11,16 +11,16 @@ output:
     fig_caption: false
     fig_width: 3
     fig_height: 3
-    includes:
+    includes:  
       in_header: data/preamble.tex
 ---
 
 ```{r user setup, include=FALSE}
 base="/data/pacbio/sequel/000/"
-jobid="000075"
+jobid="000149"
 # provide here a custom title use as document title
 # eg " - my alias"
-alias <- "NC_Exp2837_S1_4pM-Cell1_a"
+alias <- ""
 
 ############################################################
 # do not edit below this line unless you know what you do!!
@@ -30,8 +30,8 @@ alias <- "NC_Exp2837_S1_4pM-Cell1_a"
 ```{r setup, include=FALSE}
 library("knitr")
 # set default parameters [echo=TRUE to include code]
-opts_chunk$set(message=FALSE,
-               warning=FALSE,
+opts_chunk$set(message=FALSE, 
+               warning=FALSE, 
                eval=FALSE,
                echo=FALSE,
                include=TRUE,
@@ -120,7 +120,7 @@ knitr::include_graphics(c(pic1, pic2))
 \vskip 0.75in
 
 \footnotesize
-`r script.version`
+`r script.version`  
 printed: `r format(Sys.time(), "%a %b %d %X %Y")`
 \normalsize
 
@@ -177,3 +177,4 @@ if (file.exists(jason.file)) {
 \centering
 \subfloat[]{\scalebox{0.9}{\input{/tmp/td}}}
 \end{table}
+
