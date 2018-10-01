@@ -36,7 +36,8 @@ our ( $makebam, $makefasta ) = ( 0, 0 );
 
 my $usage = "Aim: Filter a BAM file by read length
 #  print filtered read lengths to file
-#  (also output kept reads to BAM if -b is set)
+#  (also output filtered reads to BAM if -b is set)
+#  (also output filtered reads to FASTA if -f is set)
 ## Usage: bam_size-filter.pl <-i bam-file>
 # optional <-m minsize>
 # optional <-x maxsize>
@@ -51,7 +52,7 @@ my $usage = "Aim: Filter a BAM file by read length
 my $infile = $opt_i || die $usage . "\n";
 my $minlen = $opt_m;
 my $maxlen = $opt_x;
-# at least one set
+# at least one size limit should be set
 ( defined($opt_m) || defined($opt_x) ) || die "# set min, max or both!\n".$usage."\n";
 defined($opt_b) && ( $makebam = 1 );
 defined($opt_f) && ( $makefasta = 1 );
