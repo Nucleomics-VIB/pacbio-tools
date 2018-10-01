@@ -52,7 +52,7 @@ my $usage = "Aim: Filter a BAM file by read length
 my $infile = $opt_i || die $usage . "\n";
 my $minlen = $opt_m;
 my $maxlen = $opt_x;
-# at least one size limit should be set
+# at least one set
 ( defined($opt_m) || defined($opt_x) ) || die "# set min, max or both!\n".$usage."\n";
 defined($opt_b) && ( $makebam = 1 );
 defined($opt_f) && ( $makefasta = 1 );
@@ -69,7 +69,7 @@ my $lenfile=basename($infile, ".bam").$minlabel.$maxlabel."_lengths.txt";
 open BAM,"samtools view -h $infile |";
 # create handlers for data writing
 open LENDIST, "> $lenfile";
-( $makebam == 1 ) && open OUTBAM, "> $outbname";
+( $makebam == 1 ) && open OUTBAM, " | samtools view -hSb - > $outbname";
 ( $makefasta == 1 ) && open OUTFASTA, "> $outfname";
 
 # counters
@@ -108,7 +108,7 @@ while(<BAM>){
 	$countgood++;
 	print LENDIST $readlen . "\n";
 	# optional
-	( $makebam == 1 ) && print OUTBAM $_ . "\n";
+	( $makebam == 1 ) && print OUTBAM $_;
 	( $makefasta == 1 ) && print OUTFASTA ">".$fields[0]."\n".$fields[9]."\n";
 }
 
@@ -118,5 +118,5 @@ print STDOUT "# reads shorter than min $countshort\n";
 print STDOUT "# reads longer than max $countlong\n";
 print STDOUT "# Lengths are stored in $lenfile\n";
 # optional
-( $makebam == 1 ) && print STDOUT "# BAM results are stored in $outbname\n";
-( $makefasta == 1 ) && print STDOUT "# FASTA results are stored in $outfname\n";
+( $makebam == 1 ) && print STDERR "# BAM results are stored in $outbname\n";
+( $makefasta == 1 ) && print STDERR "# FASTA results are stored in $outfname\n";
