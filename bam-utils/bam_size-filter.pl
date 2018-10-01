@@ -29,11 +29,10 @@ if (! grep { -x "$_/samtools"}split /:/,$ENV{PATH}) {
 # disable buffering to get output during long process (loop)
 $|=1; 
 
+# cmd arguments
 getopts('i:m:x:bfh');
 our ( $opt_i, $opt_m, $opt_x, $opt_b, $opt_f, $opt_h );
-our ( $makebam, $makefasta ) = ( 0, 
-
-0 );
+our ( $makebam, $makefasta ) = ( 0, 0 );
 
 my $usage = "Aim: Filter a BAM file by read length
 #  print filtered read lengths to file
@@ -58,24 +57,26 @@ defined($opt_b) && ( $makebam = 1 );
 defined($opt_f) && ( $makefasta = 1 );
 defined($opt_h) && die $usage . "\n";
 
+# variables
 my $minlabel = defined($minlen) ? "_gt".$minlen : "";
 my $maxlabel = defined($maxlen) ? "_lt".$maxlen : "";
 my $outbname=basename($infile, ".bam").$minlabel.$maxlabel.".bam";
 my $outfname=basename($infile, ".bam").$minlabel.$maxlabel.".fasta";
 my $lenfile=basename($infile, ".bam").$minlabel.$maxlabel."_lengths.txt";
 
-# create handler for data parsing
+# create handlers for data parsing
 open BAM,"samtools view -h $infile |";
-open LENDIST,"> $lenfile";
-# additional outputs
+# create handlers for data writing
+open LENDIST, "> $lenfile";
 ( $makebam == 1 ) && open OUTBAM, "> $outbname";
 ( $makefasta == 1 ) && open OUTFASTA, "> $outfname";
 
+# counters
 my $countgood=0;
-my $countbad=0;
 my $countshort=0;
 my $countlong=0;
 
+# parse data and process
 while(<BAM>){
 	# header
 	if (/^(\@)/) {
@@ -103,17 +104,18 @@ while(<BAM>){
 		}
 
 	# otherwise in range by default
+	$countgood++;
+	print LENDIST $readlen . "\n";
+	# optional
 	( $makebam == 1 ) && print OUTBAM $_ . "\n";
 	( $makefasta == 1 ) && print OUTFASTA ">".$fields[0]."\n".$fields[9]."\n";
-	print LENDIST $readlen . "\n";
-	$countgood++;
 }
 
+# report counts
 print STDOUT "# kept $countgood reads\n";
-print STDOUT "# filtered out $countbad reads\n";
 print STDOUT "# reads shorter than min $countshort\n";
 print STDOUT "# reads longer than max $countlong\n";
-
+print STDOUT "# Lengths are stored in $lenfile\n";
+# optional
 ( $makebam == 1 ) && print STDOUT "# BAM results are stored in $outbname\n";
 ( $makefasta == 1 ) && print STDOUT "# FASTA results are stored in $outfname\n";
-print STDOUT "# Lengths are stored in $lenfile\n";
