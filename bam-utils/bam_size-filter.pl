@@ -6,16 +6,21 @@ use Getopt::Std;
 
 # bam_size-filter.pl
 # filter BAM read data for min and/or max read-length
-# save filtered reads to new BAM file (optional)
+# save filtered records to new BAM file (optional)
+# save filtered records to new FASTA file (optional)
 # output filtered lengths to a text file for stats
 #
 # Stéphane Plaisance - VIB-NC-BITS Jan-31-2017 v1.1
+# v1.2 adding FASTA output option
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # required:
 # Samtools locally installed
-print "samtools installed" if grep { -x "$_/samtools"}split /:/,$ENV{PATH};
+if (! grep { -x "$_/samtools"}split /:/,$ENV{PATH}) {
+	print "samtools is not installed or not in PATH";
+	exit 1;
+	}
 
 ############################
 # handle command parameters
@@ -24,8 +29,11 @@ print "samtools installed" if grep { -x "$_/samtools"}split /:/,$ENV{PATH};
 # disable buffering to get output during long process (loop)
 $|=1; 
 
-getopts('i:m:x:bh');
-our ( $opt_i, $opt_m, $opt_x, $opt_b, $opt_h );
+getopts('i:m:x:bfh');
+our ( $opt_i, $opt_m, $opt_x, $opt_b, $opt_f, $opt_h );
+our ( $makebam, $makefasta ) = ( 0, 
+
+0 );
 
 my $usage = "Aim: Filter a BAM file by read length
 #  print filtered read lengths to file
@@ -34,6 +42,7 @@ my $usage = "Aim: Filter a BAM file by read length
 # optional <-m minsize>
 # optional <-x maxsize>
 # optional <-b to also create a BAM output (default only text file of lengths)>
+# optional <-f to also create a FASTA output (default only text file of lengths)>
 # <-h to display this help>";
 
 ####################
@@ -45,19 +54,22 @@ my $minlen = $opt_m;
 my $maxlen = $opt_x;
 # at least one set
 ( defined($opt_m) || defined($opt_x) ) || die "# set min, max or both!\n".$usage."\n";
-my $makebam;
 defined($opt_b) && ( $makebam = 1 );
+defined($opt_f) && ( $makefasta = 1 );
 defined($opt_h) && die $usage . "\n";
 
 my $minlabel = defined($minlen) ? "_gt".$minlen : "";
 my $maxlabel = defined($maxlen) ? "_lt".$maxlen : "";
-my $outname=basename($infile, ".bam").$minlabel.$maxlabel.".bam";
+my $outbname=basename($infile, ".bam").$minlabel.$maxlabel.".bam";
+my $outfname=basename($infile, ".bam").$minlabel.$maxlabel.".fasta";
 my $lenfile=basename($infile, ".bam").$minlabel.$maxlabel."_lengths.txt";
 
 # create handler for data parsing
 open BAM,"samtools view -h $infile |";
-( $makebam == 1 ) && open OUTBAM,"| samtools view -bS -h - > $outname";
 open LENDIST,"> $lenfile";
+# additional outputs
+( $makebam == 1 ) && open OUTBAM, "| samtools view -bS -h - > $outbname";
+( $makefasta == 1 ) && open OUTFASTA, "> $outfname";
 
 my $countgood=0;
 my $countbad=0;
@@ -67,7 +79,7 @@ my $countlong=0;
 while(<BAM>){
 	# header
 	if (/^(\@)/) {
-		defined($makebam) && print OUTBAM $_;
+		( $makebam == 1 ) && print OUTBAM $_;
 		next;
 		}
 	
@@ -90,8 +102,9 @@ while(<BAM>){
 			}
 		}
 
-	# in range by default
+	# otherwise in range by default
 	( $makebam == 1 ) && print OUTBAM $_ . "\n";
+	( $makefasta == 1 ) && print OUTFASTA ">".$fields[0]."\n".$fields[9]."\n";
 	print LENDIST $readlen . "\n";
 	$countgood++;
 }
@@ -101,8 +114,6 @@ print STDOUT "# filtered out $countbad reads\n";
 print STDOUT "# reads shorter than min $countshort\n";
 print STDOUT "# reads longer than max $countlong\n";
 
-if ( $makebam == 1 ) {
-	print STDOUT "# results are stored in $outname and $lenfile\n";
-	} else {
-	print STDOUT "# results are stored in $lenfile\n";
-}
+( $makebam == 1 ) && print STDOUT "# results are stored in $outbname\n";
+( $makefasta == 1 ) && print STDOUT "# results are stored in $outfname\n";
+print STDOUT "# results are stored in $lenfile\n";
