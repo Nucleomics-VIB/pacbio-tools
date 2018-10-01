@@ -68,7 +68,7 @@ my $lenfile=basename($infile, ".bam").$minlabel.$maxlabel."_lengths.txt";
 open BAM,"samtools view -h $infile |";
 open LENDIST,"> $lenfile";
 # additional outputs
-( $makebam == 1 ) && open OUTBAM, "| samtools view -bS -h - > $outbname";
+( $makebam == 1 ) && open OUTBAM, "> $outbname";
 ( $makefasta == 1 ) && open OUTFASTA, "> $outfname";
 
 my $countgood=0;
