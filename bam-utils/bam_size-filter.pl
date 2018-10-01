@@ -114,6 +114,6 @@ print STDOUT "# filtered out $countbad reads\n";
 print STDOUT "# reads shorter than min $countshort\n";
 print STDOUT "# reads longer than max $countlong\n";
 
-( $makebam == 1 ) && print STDOUT "# results are stored in $outbname\n";
-( $makefasta == 1 ) && print STDOUT "# results are stored in $outfname\n";
-print STDOUT "# results are stored in $lenfile\n";
+( $makebam == 1 ) && print STDOUT "# BAM results are stored in $outbname\n";
+( $makefasta == 1 ) && print STDOUT "# FASTA results are stored in $outfname\n";
+print STDOUT "# Lengths are stored in $lenfile\n";
