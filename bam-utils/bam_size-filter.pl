@@ -114,8 +114,8 @@ while(<BAM>){
 
 # report counts
 print STDOUT "# kept $countgood reads\n";
-print STDOUT "# reads shorter than min $countshort\n";
-print STDOUT "# reads longer than max $countlong\n";
+print STDOUT "# ignored $countshort reads shorter than $minlen \n";
+print STDOUT "# ignored $countlong reads longer than $maxlen \n";
 print STDOUT "# Lengths are stored in $lenfile\n";
 # optional
 ( $makebam == 1 ) && print STDERR "# BAM results are stored in $outbname\n";
