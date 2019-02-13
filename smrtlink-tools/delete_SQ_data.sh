@@ -6,7 +6,7 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1, 2018_05_09"
+version="1.1.1, 2019_02_13"
 usage='# Usage: delete_SQ_data.sh
 # script version '${version}'
 ## input files
@@ -21,7 +21,7 @@ pbuser="smrtanalysis"
 while getopts "f:r:lh" opt; do
 	case $opt in
 		f) foldername=${OPTARG} ;;
-		r) datapath=${OPTARG} ;;
+		r) datapath=${OPTARG:-"$SMRT_DATA"} ;;
 		l) echo "# Data currently in ${datapath:-"$SMRT_DATA"}:";
 			tree -I "000" -L 3 ${datapath:-"$SMRT_DATA"}; 
 			exit 0 ;;
