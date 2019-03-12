@@ -37,11 +37,11 @@ lenstats <- function(x, na.rm = TRUE){
   S50 <- sum(x)/2
   csum <- cumsum(sorted)
   GTL50 <- as.vector(csum >= S50)
-  L50=min(which(GTL50 == TRUE))
+  L50 <- min(which(GTL50 == TRUE))
   N50 <- round(sorted[L50], 1)
   
   # add more items
-  result=c(count=length(x),mean=mean(x),median=median(x), N50=N50, L50=L50)
+  result=c(count=length(x), mean=mean(x), median=median(x), N50=N50, L50=L50)
   # return list
   result
 }
@@ -52,6 +52,11 @@ subreads <- list.files(path=userpath, pattern = "subreads.bam$")
 
 # optionally, process polymerase reads rebuilt using pb2polymerase.sh
 polymerase <- list.files(path=userpath, pattern = ".zmws_length-dist.txt$")
+# test if found
+if(length(polymerase) == 0) {
+    # nothing found
+    polymerase=as.list("empty")
+}
   
 # test if found
 if (!exists("scraps")){
@@ -159,11 +164,12 @@ popViewport(3)
 if ( grepl(".zmws_length-dist.txt$", polymerase) ){
   cat(paste0("# reading polymerase reads from: ", userpath, "/", polymerase, "\n"))
   polycounts <- paste0(userpath, "/", polymerase)
-  poly <- read_csv(polycounts, col_types = cols())
+  poly.raw <- read_csv(polycounts, col_types = cols())
+  poly <- poly.raw[poly.raw$len>500,]
   hist(poly$len, breaks=500, xlim=c(0,50000), 
        main="Polymerase read lengths",
        xlab="")
-  stats4 <- floor(lenstats(poly$len))
+  stats4 <- floor(lenstats(poly.raw$len))
   abline(v=stats4['N50'], col='blue')
   
   # eighth plot: table

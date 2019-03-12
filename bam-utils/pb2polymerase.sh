@@ -21,7 +21,7 @@ version="1.0, 2018_04_23"
 usage='# Usage: pb2polymerase.sh
 # script version '${version}'
 ## input files
-# [required: -s <name>.subreads.bam BAM file]
+# [required: -s <name>.scraps.bam BAM file]
 # [-t <threads for computation (default:8)>]
 # [-k <keep the bam2bam output (large file >20GB!)>]
 # [-h for this help]'
@@ -104,5 +104,4 @@ samtools view "out_${title}.zmws.bam" | \
 if [ -z "${keep}" ]
 then
 	rm out_${title}*
-	
 fi
