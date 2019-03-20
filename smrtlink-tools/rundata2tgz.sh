@@ -23,7 +23,7 @@ usage='# Usage: rundata2tgz.sh
 ## input files
 # [required: -i <run-folder> (name of the run folder containing the flow-cell folder)]
 # [-f <flowcell name (default <1_A01> for a single-cell run)>]
-# [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
+# [-o <output folder ($NCDATA|$GCDATA|$NCLVS/Runs/PacBio/2019-03; default to <$NCDADA>)]
 # [-S <data root (default to <$SMRT_DATA>)]
 # [-b <also copy subreads.bam (default=NOT)]
 # [-l <show the list of runs currently present on the server>]
@@ -108,7 +108,7 @@ flowcell_path=${run_folder}/${flow_cell}
 testfolderexist "${data_folder}/${flowcell_path}" "-i"
 
 # check output folder
-archive_path=${outpath:-"$GCDATA"}
+archive_path=${outpath:-"$NCDATA"}
 testfolderwritable "${archive_path}" "-o <output_folder>"
 
 # archive name
