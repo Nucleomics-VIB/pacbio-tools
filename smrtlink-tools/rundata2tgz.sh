@@ -13,11 +13,12 @@
 # requires pigz for fast compression
 # 2018-01-26: edit listing the repo and add metadata.xml file;  v1.1.3
 # 2018-06-05: also save subreads.bam next to archive;  v1.1.4
+# 2019-03-21: md5 for bam;  v1.1.5
 
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1.4, 2018_06_05"
+version="1.1.5, 2019_03_21"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
@@ -155,12 +156,17 @@ fi
 
 # optionally copy the subread.bam file
 if [ $bamcopy == 1 ]; then
-	echo
-	echo "# copying the subreads.bam file"
-
 	subreads=$(find "${data_folder}/${run_folder}/${flow_cell}" -name "*.subreads.bam" -print )
 	bname=$(basename "${subreads}")
-	cp ${subreads} ${archive_path}/${archive_file%.tgz}_${bname}
+	# create md5sum
+	echo
+	echo "# creating a md5sum for the subreads.bam file"
+	md5sum ${subreads} > ${subreads}_md5.txt
+	# copy bam data
+	echo
+	echo "# copying the subreads.bam file and md5sum"
+	cp ${subreads}_md5.txt ${subreads} ${archive_path}/${archive_file%.tgz}_${bname}_md5.txt
+	cp ${subreads} ${subreads} ${archive_path}/${archive_file%.tgz}_${bname}
 
 	if [ $? -eq 0 ]; then
 		echo
