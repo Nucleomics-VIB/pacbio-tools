@@ -158,24 +158,32 @@ fi
 if [ $bamcopy == 1 ]; then
 	subreads=$(find "${data_folder}/${run_folder}/${flow_cell}" -name "*.subreads.bam" -print )
 	bname=$(basename "${subreads}")
+	
 	# create md5sum
-	echo
 	echo "# creating a md5sum for the subreads.bam file"
-	md5sum ${subreads} > ${subreads}_md5.txt
+	md5sum ${subreads} > ${archive_path}/${subreads}_md5.txt
+
 	# copy bam data
 	echo
-	echo "# copying the subreads.bam file and md5sum"
-	cp ${subreads}_md5.txt ${subreads} ${archive_path}/${archive_file%.tgz}_${bname}_md5.txt
-	cp ${subreads} ${subreads} ${archive_path}/${archive_file%.tgz}_${bname}
+	echo "# copying the subreads.bam file"
+	cp ${subreads} ${archive_path}/${bname}
 
+    echo 
 	if [ $? -eq 0 ]; then
 		echo
-		echo "# subreads.bam file saved as ${archive_path}/${archive_file%.tgz}_${bname}"
+		echo "# subreads.bam file saved as ${archive_path}/${bname}"
 	else
 		echo
 		echo "# something went wrong while copying subreads.bam, please have a check!"
 		exit 1
 	fi
+
+	echo
+	echo "# verifying the checksum against the bam copy"
+	cd ${archive_path} && md5sum -c ${subreads}_md5.txt 2>&1 | \
+	 tee -a ${subreads}_md5-test.txt && \
+	 cd -
+
 fi
 
 # also copy metadata file
@@ -194,4 +202,3 @@ else
 	echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
 	exit 1
 fi
-
