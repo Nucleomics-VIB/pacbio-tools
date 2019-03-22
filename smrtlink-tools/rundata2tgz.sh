@@ -161,7 +161,7 @@ if [ $bamcopy == 1 ]; then
 	
 	# create md5sum
 	echo "# creating a md5sum for the subreads.bam file"
-	md5sum ${subreads} > ${archive_path}/${subreads}_md5.txt
+	md5sum ${subreads} > ${archive_path}/${bname}_md5.txt
 
 	# copy bam data
 	echo
@@ -180,8 +180,8 @@ if [ $bamcopy == 1 ]; then
 
 	echo
 	echo "# verifying the checksum against the bam copy"
-	cd ${archive_path} && md5sum -c ${subreads}_md5.txt 2>&1 | \
-	 tee -a ${subreads}_md5-test.txt && \
+	cd ${archive_path} && md5sum -c ${bname}_md5.txt 2>&1 | \
+	 tee -a ${bname}_md5-test.txt && \
 	 cd -
 
 fi
