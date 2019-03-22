@@ -123,17 +123,17 @@ tar --use-compress-program="pigz" \
 	--exclude "*.log" \
 	-C ${data_folder} \
 	-h -cvf \
-	${archive_path}/${archive_file} \
+	${archive_path%/}/${archive_file} \
 	${run_folder}/${flow_cell}
 
 if [ $? -eq 0 ]; then
 	echo
 	echo "# archive was created successfully, now checksumming"
-	md5sum ${archive_path}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" \
-		> ${archive_path}/${archive_file}_md5.txt && \
-		echo; echo "# checksum saved as: ${archive_path}/${archive_file}_md5.txt" && \
-		du -a -h --max-depth=1 ${archive_path}/${archive_file}* | \
-		sort -hr ; cat ${archive_path}/${archive_file}_md5.txt
+	md5sum ${archive_path%/}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" \
+		> ${archive_path%/}/${archive_file}_md5.txt && \
+		echo; echo "# checksum saved as: ${archive_path%/}/${archive_file}_md5.txt" && \
+		du -a -h --max-depth=1 ${archive_path%/}/${archive_file}* | \
+		sort -hr ; cat ${archive_path%/}/${archive_file}_md5.txt
 else
 	echo
 	echo "# something went wrong while creating archive, please have a check!"
@@ -146,7 +146,7 @@ if [ $? -eq 0 ]; then
 	echo "# verifying the checksum against the archive"
 	cd ${archive_path} && md5sum -c ${archive_file}_md5.txt 2>&1 | \
 	 tee -a ${archive_file}_md5-test.txt && \
-	 cd -
+	 cd - &>/dev/null
 else
 	echo
 	echo "# something went wrong while checking md5sum, please have a check!"
@@ -159,31 +159,29 @@ if [ $bamcopy == 1 ]; then
 	subreads=$(find "${data_folder}/${run_folder}/${flow_cell}" -name "*.subreads.bam" -print )
 	bname=$(basename "${subreads}")
 	
-	# create md5sum
-	echo "# creating a md5sum for the subreads.bam file"
-	md5sum ${subreads} > ${archive_path}/${bname}_md5.txt
-
 	# copy bam data
 	echo
 	echo "# copying the subreads.bam file"
-	cp ${subreads} ${archive_path}/${bname}
+	cp ${subreads} ${archive_path%/}/${archive_file%.tgz}_${bname}
 
     echo 
 	if [ $? -eq 0 ]; then
-		echo
-		echo "# subreads.bam file saved as ${archive_path}/${bname}"
+		echo "# subreads.bam file saved as ${archive_path%/}/${bname}"
 	else
-		echo
 		echo "# something went wrong while copying subreads.bam, please have a check!"
 		exit 1
 	fi
 
+	# create md5sum
+	echo
+	echo "# creating a md5sum for the subreads.bam file copy"
+	cd ${archive_path}
+	md5sum ${archive_file%.tgz}_${bname} > ${archive_file%.tgz}_${bname}_md5.txt
 	echo
 	echo "# verifying the checksum against the bam copy"
-	cd ${archive_path} && md5sum -c ${bname}_md5.txt 2>&1 | \
-	 tee -a ${bname}_md5-test.txt && \
-	 cd -
-
+	md5sum -c ${archive_file%.tgz}_${bname}_md5.txt 2>&1 | \
+	tee -a ${archive_file%.tgz}_${bname}_md5-test.txt && \
+	cd - &>/dev/null
 fi
 
 # also copy metadata file
@@ -192,7 +190,7 @@ echo "# copying the run.metadata.xml file"
 
 metadata=$(find "${data_folder}/${run_folder}/${flow_cell}" -regex ".*\..*.run.metadata.xml" -print )
 mname=$(basename "${metadata}")
-cp ${metadata} ${archive_path}/${archive_file%.tgz}${mname} && touch ${archive_path}/FLAG_READY4COPY_${archive_file%.tgz}.txt
+cp ${metadata} ${archive_path%/}/${archive_file%.tgz}${mname} && touch ${archive_path%/}/FLAG_READY4COPY_${archive_file%.tgz}.txt
 
 if [ $? -eq 0 ]; then
 	echo
