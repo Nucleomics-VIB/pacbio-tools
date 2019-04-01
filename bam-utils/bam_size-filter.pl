@@ -66,8 +66,8 @@ defined($opt_q) && ( $makefastq = 1 );
 defined($opt_h) && die $usage . "\n";
 
 # variables
-my $minlabel = defined($minlen) ? "_gt".$minlen : "";
-my $maxlabel = defined($maxlen) ? "_lt".$maxlen : "";
+my $minlabel = defined($minlen) ? "_gt".$minlen : "_gt_na";
+my $maxlabel = defined($maxlen) ? "_lt".$maxlen : "_lt_na";
 my $outbname=basename($infile, ".bam").$minlabel.$maxlabel.".bam";
 my $outfname=basename($infile, ".bam").$minlabel.$maxlabel.".fasta";
 my $outqname=basename($infile, ".bam").$minlabel.$maxlabel.".fastq";
