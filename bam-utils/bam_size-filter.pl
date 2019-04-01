@@ -12,6 +12,7 @@ use Getopt::Std;
 #
 # Stéphane Plaisance - VIB-NC-BITS Jan-31-2017 v1.1
 # v1.2 adding FASTA output option
+# v1.3 adding FASTQ output (although Seque Qscores are all !)
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -29,21 +30,26 @@ if (! grep { -x "$_/samtools"}split /:/,$ENV{PATH}) {
 # disable buffering to get output during long process (loop)
 $|=1; 
 
+my $version="1.3";
+
 # cmd arguments
-getopts('i:m:x:bfh');
-our ( $opt_i, $opt_m, $opt_x, $opt_b, $opt_f, $opt_h );
-our ( $makebam, $makefasta ) = ( 0, 0 );
+getopts('i:m:x:bfqh');
+our ( $opt_i, $opt_m, $opt_x, $opt_b, $opt_f, $opt_q, $opt_h );
+our ( $makebam, $makefasta, $makefastq ) = ( 0, 0, 0 );
 
 my $usage = "Aim: Filter a BAM file by read length
 #  print filtered read lengths to file
 #  (also output filtered reads to BAM if -b is set)
 #  (also output filtered reads to FASTA if -f is set)
+#  (also output filtered reads to FASTQ if -q is set)
 ## Usage: bam_size-filter.pl <-i bam-file>
 # optional <-m minsize>
 # optional <-x maxsize>
 # optional <-b to also create a BAM output (default only text file of lengths)>
 # optional <-f to also create a FASTA output (default only text file of lengths)>
-# <-h to display this help>";
+# optional <-q to also create a FASTA output (default only text file of lengths)>
+# <-h to display this help>
+# script version: ".$version;
 
 ####################
 # declare variables
@@ -56,6 +62,7 @@ my $maxlen = $opt_x;
 ( defined($opt_m) || defined($opt_x) ) || die "# set min, max or both!\n".$usage."\n";
 defined($opt_b) && ( $makebam = 1 );
 defined($opt_f) && ( $makefasta = 1 );
+defined($opt_q) && ( $makefastq = 1 );
 defined($opt_h) && die $usage . "\n";
 
 # variables
@@ -63,6 +70,7 @@ my $minlabel = defined($minlen) ? "_gt".$minlen : "";
 my $maxlabel = defined($maxlen) ? "_lt".$maxlen : "";
 my $outbname=basename($infile, ".bam").$minlabel.$maxlabel.".bam";
 my $outfname=basename($infile, ".bam").$minlabel.$maxlabel.".fasta";
+my $outqname=basename($infile, ".bam").$minlabel.$maxlabel.".fastq";
 my $lenfile=basename($infile, ".bam").$minlabel.$maxlabel."_lengths.txt";
 
 # create handlers for data parsing
@@ -71,6 +79,7 @@ open BAM,"samtools view -h $infile |";
 open LENDIST, "> $lenfile";
 ( $makebam == 1 ) && open OUTBAM, " | samtools view -hSb - > $outbname";
 ( $makefasta == 1 ) && open OUTFASTA, "> $outfname";
+( $makefastq == 1 ) && open OUTFASTQ, "> $outqname";
 
 # counters
 my $countgood=0;
@@ -110,6 +119,7 @@ while(<BAM>){
 	# optional
 	( $makebam == 1 ) && print OUTBAM $_;
 	( $makefasta == 1 ) && print OUTFASTA ">".$fields[0]."\n".$fields[9]."\n";
+	( $makefastq == 1 ) && print OUTFASTQ "@".$fields[0]."\n".$fields[9]."\n+\n".$fields[10]."\n";
 }
 
 # report counts
@@ -120,3 +130,4 @@ print STDOUT "# Lengths are stored in $lenfile\n";
 # optional
 ( $makebam == 1 ) && print STDERR "# BAM results are stored in $outbname\n";
 ( $makefasta == 1 ) && print STDERR "# FASTA results are stored in $outfname\n";
+( $makefastq == 1 ) && print STDERR "# FASTQ results are stored in $outqname\n";
