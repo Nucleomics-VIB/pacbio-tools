@@ -6,7 +6,7 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1.1, 2019_02_13"
+version="1.1.2, 2019_04_11"
 usage='# Usage: delete_SQ_data.sh
 # script version '${version}'
 ## input files
@@ -21,9 +21,9 @@ pbuser="smrtanalysis"
 while getopts "f:r:lh" opt; do
 	case $opt in
 		f) foldername=${OPTARG} ;;
-		r) datapath=${OPTARG:-"$SMRT_DATA"} ;;
-		l) echo "# Data currently in ${datapath:-"$SMRT_DATA"}:";
-			tree -I "000" -L 3 ${datapath:-"$SMRT_DATA"}; 
+		r) datapath_opt=${OPTARG} ;;
+		l) echo "# Data currently in ${datapath_opt:-"$SMRT_DATA"}:";
+			tree -I "000" -L 3 ${datapath_opt:-"$SMRT_DATA"}; 
 			exit 0 ;;
 		h) echo "${usage}" >&2; exit 0 ;;
 		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -32,10 +32,11 @@ while getopts "f:r:lh" opt; do
 done
 
 if [ $# -lt 1 ]; then
-  echo "# please provide the name of the Sequel run folder to empty"
+  echo "${usage}" >&2
   exit 0
 fi
 
+datapath=${datapath_opt:-"$SMRT_DATA"}
 folderpath=${datapath}/${foldername}
 date=$(date +%Y%m%d)
 
