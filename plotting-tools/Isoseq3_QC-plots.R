@@ -2,10 +2,10 @@
 
 # script: Isoseq3_QC-plots.R
 # create plots from Isoseq3 polished.cluster_report.csv
-# SP & Joke A. 20019-05-21 v1.0
+# SP & Joke A. 2019-05-21 v1.0
 
 # required libraries
-suppressMessages(library(readr))
+suppressMessages(library("readr"))
 suppressMessages(library("dplyr"))
 suppressMessages(library("ggplot2"))
 suppressMessages(library("grid"))
