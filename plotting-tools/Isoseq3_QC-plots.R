@@ -2,7 +2,8 @@
 
 # script: Isoseq3_QC-plots.R
 # create plots from Isoseq3 polished.cluster_report.csv
-# SP & Joke A. 2019-05-21 v1.0
+# SP & Joke A. 2019-05-21 v1.1
+# added percent CCS table
 
 # required libraries
 suppressMessages(library("readr"))
@@ -23,8 +24,19 @@ if (length(args)==0) {
 polished_cluster_report <- suppressMessages(read_csv("polished.cluster_report.csv"))
 
 # plot CCS support per transcript until 'lim'
-hist.data <- polished_cluster_report %>% 
-  count(cluster_id)
+hist.data <- polished_cluster_report %>%
+  count(cluster_id) %>%
+  arrange(desc(n)) %>%
+  mutate(cum_sum = cumsum(n)) %>%
+  mutate(percent = cum_sum/sum(n))
+
+# add table for CCS Nvalues
+cum.data <- data.frame(percent=numeric(), CCS_count=numeric())
+for (lim in seq(0, 1, by=0.1)) {
+  dat <- hist.data[min(which(hist.data$percent>=lim)),]
+  cum.data <- rbind(cum.data, c(100*(1-lim), dat$n))
+}
+colnames(cum.data) <- c("percent", "min_CCS_count")
 
 lim <- 20
 p1 <- suppressMessages(ggplot(hist.data[hist.data$n<=lim,], aes(n)) +
@@ -39,7 +51,6 @@ p1 <- suppressMessages(ggplot(hist.data[hist.data$n<=lim,], aes(n)) +
 
 # plot novel Transcript saturation
 plot.data <- data.frame(CCS_fraction=0, Transcript_count=0)
-
 for (i in seq(0.1, 1, by=0.1)) {
   dat <- sample_frac(polished_cluster_report, i)
   plot.data <- rbind(plot.data, c( i, length(unique(dat$cluster_id))) )
@@ -57,6 +68,10 @@ p2 <- suppressMessages(ggplot(plot.data, aes(x=CCS_fraction, y=Transcript_count)
   ylab("Transcript count"))
 
 pdf("isoseq3_QC-plots.pdf", onefile = TRUE)
-grid.arrange(p1, p2,
-	top = textGrob(title, gp=gpar(fontsize=20,font=3)))
+lay <- rbind(c(1,1,1,1,2,2),
+             c(3,3,3,3,4,4))
+grid.arrange(p1, tableGrob(cum.data, rows=NULL), p2, 
+  ncol=2,
+  top = textGrob(title, gp=gpar(fontsize=20, font=3)),
+  layout_matrix = lay)
 null <- dev.off()
