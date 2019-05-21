@@ -35,7 +35,7 @@ p1 <- suppressMessages(ggplot(hist.data[hist.data$n<=lim,], aes(n)) +
         axis.text.y=element_text(size=rel(1)),
         text = element_text(size=12)) +
   xlab("number of supporting CCS reads") +
-  ylab("Transcript models"))
+  ylab("Transcript count"))
 
 # plot novel Transcript saturation
 plot.data <- data.frame(CCS_fraction=0, Transcript_count=0)
