@@ -2,12 +2,14 @@
 
 # script: Isoseq3_QC-plots.R
 # create plots from Isoseq3 polished.cluster_report.csv
-# SP & Joke A. 2019-05-21 v1.1
-# added percent CCS table
+# create plot from Isoseq3 unpolished.cluster
+# designed for single smartcell data !
+# SP & Joke A. 2019-05-21 v2.0
 
 # required libraries
 suppressMessages(library("readr"))
 suppressMessages(library("dplyr"))
+suppressMessages(library("stringr"))
 suppressMessages(library("ggplot2"))
 suppressMessages(library("grid"))
 suppressMessages(library("gridExtra"))
@@ -38,7 +40,7 @@ for (lim in seq(0, 1, by=0.1)) {
 }
 colnames(cum.data) <- c("percent", "min_CCS_count")
 
-lim <- 20
+lim <- 15
 p1 <- suppressMessages(ggplot(hist.data[hist.data$n<=lim,], aes(n)) +
   geom_bar() +
   scale_x_continuous(breaks=c(1:lim)) +
@@ -50,13 +52,13 @@ p1 <- suppressMessages(ggplot(hist.data[hist.data$n<=lim,], aes(n)) +
   ylab("Transcript count"))
 
 # plot novel Transcript saturation
-plot.data <- data.frame(CCS_fraction=0, Transcript_count=0)
+plot.data <- data.frame(CCS_sample=0, Transcript_count=0)
 for (i in seq(0.1, 1, by=0.1)) {
   dat <- sample_frac(polished_cluster_report, i)
   plot.data <- rbind(plot.data, c( i, length(unique(dat$cluster_id))) )
 }
 
-p2 <- suppressMessages(ggplot(plot.data, aes(x=CCS_fraction, y=Transcript_count)) +
+p2 <- suppressMessages(ggplot(plot.data, aes(x=CCS_sample, y=Transcript_count)) +
   scale_x_continuous(labels = scales::percent) +
   geom_smooth(method="loess", se=FALSE, fullrange=TRUE, size=1) +
   geom_point(shape=20, size=4, color="red") +
@@ -64,14 +66,48 @@ p2 <- suppressMessages(ggplot(plot.data, aes(x=CCS_fraction, y=Transcript_count)
   theme(axis.text.x=element_text(size=rel(1)),
         axis.text.y=element_text(size=rel(1)),
         text = element_text(size=12)) +
-  xlab("CCS fraction") +
+  xlab("CCS sample") +
   ylab("Transcript count"))
 
+
+# load and process unpolished.cluster
+pairwise <- suppressMessages(read_table2("unpolished.cluster"))
+# simplify content (ony works when data comes from a single Smart-cell)
+pairwise$from <- str_replace(pairwise$from, "(.*)_(.*)_(.*)/(.*)/ccs","\\4")
+pairwise$to <- str_replace(pairwise$to, "(.*)_(.*)_(.*)/(.*)/ccs","\\4")
+
+# subset 0 to 100% and count n>1
+saturation.data <- data.frame(FLNC_sample=numeric(), Cluster_count=numeric())
+for (sub in seq(0, 1, by=0.1)) {
+  data <- sample_frac(pairwise, sub) %>%
+    group_by(to) %>%
+    summarise(n = n()) %>%
+    filter(n > 1) 
+  saturation.data <- rbind(saturation.data, c(sub, nrow(data)))
+}
+colnames(saturation.data) <- c("FLNC_sample", "Cluster_count")
+
+p3 <- ggplot(saturation.data, aes(x=FLNC_sample, y=Cluster_count)) +
+  scale_x_continuous(labels = scales::percent) +
+  geom_smooth(method="loess", se=FALSE, fullrange=TRUE, size=1) +
+  geom_point(shape=20, size=4, color="red") +
+  theme_classic() +
+  theme(axis.text.x=element_text(size=rel(1)),
+        axis.text.y=element_text(size=rel(1)),
+        text = element_text(size=12)) +
+  xlab("FLNC sample") +
+  ylab("Cluster count")
+
 pdf("isoseq3_QC-plots.pdf", onefile = TRUE)
-lay <- rbind(c(1,1,1,1,2,2),
-             c(3,3,3,3,4,4))
-grid.arrange(p1, tableGrob(cum.data, rows=NULL), p2, 
+lay <- rbind(c(1,1,1,1,5,2,2,2),
+             c(3,3,3,3,4,4,4,4))
+mytheme <- gridExtra::ttheme_default(
+  core = list(fg_params=list(cex = 0.65)),
+  colhead = list(fg_params=list(cex = 0.65)),
+  rowhead = list(fg_params=list(cex = 0.65)))
+grid.arrange(p1, tableGrob(cum.data, rows=NULL, theme = mytheme), p2, p3,
   ncol=2,
   top = textGrob(title, gp=gpar(fontsize=20, font=3)),
-  layout_matrix = lay)
+  layout_matrix = lay,
+  vp=viewport(width=0.95, height=0.95))
 null <- dev.off()
