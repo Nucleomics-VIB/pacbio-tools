@@ -4,7 +4,7 @@
 # create plots from Isoseq3 polished.cluster_report.csv
 # create plot from Isoseq3 unpolished.cluster
 # designed for single smartcell data !
-# SP & Joke A. 2019-05-21 v2.0
+# SP & Joke A. 2019-05-21 v2.1
 
 # required libraries
 suppressMessages(library("readr"))
@@ -25,14 +25,14 @@ if (length(args)==0) {
 
 polished_cluster_report <- suppressMessages(read_csv("polished.cluster_report.csv"))
 
-# plot CCS support per transcript until 'lim'
+# plot CCS support per transcript until 'lim' to avoid long tail
 hist.data <- polished_cluster_report %>%
   count(cluster_id) %>%
   arrange(desc(n)) %>%
   mutate(cum_sum = cumsum(n)) %>%
   mutate(percent = cum_sum/sum(n))
 
-# add table for CCS Nvalues
+# add table for CCS Nvalues (similar to N5à but whole range of N's)
 cum.data <- data.frame(percent=numeric(), CCS_count=numeric())
 for (lim in seq(0, 1, by=0.1)) {
   dat <- hist.data[min(which(hist.data$percent>=lim)),]
@@ -51,11 +51,13 @@ p1 <- suppressMessages(ggplot(hist.data[hist.data$n<=lim,], aes(n)) +
   xlab("number of supporting CCS reads") +
   ylab("Transcript count"))
 
-# plot novel Transcript saturation
+# 10x subset 0 to 100% and count unique Transcripts
 plot.data <- data.frame(CCS_sample=0, Transcript_count=0)
+for (iter in seq(1, 10, by=1)) {
 for (i in seq(0.1, 1, by=0.1)) {
   dat <- sample_frac(polished_cluster_report, i)
   plot.data <- rbind(plot.data, c( i, length(unique(dat$cluster_id))) )
+}
 }
 
 p2 <- suppressMessages(ggplot(plot.data, aes(x=CCS_sample, y=Transcript_count)) +
@@ -67,8 +69,7 @@ p2 <- suppressMessages(ggplot(plot.data, aes(x=CCS_sample, y=Transcript_count)) 
         axis.text.y=element_text(size=rel(1)),
         text = element_text(size=12)) +
   xlab("CCS sample") +
-  ylab("Transcript count"))
-
+  ylab("Transcript count (10 random pulls)"))
 
 # load and process unpolished.cluster
 pairwise <- suppressMessages(read_table2("unpolished.cluster"))
@@ -76,8 +77,10 @@ pairwise <- suppressMessages(read_table2("unpolished.cluster"))
 pairwise$from <- str_replace(pairwise$from, "(.*)_(.*)_(.*)/(.*)/ccs","\\4")
 pairwise$to <- str_replace(pairwise$to, "(.*)_(.*)_(.*)/(.*)/ccs","\\4")
 
-# subset 0 to 100% and count n>1
+# 10x subset 0 to 100% and count n>1
 saturation.data <- data.frame(FLNC_sample=numeric(), Cluster_count=numeric())
+
+for (iter in seq(1, 10, by=1)) {
 for (sub in seq(0, 1, by=0.1)) {
   data <- sample_frac(pairwise, sub) %>%
     group_by(to) %>%
@@ -85,6 +88,8 @@ for (sub in seq(0, 1, by=0.1)) {
     filter(n > 1) 
   saturation.data <- rbind(saturation.data, c(sub, nrow(data)))
 }
+}
+
 colnames(saturation.data) <- c("FLNC_sample", "Cluster_count")
 
 p3 <- ggplot(saturation.data, aes(x=FLNC_sample, y=Cluster_count)) +
@@ -96,7 +101,7 @@ p3 <- ggplot(saturation.data, aes(x=FLNC_sample, y=Cluster_count)) +
         axis.text.y=element_text(size=rel(1)),
         text = element_text(size=12)) +
   xlab("FLNC sample") +
-  ylab("Cluster count")
+  ylab("Cluster count (10 random pulls)")
 
 pdf("isoseq3_QC-plots.pdf", onefile = TRUE)
 lay <- rbind(c(1,1,1,1,5,2,2,2),
