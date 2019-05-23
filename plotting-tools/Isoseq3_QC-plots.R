@@ -32,10 +32,11 @@ hist.data <- polished_cluster_report %>%
   mutate(cum_sum = cumsum(n)) %>%
   mutate(percent = cum_sum/sum(n))
 
-# add table for CCS Nvalues (similar to N5à but whole range of N's)
+# add table for CCS Nvalues (similar to N50 but whole range of N's)
+# X% of the transcripts have Y or more supporting CCS's
 cum.data <- data.frame(percent=numeric(), CCS_count=numeric())
 for (lim in seq(0, 1, by=0.1)) {
-  dat <- hist.data[min(which(hist.data$percent>=lim)),]
+  dat <- hist.data[min(which(hist.data$percent>lim)),]
   cum.data <- rbind(cum.data, c(100*(1-lim), dat$n))
 }
 colnames(cum.data) <- c("percent", "min_CCS_count")
@@ -103,16 +104,29 @@ p3 <- ggplot(saturation.data, aes(x=FLNC_sample, y=Cluster_count)) +
   xlab("FLNC sample") +
   ylab("Cluster count (10 random pulls)")
 
-pdf("isoseq3_QC-plots.pdf", onefile = TRUE)
+pdf("isoseq3_QC-plots.pdf", onefile = TRUE, width=12, height=8)
 lay <- rbind(c(1,1,1,1,5,2,2,2),
              c(3,3,3,3,4,4,4,4))
+table.legend <- "X% transcripts have Y or less supporting CCS's\n\n\n"
 mytheme <- gridExtra::ttheme_default(
   core = list(fg_params=list(cex = 0.65)),
   colhead = list(fg_params=list(cex = 0.65)),
   rowhead = list(fg_params=list(cex = 0.65)))
-grid.arrange(p1, tableGrob(cum.data, rows=NULL, theme = mytheme), p2, p3,
-  ncol=2,
-  top = textGrob(title, gp=gpar(fontsize=20, font=3)),
-  layout_matrix = lay,
-  vp=viewport(width=0.95, height=0.95))
+grid.arrange(p1, 
+             tableGrob(cum.data, 
+                       rows=NULL, 
+                       theme = mytheme), 
+             p2, 
+             p3,
+             ncol=2,
+             top=textGrob(title, gp=gpar(fontsize=20, font=3)),
+             layout_matrix = lay,
+             vp=viewport(width=0.95, height=0.95))
+# add legend
+grid.text(table.legend, 
+          x=unit(0.8, "npc"), 
+          y=unit(0.87, "npc"),
+          gp=gpar(fontsize=11, font=3))
+          
+#          family="Times New Roman"))
 null <- dev.off()
