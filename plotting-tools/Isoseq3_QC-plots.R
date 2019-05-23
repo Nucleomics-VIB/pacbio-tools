@@ -36,7 +36,7 @@ hist.data <- polished_cluster_report %>%
 # X% of the transcripts have Y or more supporting CCS's
 cum.data <- data.frame(percent=numeric(), CCS_count=numeric())
 for (lim in seq(0, 1, by=0.1)) {
-  dat <- hist.data[min(which(hist.data$percent>lim)),]
+  dat <- suppressWarnings(hist.data[min(which(hist.data$percent>lim)),])
   cum.data <- rbind(cum.data, c(100*(1-lim), dat$n))
 }
 colnames(cum.data) <- c("percent", "min_CCS_count")
