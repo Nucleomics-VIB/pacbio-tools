@@ -15,20 +15,25 @@ suppressMessages(library("grid"))
 suppressMessages(library("gridExtra"))
 suppressMessages(library("data.table"))
 
+# read user input
 args <- commandArgs(trailingOnly=TRUE)
-# argument for plot title
 
+## test if there is at least one argument: if not, return an error
 if (length(args)==0) {
-  title="Isoseq3 QC plots"
+  stop("# please provide the path to polished.cluster_report.csv\n", call.=FALSE)
 } else if (length(args)==1) {
-  title <- args[1]
+  infile <- args[1]
 }
 
 ####################################################################################
 # load polished.cluster_report.csv
 ####################################################################################
 
-polished_cluster_report <- suppressMessages(read_csv("polished.cluster_report.csv"))
+polished_cluster_report <- suppressMessages(read_csv(infile))
+
+# set title
+runID<- unique(gsub("(.*)/.*/ccs", "\\1", polished_cluster_report$read_id))
+title <- paste0("Isoseq3 QC plots for run ", runID , sep="")
 
 # plot CCS support per transcript until 'lim' to avoid long tail
 hist.data <- polished_cluster_report %>%
