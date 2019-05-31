@@ -32,7 +32,7 @@ if (length(args)==0) {
 polished_cluster_report <- suppressMessages(read_csv(infile))
 
 # set title
-runID<- unique(gsub("(.*)/.*/ccs", "\\1", polished_cluster_report$read_id))
+runID <- unique(gsub("(.*)/.*/ccs", "\\1", polished_cluster_report$read_id))
 title <- paste0("Isoseq3 QC plots for run ", runID , sep="")
 
 # plot CCS support per transcript until 'lim' to avoid long tail
