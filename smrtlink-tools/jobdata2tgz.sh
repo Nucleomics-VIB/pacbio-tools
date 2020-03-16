@@ -15,14 +15,14 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1, 2018_04_13"
+version="1.2, 2020_01_29"
 usage='# Usage: jobdata2tgz.sh
 # script version '${version}'
 ## input files
 # [required: -i <job-folder> (name of the run folder containing the SMRTLink job)]
 # [-o <output folder ($NCDATA|$GCDATA; default to <$GCDADA>)]
-# [-S <JOB data root (default to <$SMRT_DATA/000>)]
-# [-p <use pigz (default is to use gzip)>)]
+# [-S <JOB data root (default to <$SMRT_JOBS>)]
+# [-p <use pigz and 8 threads (default is to use gzip)>)]
 # [-l <show the list of jobs currently present on the server>]
 # [-h for this help]'
 
@@ -31,10 +31,10 @@ while getopts "i:o:S:plh" opt; do
 		i) jobfolder=${OPTARG} ;;
 		o) outpath=${OPTARG} ;;
 		p) usepigz=1 ;;
-		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA/000"}:";
-			ls ${dataroot:-"$SMRT_DATA/000"};
+		l) echo "# Job data currently in ${jobdataroot:-"$SMRT_JOBS"}:";
+			ls ${dataroot:-"$SMRT_JOBS"};
 			exit 0 ;;
-		S) dataroot=${OPTARG} ;;
+		S) jobdataroot=${OPTARG} ;;
 		h) echo "${usage}" >&2; exit 0 ;;
 		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
 		*) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -96,11 +96,11 @@ fi
 testvariabledef "${jobfolder}" "-i"
 
 # check data folder
-data_folder=${dataroot:-"$SMRT_DATA/000"}
+job_data_folder=${jobdataroot:-"$SMRT_JOBS"}
 
 # check runfolder
 job_folder=${jobfolder}
-testfolderexist "${data_folder}/${job_folder}" "-i <job-folder-name (in ${data_folder})>"
+testfolderexist "${job_data_folder}/${job_folder}" "-i <job-folder-name (in ${job_data_folder})>"
 
 # check output folder
 archive_path=${outpath:-"$GCDATA"}
@@ -110,18 +110,18 @@ testfolderwritable "${archive_path}" "-o <output_folder>"
 archive_file="job_"$(basename ${job_folder}).tgz
 
 # create archive (dereference/follow symlinks)
-echo "# creating archive from: ${data_folder}/${job_folder}"
+echo "# creating archive from: ${job_data_folder}/${job_folder}"
 
 if [ -n "$usepigz" ]; then
 	# use pigz for speed and pv to monitor the process
-	tar -C ${data_folder} \
+	tar -C ${job_data_folder} \
 		-cf \
 		- \
 		${job_folder} | \
-		pv -p -s $(du -sk "${data_folder}/${job_folder}" | cut -f 1)k | \
+		pv -p -s $(du -sk "${job_data_folder}/${job_folder}" | cut -f 1)k | \
 		pigz -p 8 > ${archive_path}/${archive_file}
 else
-	tar -C ${data_folder} \
+	tar -C ${job_data_folder} \
 		-czvf \
 		${archive_path}/${archive_file} \
 		${job_folder}
