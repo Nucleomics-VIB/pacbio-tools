@@ -1,5 +1,5 @@
 #!/bin/bash
-# script name: run_wgtb2_pb.sh <reads> <genome-size> <prefix> <platform> <thr>
+# script name: run_wtdbg2_pb.sh <reads> <genome-size> <prefix> <platform> <thr>
 # optimized for Sequel reads
 # from https://github.com/ruanjue/wtdbg2
 # assemble reads using wdbg2
@@ -12,7 +12,7 @@ version="1.0, 2020_03_16"
 
 reads=${1}
 genomesize=${2:-"12.5m"}
-prefix=${3:-"wdbg2_asm/$(basename ${reads%.fq.gz})"}
+prefix=${3:-"wtdbg2_asm/$(basename ${reads%.fq.gz})"}
 platform=${4:-"sq"}
 mm2x=${5:-"map-pb"}
 thr=${6:-84}
