@@ -166,7 +166,7 @@ cmd="${binpath}/arrow ${destfolder}/sorted_blasr.bam \
 	-o ${destfolder}/arrow-polished-${draftname%.*}.gff \
 	-o ${destfolder}/arrow-polished-${draftname%.*}.fastq"
 
-# show and execute	
+# show and execute
 echo
 echo "# correcting assembly with: ${cmd}"
 eval ${cmd}
