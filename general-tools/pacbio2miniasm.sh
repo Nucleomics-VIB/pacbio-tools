@@ -29,12 +29,11 @@ usage='# Usage: pacbio2miniasm.sh
 # script version '${version}'
 # [-h for this help]'
 
-while getopts "r:o:t:h" opt; do
+while getopts "r:x:o:t:h" opt; do
   case $opt in
     r | --fasta-reads) reads=${OPTARG} ;;
     x | --preset) opt_x=${OPTARG} ;;
     o | --out_prefix) outpfx=${OPTARG} ;;
-    m | --max_mem) opt_m=${OPTARG} ;;
     t | --max_treads) opt_t=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -55,11 +54,11 @@ fi
 
 # other defaults
 preset=${opt_x:-"ava-pb"}
-outpref=${outpfx:-"miniasm_$(basename ${reads%.*})"}
+outpref=${outpfx:-"miniasm_$(basename ${reads%.f*})"}
 maxthr=${opt_t:-4}
 
 # create new folder
-basedir=$(dirname ${reads})
+basedir=$(pwd)
 outdir="${basedir}/${outpref}"
 mkdir -p ${outdir}
 
@@ -96,15 +95,10 @@ fi
 # continue on success
 if [ $? -eq 0 ]; then
 
-# convert to fasta
+# convert to fasta and cut lines at 80 character using fold
 awk '/^S/{print ">"$2"\n"$3}' ${outdir}/${outpref}.gfa \
 	| fold > ${outdir}/${outpref}.fasta
 
-echo
-echo "# ${cmd}"
-echo
-eval ${cmd}
-	
 echo
 echo "# all done."
 else
