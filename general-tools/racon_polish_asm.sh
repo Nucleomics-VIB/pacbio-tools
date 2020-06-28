@@ -78,14 +78,6 @@ if [ ! -f "${longreads}" ]; then
 	exit 1
 fi
 
-# test platform
-if [ -z "${pltf}" ];then
-  echo "# no platform provided!"
-  echo "${usage}"
-  exit 1
-fi
-
-input=${draft}
 rounds=${opt_rounds:-1}
 export thr=${opt_thr:-4}
 
@@ -93,13 +85,18 @@ export thr=${opt_thr:-4}
 # for PB, add -H use homopolymer-compressed k-mer (preferrable for PacBio)
 export type=${opt_plf:-"map-pb -H"}
 
-# perform polishing ${rounds} times
+outdir=$(pwd)/racon-polished-$(basename ${draft%.fa*})
+mkdir -p ${outdir}
+cp ${draft} ${outdir}/$(basename ${draft%.fa*})_racon_draft.fa
+input=${outdir}/$(basename ${draft%.fa*})_racon_draft.fa
 
+# perform polishing ${rounds} times
 for (( i=1; i<="${rounds}"; i++ )); do
-	output=${input%_racon*.fa*}_racon${i}x.fa
-	fminimap2 ${input} ${longreads} > pb_mapped_${i}x.paf.gz
-	fracon ${longreads} pb_mapped_${i}x.paf.gz ${input} > ${output}
-	input=${output}
+	output=$(basename ${input%_racon*.fa*}_racon${i}x.fa)
+	fminimap2 ${input} ${longreads} > ${outdir}/pb_mapped_${i}x.paf.gz
+	fracon ${longreads} ${outdir}/pb_mapped_${i}x.paf.gz ${input} > ${outdir}/${output}
+	# swap and loop
+	input=${outdir}/${output}
 done
 
 endts=$(date +%s)

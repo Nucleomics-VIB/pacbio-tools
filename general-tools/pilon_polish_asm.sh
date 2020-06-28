@@ -137,20 +137,40 @@ export mem=${opt_mem:-"4G"}
 exec > >(tee -a ${destfolder}/pilon-polished-${draftname%.*}-log.txt) 2>&1
 
 ##############################################
+# echo parameters to log
+##############################################
+
+echo "#---------------------------------------------"
+echo "# setup:"
+echo "# input assembly: ${draftname}"
+echo "# polishing reads1: ${R1}"
+echo "# polishing reads2: ${R2}"
+echo "# max polishong rounds: ${rounds}"
+echo "# BWA mem $(bwa 2>&1| grep "Version")"
+echo "# $(java -jar $PILON/pilon.jar --version)"
+
+##############################################
 # run wrapper for rounds of pilon polishing
 ##############################################
 
 input="draft.fa"
 
 for (( i=1; i<="${rounds}"; i++ )); do
+	echo
+	echo "#---------------------------------------------"
+	echo "# polishiong step $i}"
 	fbwamap ${input} ${R1} ${R2} > mapped_${i}x.bam \
 	  && samtools index mapped_${i}x.bam
 	fpilon ${input} mapped_${i}x.bam ${i} \
 	  || exit 1
 	input=pilon${i}x.fasta
 	# test if pilon found changes
-	[[ -s pilon${i}x.changes ]] \
-	  || (echo "# no changes after round ${i}, exiting!" && break)
+	[[ -s pilon${i}x.changes ]] && continue
+	echo "# no changes after round ${i}, cleaning up and exiting!"
+	# cleanup last round files
+	rm mapped_${i}x.bam*
+	rm pilon${i}x.*
+	break
 done
 
 ##############################################
