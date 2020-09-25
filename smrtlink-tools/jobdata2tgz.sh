@@ -7,6 +7,7 @@
 # run folders are expected in the SMRT_DATA root (define it)
 # optional: pigz required to speed up archiving files together with pv to monitor the process
 # standard with gzip and one thread
+# add --dereference to add original files instead of symlinks
 #
 # Stephane Plaisance (VIB-NC+BITS) 2018/04/13; v1.0
 #
@@ -15,7 +16,7 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.2, 2020_01_29"
+version="1.3, 2020_09_25"
 usage='# Usage: jobdata2tgz.sh
 # script version '${version}'
 ## input files
@@ -112,19 +113,23 @@ archive_file="job_"$(basename ${job_folder}).tgz
 # create archive (dereference/follow symlinks)
 echo "# creating archive from: ${job_data_folder}/${job_folder}"
 
+curdir=$(pwd)
+
 if [ -n "$usepigz" ]; then
 	# use pigz for speed and pv to monitor the process
-	tar -C ${job_data_folder} \
-		-cf \
+	cd ${job_data_folder} && \
+	tar -cfh \
 		- \
 		${job_folder} | \
 		pv -p -s $(du -sk "${job_data_folder}/${job_folder}" | cut -f 1)k | \
-		pigz -p 8 > ${archive_path}/${archive_file}
+		pigz -p 8 > ${archive_path}/${archive_file} && \
+		cd ${curdir}
 else
-	tar -C ${job_data_folder} \
-		-czvf \
+	cd ${job_data_folder} && \
+	tar --dereference -czvf \
 		${archive_path}/${archive_file} \
-		${job_folder}
+		${job_folder} && \
+		cd ${curdir}
 fi
 
 if [ $? -eq 0 ]; then

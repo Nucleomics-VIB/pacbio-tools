@@ -14,11 +14,12 @@
 # 2018-01-26: edit listing the repo and add metadata.xml file;  v1.1.3
 # 2018-06-05: also save subreads.bam next to archive;  v1.1.4
 # 2019-03-21: md5 for bam;  v1.1.5
+# 2020-09-25: support -S with -l; v1.1.6
 
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1.5, 2019_03_21"
+version="1.1.6, 2020_09_25"
 usage='# Usage: rundata2tgz.sh
 # script version '${version}'
 ## input files
@@ -38,9 +39,7 @@ while getopts "i:f:o:S:lbh" opt; do
 		f) flowcell=${OPTARG} ;;
 		o) outpath=${OPTARG} ;;
 		b) bamcopy=1 ;;
-		l) echo "# Data currently in ${dataroot:-"$SMRT_DATA"}:";
-			tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
-			exit 0 ;;
+		l) list=1 ;;
 		S) dataroot=${OPTARG} ;;
 		h) echo "${usage}" >&2; exit 0 ;;
 		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -91,11 +90,16 @@ fi
 # test inputs
 #############################
 
-# check input defined
-testvariabledef "${runfolder}" "-i"
-
 # check data folder
 data_folder=${dataroot:-"$SMRT_DATA"}
+
+# user asked for list
+[ -n ${list} ] && { echo "# Data currently in ${data_folder}:";
+	tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
+	exit 0; }
+
+# check input defined
+testvariabledef "${runfolder}" "-i"
 
 # check runfolder
 run_folder=${runfolder}
