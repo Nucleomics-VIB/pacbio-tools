@@ -16,7 +16,7 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.3, 2020_09_25"
+version="1.4, 2020_09_25"
 usage='# Usage: jobdata2tgz.sh
 # script version '${version}'
 ## input files
