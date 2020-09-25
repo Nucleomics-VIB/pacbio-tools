@@ -94,7 +94,7 @@ fi
 data_folder=${dataroot:-"$SMRT_DATA"}
 
 # user asked for list
-[ -n ${list} ] && { echo "# Data currently in ${data_folder}:";
+[ ${list} ] && { echo "# Data currently in ${data_folder}:";
 	tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
 	exit 0; }
 
