@@ -56,9 +56,9 @@ minlen=${optminl:-0}
 maxlen=${optmaxl:-1000000}
 minacc=${optmina:-0}
 minpass=${optminp:-1}
-maxpass=${optminp:-10000}
+maxpass=${optmaxp:-10000}
 outfmt=${optfrmt:-"bam"}
-outpfx=$(basename ${bamfile%.bam})_minl-${minlen}_maxl-${maxlen}_mina-${minacc}_minpass-${minpass}
+outpfx=$(basename ${bamfile%.bam})_minl-${minlen}_maxl-${maxlen}_mina-${minacc}_minpass-${minpass}_maxpass-${maxpass}
 
 # check if requirements are present
 $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
@@ -85,13 +85,13 @@ filt=filt+1
 }
 }
 }
-END{print "total reads:"tot"\nfiltered reads:"filt| "cat 1>&2"}' \
+END{print "total reads:"tot"\nfiltered reads:"filt >> "/dev/stderr"}' \
 | samtools view -Sb > "${outpfx}.bam"
 
 else
 
 # make it a fastq.gz
-samtools view -h ${bamfile} | \
+samtools view ${bamfile} | \
 awk -v minl="${minlen}" \
 -v maxl="${maxlen}" \
 -v mina="${minacc}" \
@@ -107,6 +107,7 @@ filt=filt+1
 }
 }
 }
-END{print "total reads:"tot"\nfiltered reads:"filt| "cat 1>&2"}' | bgzip -c > "${outpfx}.fq.gz"
+END{print "total reads:"tot"\nfiltered reads:"filt >> "/dev/stderr"}' \
+| bgzip -c > "${outpfx}.fq.gz"
 
 fi
