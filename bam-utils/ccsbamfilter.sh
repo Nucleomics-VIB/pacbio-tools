@@ -2,11 +2,11 @@
 
 # ccsbamfilter.sh: 
 # filter a PB CCS BAM file
-# output results as a new bam of a fastq (bgzipped)
-# filter by:
+# output results as a new bam or a fastq (bgzipped)
+# filter ccs reads by:
 # - min and max insert length
 # - min Accuracy
-# - min ccs pass number
+# - min and max ccs pass number
 #
 # Stéphane Plaisance - VIB-NC-BITS Nov-19-2020 v1.0
 #
