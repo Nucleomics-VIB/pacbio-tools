@@ -17,7 +17,7 @@
 # GNU awk for parsing sam data
 # bgzip for fastq compression
 
-version="1.0, 2020_11_24"
+version="1.1, 2020_11_25"
 
 usage='# Usage: ccsbamfilter.sh -i <bam file>
 # script version '${version}'
@@ -25,15 +25,17 @@ usage='# Usage: ccsbamfilter.sh -i <bam file>
 # [optional: -L <max length |1000000>]
 # [optional: -a <min accuracy|0>]
 # [optional: -p <min pass# |1>]
+# [optional: -P <max pass# |10000>]
 # [optional: -f <output fastq instead of bam>]'
 
-while getopts "i:l:L:a:p:fh" opt; do
+while getopts "i:l:L:a:p:P:fh" opt; do
   case $opt in
     i) bamfile=${OPTARG} ;;
     l) optminl=${OPTARG} ;;
     L) optmaxl=${OPTARG} ;;
     a) optmina=${OPTARG} ;;
     p) optminp=${OPTARG} ;;
+    P) optmaxp=${OPTARG} ;;
     f) optfrmt="fastq" ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -54,6 +56,7 @@ minlen=${optminl:-0}
 maxlen=${optmaxl:-1000000}
 minacc=${optmina:-0}
 minpass=${optminp:-1}
+maxpass=${optminp:-10000}
 outfmt=${optfrmt:-"bam"}
 outpfx=$(basename ${bamfile%.bam})_minl-${minlen}_maxl-${maxlen}_mina-${minacc}_minpass-${minpass}
 
@@ -70,15 +73,20 @@ awk -v minl="${minlen}" \
 -v maxl="${maxlen}" \
 -v mina="${minacc}" \
 -v minp="${minpass}" \
-'BEGIN{FS="\t"; OFS="\t"}
+-v maxp="${maxpass}" \
+'BEGIN{FS="\t"; OFS="\t"; tot=0; filt=0}
 {if ($1 ~ /^@/) print $0;
 else if ($14 ~ /np:i/){
+tot=tot+1;
 len=length($10); split($14,np,":"); split($15,rq,":");
-if (len >= minl && len <= maxl && rq[3] >= mina && np[3] >= minp){
-print $0
+if (len >= minl && len <= maxl && rq[3] >= mina && np[3] >= minp && np[3] <= maxp){
+print $0;
+filt=filt+1
 }
 }
-}' | samtools view -Sb > "${outpfx}.bam"
+}
+END{print "total reads:"tot"\nfiltered reads:"filt| "cat 1>&2"}' \
+| samtools view -Sb > "${outpfx}.bam"
 
 else
 
@@ -88,13 +96,17 @@ awk -v minl="${minlen}" \
 -v maxl="${maxlen}" \
 -v mina="${minacc}" \
 -v minp="${minpass}" \
-'BEGIN{FS="\t"; OFS="\t"}
+-v maxp="${maxpass}" \
+'BEGIN{FS="\t"; OFS="\t"; tot=0; filt=0}
 {if ($14 ~ /np:i/){
+tot=tot+1;
 len=length($10); split($14,np,":"); split($15,rq,":");
-if (len >= minl && len <= maxl && rq[3] >= mina && np[3] >= minp){
+if (len >= minl && len <= maxl && rq[3] >= mina && np[3] >= minp && np[3] <= maxp){
 print "@"$1" len:"len" accuracy:"rq[3]" passes:"np[3]"\n"$10"\n+\n"$11
+filt=filt+1
 }
 }
-}' | bgzip -c > "${outpfx}.fq.gz"
+}
+END{print "total reads:"tot"\nfiltered reads:"filt| "cat 1>&2"}' | bgzip -c > "${outpfx}.fq.gz"
 
 fi
