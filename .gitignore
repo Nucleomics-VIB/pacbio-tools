@@ -1,3 +1,5 @@
-
-plotting-tools/data/.Rhistory
 .DS_Store
+.gitignore
+.Rhistory
+pbcromwell_scripts/ref-config.json
+pbcromwell_scripts/atWork/*
