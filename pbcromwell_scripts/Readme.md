@@ -4,4 +4,4 @@ Script wrappers to launch Cromwell jobs on the SMRTLink server from the terminal
 
 ## demultiplex CCS data based on a list of barcode-pairs (multiplex amplicons)
 
-## run minor variant analysis on the demultriplexed data
+## run minor variant analysis on the demultiplexed read data
