@@ -32,8 +32,8 @@ if [ -z "${job}" ]; then
     exit 1
 fi
 
-# derive full folder name with leading 0's
-folder=$(printf "%010d" "${job}")
+# derive full folder name with leading 0's (as a string)
+folder=$(printf "%010s" "${job}")
 
 # define path
 ccspath=$(readlink -f "$SMRT_JOBS/${folder}/cromwell-job")
