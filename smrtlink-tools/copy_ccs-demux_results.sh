@@ -69,3 +69,9 @@ find $ccspath -name "demultiplex*.bam" -exec cp {} "${outfolder}/bams/" \; 2>/de
 echo "## copy done"
 echo
 tree -h -L 2 "${outfolder}"
+
+# echo "# creating tgz archive"
+tar --use-compress-program="pigz -p 8 " \
+  -h -cvf \
+  ${data_folder}.tgz \ 
+  ${outfolder}

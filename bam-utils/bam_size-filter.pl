@@ -12,7 +12,7 @@ use Getopt::Std;
 #
 # Stéphane Plaisance - VIB-NC-BITS Jan-31-2017 v1.1
 # v1.2 adding FASTA output option
-# v1.3 adding FASTQ output (although Seque Qscores are all !)
+# v1.3 adding FASTQ output (although Sequel Qscores are all arbitrarily set to '!')
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 

@@ -6,7 +6,7 @@
 #
 # REM: uses code from 'pb_get_subread_path.sh -n <subread-Name> to get the subread path
 #
-# Stephane Plaisance, VIB-NC 2021/02/26; v1.0
+# Stephane Plaisance, VIB-NC 2021/02/26; v1.01
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -19,11 +19,12 @@ usage='# Usage: run_pbcromwell_pb_demux_ccs.sh
 # -j <opt: run using json config (default using args>)
 # -t <opt: threads per job (default 6)>
 # -o <opt: output base folder (default ccs-demux_out - should not exist!)>
+# -S <barcodes are symetric (default OFF)>
 # -l => lists the subread names of all available datasets and barcode sets
 # [-h for this help]
 # script version '${version}
 
-while getopts "c:b:s:t:o:jSh" opt; do
+while getopts "c:b:s:t:o:jSlh" opt; do
   case $opt in
     l) echo "# SMRTLink available barcode sets:" ;
        GET ${SMRTLinkURL}/datasets/barcodes | jq .[] | jq .name ;

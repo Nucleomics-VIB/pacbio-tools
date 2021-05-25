@@ -34,17 +34,17 @@ usage='# Usage: rundata2tgz.sh
 $( hash pigz 2>/dev/null ) || ( echo "# pigz not found in PATH"; exit 1 )
 
 while getopts "i:f:o:S:lbh" opt; do
-	case $opt in
-		i) runfolder=${OPTARG} ;;
-		f) flowcell=${OPTARG} ;;
-		o) outpath=${OPTARG} ;;
-		b) bamcopy=1 ;;
-		l) list=1 ;;
-		S) dataroot=${OPTARG} ;;
-		h) echo "${usage}" >&2; exit 0 ;;
-		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
-		*) echo "this command requires arguments, try -h" >&2; exit 1 ;;
-	esac
+  case $opt in
+    i) runfolder=${OPTARG} ;;
+    f) flowcell=${OPTARG} ;;
+    o) outpath=${OPTARG} ;;
+    b) bamcopy=1 ;;
+    l) list=1 ;;
+    S) dataroot=${OPTARG} ;;
+    h) echo "${usage}" >&2; exit 0 ;;
+    \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
+    *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
+  esac
 done
 
 #########################
@@ -58,7 +58,7 @@ then
    echo "${usage}"
    exit 1
 else
-	return 0
+  return 0
 fi
 }
 
@@ -66,11 +66,11 @@ function testfolderexist ()
 {
 if [ ! -d "${1}" -a ! -h "${1}" ]
 then
-	echo "! # ${1} folder not found!"
-	echo "# provide it with ${2}"
-	exit 1
+  echo "! # ${1} folder not found!"
+  echo "# provide it with ${2}"
+  exit 1
 else
-	return 0
+  return 0
 fi
 }
 
@@ -78,11 +78,11 @@ function testfolderwritable ()
 {
 if [ ! -w "${1}" ]
 then
-	echo "! # ${1} folder not found or not writable for the current user!"
-	echo "# provide it with ${2}"
-	exit 1
+  echo "! # ${1} folder not found or not writable for the current user!"
+  echo "# provide it with ${2}"
+  exit 1
 else
-	return 0
+  return 0
 fi
 }
 
@@ -95,8 +95,8 @@ data_folder=${dataroot:-"$SMRT_DATA"}
 
 # user asked for list
 [ ${list} ] && { echo "# Data currently in ${data_folder}:";
-	tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
-	exit 0; }
+  tree -a -I "000" -L 3 ${dataroot:-"$SMRT_DATA"};
+  exit 0; }
 
 # check input defined
 testvariabledef "${runfolder}" "-i"
@@ -121,71 +121,71 @@ archive_file=$(basename ${run_folder})-$(basename ${flowcell_path}).tgz
 
 # create archive (dereference/follow symlinks)
 echo "# creating archive from: ${data_folder}/${run_folder}/${flow_cell}"
-tar --use-compress-program="pigz" \
-	--exclude "*.h5" \
-	--exclude "*.baz" \
-	--exclude "*.log" \
-	-C ${data_folder} \
-	-h -cvf \
-	${archive_path%/}/${archive_file} \
-	${run_folder}/${flow_cell}
+tar --use-compress-program="pigz -p 8 " \
+  --exclude "*.h5" \
+  --exclude "*.baz" \
+  --exclude "*.log" \
+  -C ${data_folder} \
+  -h -cvf \
+  ${archive_path%/}/${archive_file} \
+  ${run_folder}/${flow_cell}
 
 if [ $? -eq 0 ]; then
-	echo
-	echo "# archive was created successfully, now checksumming"
-	md5sum ${archive_path%/}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" \
-		> ${archive_path%/}/${archive_file}_md5.txt && \
-		echo; echo "# checksum saved as: ${archive_path%/}/${archive_file}_md5.txt" && \
-		du -a -h --max-depth=1 ${archive_path%/}/${archive_file}* | \
-		sort -hr ; cat ${archive_path%/}/${archive_file}_md5.txt
+  echo
+  echo "# archive was created successfully, now checksumming"
+  md5sum ${archive_path%/}/${archive_file} | sed -r "s/ .*\/(.+)/  \1/g" \
+    > ${archive_path%/}/${archive_file}_md5.txt && \
+    echo; echo "# checksum saved as: ${archive_path%/}/${archive_file}_md5.txt" && \
+    du -a -h --max-depth=1 ${archive_path%/}/${archive_file}* | \
+    sort -hr ; cat ${archive_path%/}/${archive_file}_md5.txt
 else
-	echo
-	echo "# something went wrong while creating archive, please have a check!"
-	exit 1
+  echo
+  echo "# something went wrong while creating archive, please have a check!"
+  exit 1
 fi
 
 # checking the md5sum 
 if [ $? -eq 0 ]; then
-	echo
-	echo "# verifying the checksum against the archive"
-	cd ${archive_path} && md5sum -c ${archive_file}_md5.txt 2>&1 | \
-	 tee -a ${archive_file}_md5-test.txt && \
-	 cd - &>/dev/null
+  echo
+  echo "# verifying the checksum against the archive"
+  cd ${archive_path} && md5sum -c ${archive_file}_md5.txt 2>&1 | \
+   tee -a ${archive_file}_md5-test.txt && \
+   cd - &>/dev/null
 else
-	echo
-	echo "# something went wrong while checking md5sum, please have a check!"
-	exit 1
+  echo
+  echo "# something went wrong while checking md5sum, please have a check!"
+  exit 1
 fi
 
 
 # optionally copy the subread.bam file
-if [ $bamcopy == 1 ]; then
-	subreads=$(find "${data_folder}/${run_folder}/${flow_cell}" -name "*.subreads.bam" -print )
-	bname=$(basename "${subreads}")
-	
-	# copy bam data
-	echo
-	echo "# copying the subreads.bam file"
-	cp ${subreads} ${archive_path%/}/${archive_file%.tgz}_${bname}
+if [ -n $bamcopy ]; then
+  subreads=$(find "${data_folder}/${run_folder}/${flow_cell}" -name "*.subreads.bam" -print )
+  bname=$(basename "${subreads}")
+  
+  # copy bam data
+  echo
+  echo "# copying the subreads.bam file"
+  cp ${subreads} ${archive_path%/}/${archive_file%.tgz}_${bname}
 
     echo 
-	if [ $? -eq 0 ]; then
-		echo "# subreads.bam file saved as ${archive_path%/}/${bname}"
-	else
-		echo "# something went wrong while copying subreads.bam, please have a check!"
-		exit 1
-	fi
+  if [ $? -eq 0 ]; then
+    echo "# subreads.bam file saved as ${archive_path%/}/${bname}"
+  else
+    echo "# something went wrong while copying subreads.bam, please have a check!"
+    exit 1
+  fi
 
-	# create md5sum
-	echo
-	echo "# creating a md5sum for the subreads.bam file copy"
-	cd ${archive_path}
-	md5sum ${archive_file%.tgz}_${bname} > ${archive_file%.tgz}_${bname}_md5.txt
-	echo
-	echo "# verifying the checksum against the bam copy"
-	md5sum -c ${archive_file%.tgz}_${bname}_md5.txt 2>&1 | \
-	tee -a ${archive_file%.tgz}_${bname}_md5-test.txt && \
-	cd - &>/dev/null
+  # create md5sum
+  echo
+  echo "# creating a md5sum for the subreads.bam file copy"
+  cd ${archive_path}
+  md5sum ${archive_file%.tgz}_${bname} > ${archive_file%.tgz}_${bname}_md5.txt
+  echo
+  echo "# verifying the checksum against the bam copy"
+  md5sum -c ${archive_file%.tgz}_${bname}_md5.txt 2>&1 | \
+  tee -a ${archive_file%.tgz}_${bname}_md5-test.txt && \
+  cd - &>/dev/null
 fi
 
 # also copy metadata file
@@ -197,10 +197,10 @@ mname=$(basename "${metadata}")
 cp ${metadata} ${archive_path%/}/${archive_file%.tgz}${mname} && touch ${archive_path%/}/FLAG_READY4COPY_${archive_file%.tgz}.txt
 
 if [ $? -eq 0 ]; then
-	echo
-	echo "# run.metadata.xml and flag files copied successfully"
+  echo
+  echo "# run.metadata.xml and flag files copied successfully"
 else
-	echo
-	echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
-	exit 1
+  echo
+  echo "# something went wrong while copying run.metadata.xml or creating FLAG file, please have a check!"
+  exit 1
 fi
