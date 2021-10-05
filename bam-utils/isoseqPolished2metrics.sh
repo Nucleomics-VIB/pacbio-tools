@@ -46,7 +46,7 @@ echo "# parsing polished transcripts BAM file"
 
 samtools view "${infile}" | \
 	awk 'BEGIN{FS="\t"; OFS="\t"; print "transcript.ID","length","ib","im","is","iz","iq","zm","RG"}
-		{split($1,tid,"/");	split($12,ib,":"); split($13,im,":");
+		{split($1,tid,"/"); split($12,ib,":"); split($13,im,":");
 		split($14,is,":"); split($15,iz,":"); split($16,rq,":");
 		split($17,zm,":"); split($18,RG,":");
 		print tid[2],length($10),ib[3],im[3],is[3],iz[3],rq[3],zm[3],RG[3] }' \
