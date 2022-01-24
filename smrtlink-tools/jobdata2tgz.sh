@@ -99,7 +99,8 @@ testvariabledef "${jobfolder}" "-i"
 # check data folder
 job_data_folder=${jobdataroot:-"$SMRT_JOBS"}
 
-# check runfolder
+# check runfolder with leading zero's
+# job_folder=$(printf "%010d" ${jobfolder})
 job_folder=${jobfolder}
 testfolderexist "${job_data_folder}/${job_folder}" "-i <job-folder-name (in ${job_data_folder})>"
 
@@ -118,9 +119,7 @@ curdir=$(pwd)
 if [ -n "$usepigz" ]; then
 	# use pigz for speed and pv to monitor the process
 	cd ${job_data_folder} && \
-	tar -cfh \
-		- \
-		${job_folder} | \
+	tar --dereference -cf - ${job_folder} | \
 		pv -p -s $(du -sk "${job_data_folder}/${job_folder}" | cut -f 1)k | \
 		pigz -p 8 > ${archive_path}/${archive_file} && \
 		cd ${curdir}
