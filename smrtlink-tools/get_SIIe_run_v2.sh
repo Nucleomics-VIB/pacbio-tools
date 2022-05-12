@@ -2,27 +2,25 @@
 
 # scripts: get_SIIe_run.sh
 # download run files from bucket
-#
+# matches the new folder structure (05-2022)
 # Stephane Plaisance (VIB-NC) 2021/12/20; v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
-version="1.0, 2020-12-20"
+version="2.0, 2022-05-12"
 
 usage='# Usage: get_SIIe_run.sh <args>
-# -R <run_name (obtained from "gsutil ls gs://gcpi-rvvnc/")>
-# -r <run_id (obtained from "gsutil ls gs://gcpi-rvvnc/<run_name>")>
-# -s <smart-cell_id (obtained from "gsutil ls gs://gcpi-rvvnc/<run_name><run_id>")>
-# -l <show the list of run folders currently present on the server>]
+# -R <runs_dir (obtained from "gsutil ls gs://gcpi-rvvnc/")>
+# -r <run_id (obtained from "gsutil ls gs://gcpi-rvvnc/<runs_dir>")>
+# -l <show the list of runs_dir currently present on the server>]
 # -h <this help>
 # script version '${version}'
 # [-h for this help]'
 
-while getopts "R:r:s:lh" opt; do
+while getopts "R:r:lh" opt; do
   case $opt in
     R) rundir=${OPTARG} ;;
     r) runid=${OPTARG} ;;
-    s) scid=${OPTARG} ;;
     l) echo "# Runs data currently available on the bucket";
     		gsutil ls gs://gcpi-rvvnc/${rundir:-""}/${runid:-""};
 			exit 0 ;;
@@ -47,18 +45,11 @@ then
    exit 1
 fi
 
-if [ -z "${scid}" ]
-then
-   echo "# no SmartCell ID folder name provided!"
-   echo "${usage}"
-   exit 1
-fi
-
 # create local folder
-mkdir -p ${rundir}/${runid}/${scid} && cd ${rundir}/${runid}/${scid}
+mkdir -p ${rundir}/${runid} && cd ${rundir}/${runid}
 
 # get run folder
 echo -e "\n# getting run data"
-gsutil -m rsync "gs://gcpi-rvvnc/${rundir}/${runid}/${scid}/" .
+gsutil -m rsync "gs://gcpi-rvvnc/${rundir}/${runid}/" .
 
 echo -e "\n\n# copy done"

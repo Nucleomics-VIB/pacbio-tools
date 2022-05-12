@@ -10,7 +10,7 @@
 version="1.0, 2020-12-20"
 
 usage='# Usage: get_SIIe_demux.sh <args>
-# -r <run_name (obtained from "gsutil ls gs://gc-to-nucleomicscore/")>
+# -r <run_name (obtained from "gsutil ls gs://gcpi-rvvnc/")>
 # -l <show the list of run folders currently present on the server>]
 # -h <this help>
 # script version '${version}'
@@ -20,7 +20,7 @@ while getopts "r:lh" opt; do
   case $opt in
     r) rundir=${OPTARG} ;;
     l) echo "# Runs data currently available on the bucket";
-                gsutil ls gs://gc-to-nucleomicscore/;
+                gsutil ls gs://gcpi-rvvnc/;
                         exit 0 ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -44,7 +44,7 @@ d="fastX_data"
 mkdir -p ${d}
 echo -e "\n# getting demultiplexing fastX data"
 for q in all_barcodes.fasta.tar.gz all_barcodes.fastq.tar.gz; do
-cmd="gsutil ls gs://gc-to-nucleomicscore/${rundir}/**/${q}"
+cmd="gsutil ls gs://gcpi-rvvnc/${rundir}/**/${q}"
 res=$(eval ${cmd})
 # get the files
 gsutil cp -n ${res} ${d}/
@@ -55,7 +55,7 @@ q="barcode_ccs_summary.csv"
 d="demux_data"
 mkdir -p ${d}
 echo -e "\n# getting demultiplexing data and plots"
-cmd="gsutil ls gs://gc-to-nucleomicscore/${rundir}/**/${q}"
+cmd="gsutil ls gs://gcpi-rvvnc/${rundir}/**/${q}"
 res=$(eval ${cmd})
 path=$(dirname ${res})
 # get the files
@@ -66,7 +66,7 @@ q="demultiplex.removed.bam"
 d="bam_data"
 mkdir -p ${d}
 echo -e "\n# getting HiFi / ccs bam data"
-cmd="gsutil ls gs://gc-to-nucleomicscore/${rundir}/**/${q}"
+cmd="gsutil ls gs://gcpi-rvvnc/${rundir}/**/${q}"
 res=$(eval ${cmd})
 path=$(dirname ${res})
 # get the files
