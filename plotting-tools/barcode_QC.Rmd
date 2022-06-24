@@ -58,7 +58,7 @@ treemap(barcodes,
 
 *Note:* very low barcode counts will result into small polygons without a readable label.
 
-### Barcode count distribution counts across all samples (N=`r nrow(barcodes)`)
+### Barcode count distribution across all samples (N=`r nrow(barcodes)`)
 
 ```{r plot distribution}
 # plot distribution
