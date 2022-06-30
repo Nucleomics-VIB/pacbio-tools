@@ -10,7 +10,7 @@
 version="1.0, 2020-12-20"
 
 usage='# Usage: get_SIIe_demux.sh <args>
-# -r <run_name (obtained from "gsutil ls gs://gcpi-rvvnc/")>
+# -r <run_name (obtained from "gsutil ls gs://gcpi-rvvnc/exports")>
 # -l <show the list of run folders currently present on the server>]
 # -h <this help>
 # script version '${version}'
@@ -20,7 +20,7 @@ while getopts "r:lh" opt; do
   case $opt in
     r) rundir=${OPTARG} ;;
     l) echo "# Runs data currently available on the bucket";
-                gsutil ls gs://gcpi-rvvnc/;
+                gsutil ls gs://gcpi-rvvnc/exports;
                         exit 0 ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;

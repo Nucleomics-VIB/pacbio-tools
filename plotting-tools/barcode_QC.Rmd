@@ -56,11 +56,13 @@ treemap(barcodes,
         lowerbound.cex.labels=0)
 ```
 
-*Note:* very low barcode counts will result into small polygons without a readable label.
+*Note:* very low barcode counts will result into small polygons without a readable label, please refer to the last table for full details.
+
+\newpage
 
 ### Barcode count distribution across all samples (N=`r nrow(barcodes)`)
 
-```{r plot distribution}
+```{r plot distribution, fig.width=5, fig.height=4}
 # plot distribution
 
 su <- summary(barcodes$`Polymerase Reads`)

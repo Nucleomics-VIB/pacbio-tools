@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: barcode_QC.sh -i <ccd_paired_reads> -p <project#> 
+# usage: barcode_QC.sh -i <barcode_ccs_summary.csv> -p <project#> 
 # optional: -f <pdf|html (default pdf)>
 # 
 # plot barcode CCS results from find optical read duplicates and return counts
@@ -18,7 +18,7 @@ version="1.0, 2022_06_24"
 rmd_path="/opt/scripts/barcode_QC.Rmd"
 
 usage='# Usage: barcode_QC.sh 
-# -i <barcode_ccs.tsv file from SMRTlink>
+# -i <barcode_ccs_summary.csv file from SMRTlink>
 # -p <opt: NC project code or title>
 # -f <opt: output format pdf or HTML (default pdf)>
 # -h <this help text>
