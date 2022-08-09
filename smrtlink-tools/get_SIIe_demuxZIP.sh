@@ -50,15 +50,15 @@ cd ../
 
 # get bam data
 mkdir -p bam_data/
-find ${pfx} -name "demultiplex.*.bam" -exec cp {} bam_data/ \;
+find ${rundir}_demux -name "demultiplex.*.bam" -exec cp {} bam_data/ \;
 
 # get fastX data
 mkdir -p fastX_data/
-find ${pfx} -name "demultiplex.*.hifi_reads.fastq.gz" -exec cp {} fastX_data/ \;
+find ${rundir}_demux -name "demultiplex.*.hifi_reads.fastq.gz" -exec cp {} fastX_data/ \;
 
 # get demux job data
 mkdir -p demux_data
-demuxfolder=$(dirname $(find ${pfx} -name "barcode_ccs_summary.csv"))
+demuxfolder=$(dirname $(find ${rundir}_demux -name "barcode_ccs_summary.csv"))
 cp ${demuxfolder}/barcode_ccs_summary.csv demux_data/
 cp ${demuxfolder}/bq_histogram.png demux_data/
 cp ${demuxfolder}/nreads_histogram.png demux_data/
