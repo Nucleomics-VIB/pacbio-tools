@@ -1,0 +1,139 @@
+---
+params: 
+  expRef: 
+    value: x,
+  inputFile:
+    value: x
+---
+
+```{r setup, include=FALSE}
+# call with:
+# R --slave -e 'rmarkdown::render(
+#  input=\"${rmd_path}\", 
+#  output_format=\"${outformat}\",
+#  output_dir=\"$PWD\",
+#  params=list(expRef=\"${opt_project}\",inputFile=\"$PWD/${opt_infile}\")
+#  )'
+
+library("readr")
+library("treemap")
+library("ggplot2")
+library("knitr")
+library("kableExtra")
+knitr::opts_chunk$set(echo = FALSE)
+
+# logo for document end page
+nclogo <- "/opt/scripts/NC_logo_200.png"
+```
+
+# Sequel-IIe demultiplexing report for project: **`r params$expRef`**
+#### Nucleomics Core, [nucleomics@vib.be]
+#### date: `r Sys.Date()`
+
+\bigskip
+
+\bigskip
+
+The read count per barcode was obtained from the Sequel-IIe demultiplexing analysis (*) and used to produce the plots and tables below.
+
+* (*`r basename(params$inputFile)`*) 
+
+```{r load data}
+# load PB Lima demux counts
+ccs_summary <- suppressMessages(
+  read_delim(params$inputFile, 
+    delim = "\t", 
+    escape_double = FALSE, 
+    trim_ws = TRUE, 
+    show_col_types = FALSE)
+)
+
+# add combined barcode string in new column
+ccs_summary$BC.pairs <- paste0(ccs_summary$IdxFirstNamed, sep="--", ccs_summary$IdxCombinedNamed, sep='')
+```
+
+### Mosaic plot with polygon area based on barcode counts 
+
+```{r plot mosaic}
+treemap(ccs_summary,
+        index="BC.pairs",
+        vSize="Counts",
+        type="index",
+        title="",
+        fontsize.labels=8,
+        lowerbound.cex.labels=0)
+```
+
+*Note:* very low barcode counts will result into small polygons without a readable label, please refer to the last table for full details.
+
+\newpage
+
+### Barcode count distribution across all samples (N=`r nrow(ccs_summary)`)
+
+```{r plot distribution, fig.width=5, fig.height=4}
+# plot distribution
+
+su <- summary(ccs_summary$Counts)
+mean <- su[[4]]
+median <- su[[3]]
+pc5 <- quantile(ccs_summary$Counts,0.05)
+pc95 <- quantile(ccs_summary$Counts,0.95)
+
+# plot density histogram
+hist(ccs_summary$Counts, breaks=100,
+     main="",
+     xlab="barcode read count")
+abline(v=mean(ccs_summary$Counts),col="blue",lwd=2)
+abline(v=median(ccs_summary$Counts),col="green",lwd=2)
+abline(v=pc5,col="black",lwd=1)
+abline(v=pc95,col="black",lwd=1)
+
+# bottom5%
+low <- ccs_summary[ccs_summary$Counts<=pc5,]
+low_ordered <-low[order(low$Counts),]
+
+# top5%
+high <- ccs_summary[ccs_summary$Counts>=pc95,]
+high_ordered <- high[order(high$Counts),]
+```
+
+**legend:** black lines indicate the bottom 5% and top 5% limits, the blue line indicates the **mean** count value across all barcodes (`r as.integer(mean)`), the green line refers to the **median** count value (`r as.integer(median)`).
+
+### 5% least represented barcodes
+
+```{r low counts}
+kable(low_ordered) %>%
+kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+### 5% most represented barcodes
+
+```{r higcounts}
+kable(high_ordered) %>%
+kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+\newpage
+
+### Full results
+
+\footnotesize
+
+```{r allcounts}
+kable(ccs_summary[order(ccs_summary$Counts),],
+  longtable = T) %>%
+kable_styling(latex_options = c("repeat_header"),
+  repeat_header_continued = "\\textit{(Continued on Next Page...)}")
+```
+
+\normalsize
+
+\bigskip
+
+\bigskip
+
+\bigskip
+
+*`r Sys.Date()`*
+
+![logo](`r nclogo`) more at **<http://www.nucleomics.be>**

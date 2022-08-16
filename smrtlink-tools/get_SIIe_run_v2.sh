@@ -50,6 +50,6 @@ mkdir -p ${rundir}/${runid} && cd ${rundir}/${runid}
 
 # get run folder
 echo -e "\n# getting run data"
-gsutil -m rsync "gs://gcpi-rvvnc/${rundir}/${runid}/" .
+gsutil -m rsync -r "gs://gcpi-rvvnc/${rundir}/${runid}/" .
 
 echo -e "\n\n# copy done"
