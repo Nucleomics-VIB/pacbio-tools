@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # create pb-16S-nf run_samples.tsv file from HiFi read folder
+# remove carriage return from readlink output
 
 echo -e "sample-id\tabsolute-file-path" > run_samples.tsv
 
@@ -13,4 +14,4 @@ readfolder=${1:-fastq_results}
 for fq in $(find ${readfolder} -name "*.fastq.gz" -exec readlink -f {} \;);
 do bc=$(basename ${fq} | cut -d "." -f 3)
 echo -e "${bc}\t${fq}";
-done >> run_samples.tsv
+done | tr -d '\r' >> run_samples.tsv
