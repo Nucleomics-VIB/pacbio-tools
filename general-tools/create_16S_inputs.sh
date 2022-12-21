@@ -3,7 +3,10 @@
 # script: create_16S_inputs.sh
 
 # create samples.tsvand metadata.tsv for pb-16S-nf
-# the metadata file needs be manually edited to change control samples to 'Control'
+# the metadata files needs be manually edited to change control samples to 'Control'
+# - and optionally add more metadata columns
+# also create metadata_qiime.tsv for use with qiime2
+# - when adding extra columns, specify (numeric or categorical) in line#2
 
 if [ $# -lt 2 ]; then
     echo "# requires read folder and barcode.csv arguments"
@@ -40,7 +43,15 @@ join -t $'\t'  -a1 -a2 -e 1 -o auto bc2names.tsv bc2samples.tsv | cut -f 2,3 >> 
 ###################
 
 echo -e "sample_name\tcondition" > metadata.tsv
-awk 'BEGIN{IFS="\t";OFS="\t"}{print $2, "Sample"}'  bc2names.tsv >> metadata.tsv
+awk 'BEGIN{IFS="\t";OFS="\t"}{print $2, "Sample"}' bc2names.tsv >> metadata.tsv
+
+
+###################
+# create qiime_metadata.tsv
+###################
+
+echo -e "sample-id\tgroup\n#q2:types\tcategorical\tcategorical" > qiime_metadata.tsv
+awk 'BEGIN{IFS="\t";OFS="\t"}{print $2, "Sample"}' bc2names.tsv >> qiime_metadata.tsv
 
 #########
 # cleanup #
