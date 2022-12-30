@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# pb-16S-nf_make_samples.sh
 # create pb-16S-nf run_samples.tsv file from HiFi read folder
 # remove carriage return from readlink output
 

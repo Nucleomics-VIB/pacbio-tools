@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# pb-16S-nf_make_metadata.sh
 # create pb-16S-nf metadata file from barcode-name.csv and HiFi read folder
 
 if [ $# -lt 1 ]; then
@@ -12,7 +13,7 @@ echo -e "sample_name\tcondition\tsample_label" > run_metadata.tsv
 condition="condition"
 
 # find all fastq and add rows to tsv
-readfolder=fastq_results
+readfolder=${2:-fastq_results}
 
 # read files are named like
 #  m64279e_221217_093107.hifi_reads.bc1024--bc1044.fastq.gz
