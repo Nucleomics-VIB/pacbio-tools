@@ -20,7 +20,7 @@ data <- separate(data = data,
          sep = ";")
 
 # retain genus and species to shorten labels in new columns
-#data$label <- paste0(data$genus, ".", data$species, sep="")
+#data$label <- paste0(data$genus, " _ ", data$species, sep="")
 data$label <- data$species
 
 # read ori tree file

@@ -18,6 +18,7 @@ readfolder=${2:-fastq_results}
 # read files are named like
 #  m64279e_221217_093107.hifi_reads.bc1024--bc1044.fastq.gz
 
+
 for fq in $(find ${readfolder} -name "*.fastq.gz" -exec readlink -f {} \;);
 do bc=$(basename ${fq} | cut -d "." -f 3)
 label=$(cat $1 | grep ${bc} | cut -d "," -f 2)
