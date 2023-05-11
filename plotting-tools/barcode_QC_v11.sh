@@ -98,7 +98,7 @@ echo "# converting barcode data to fastq"
 # use parallel for speedup
 parallel --plus \
   -j4 \
-  "bam2fastq {} -o fastq_results/{= s#^\.\/##; s#.*\/##; s#.bam\$##;  =}" \
+  "bam2fastq {} -o fastq_results/{= s#^\.\/##; s#.*\/##; s#.bam\$##; s#.*\.##; =}" \
   ::: $(dirname ${opt_infile})/bc*/*.bam
 fi
 
