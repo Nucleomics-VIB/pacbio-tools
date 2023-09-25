@@ -54,8 +54,6 @@ if [ ! -f "${opt_infile}" ]; then
 	exit 1
 fi
 
-filepath=$PWD{pwd}
-
 # project
 if [ -z "${opt_project}" ]; then
    echo
