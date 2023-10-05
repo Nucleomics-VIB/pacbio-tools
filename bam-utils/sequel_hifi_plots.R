@@ -4,6 +4,7 @@
 # usage: sequel_hifi_plots.R <output of hifiBam2metrics.sh on HIFI bam>
 #
 # Stephane Plaisance VIB-NC September-16-2022 v1.0
+# October 2023 - version 1.1: add Qvalues and PNG output, and fix syntax changes
 
 # R libraries
 suppressMessages(library("optparse"))
@@ -23,6 +24,8 @@ option_list = list(
               help="maximal HiFi length [default= %default]", metavar="numeric"),
   make_option(c("-a", "--minaccuracy"), type="numeric", default="0", 
               help="minimal HiFi accuracy [default= %default]", metavar="numeric"),
+  make_option(c("-q", "--qualitymetric"), type="character", default="Qvalue", 
+              help="quality metric to plot (accuracy or Qvalue) [default= %default]", metavar="character"),
   make_option(c("-f", "--format"), type="character", default="png", 
               help="output format (png or pdf) [default= %default]", metavar="character")
 ); 
@@ -61,6 +64,9 @@ ccs_info <- read_delim(opt$infile,
 # filtered data
 ccs_data <- subset(ccs_info, (npass>opt$minpass & len>=opt$minlength & len<=opt$maxlength & Accuracy>=opt$minaccuracy))
 
+# add Q value
+ccs_data$Qvalue <- -10*log(1-(ccs_data$Accuracy),10)
+
 minl <- min(ccs_data$len)
 maxl <- max(ccs_data$len)
 n50reads <- Nvalue(50,ccs_data$len)
@@ -69,7 +75,10 @@ maxpass <- max(ccs_data$npass)
 n50npass <- Nvalue(50,ccs_data$npass)
 minaccu <- min(c(0.999, min(ccs_data$Accuracy)))
 maxaccu <- max(ccs_data$Accuracy)
-medaccu <- median(ccs_data$Accuracy)
+medaccu <- round(median(ccs_data$Accuracy),1)
+minQ <- min(c(20, min(ccs_data$Qvalue)))
+maxQ <- max(c(60, ccs_data$Qvalue))
+medQ <- round(median(ccs_data$Qvalue),1)
 
 # Determine the output file extension based on the chosen format
 output_file_extension <- ifelse(opt$format == "pdf", "pdf", "png")
@@ -78,7 +87,7 @@ output_file_extension <- ifelse(opt$format == "pdf", "pdf", "png")
 if (opt$format == "pdf") {
   pdf(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 10, height = 10)
 } else {
-  png(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 800, height = 800, res = 300)
+  png(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 1600, height = 1600, res = 150)
 }
 
 # plot lengths
@@ -97,37 +106,75 @@ p2 <- ggplot() +
   theme(plot.title = element_text(margin=margin(b=0), size = 14)) +
   ggtitle(paste0("pass number", " (min=",minpass,", N50=" ,n50npass, ")"))
 
-# plot accuracy
-p3 <- ggplot() + 
-  geom_density(data=ccs_data, aes(Accuracy, colour="red"), lwd=1.25, show.legend=FALSE) +
-  labs(x = "CCS accuracy", y = "density") +
-  theme_linedraw() +
-  theme(plot.title = element_text(margin=margin(b=0), size = 14)) +
-  coord_flip() +
-  ggtitle(paste0("CCS accuracy ([", minaccu, "..", maxaccu, "], median=" ,medaccu, ")"))
+# create last plots depending on qualitymetric
+if (opt$qualitymetric == "accuracy") {
 
-# biplot npass x accuracy
-p4 <- ggplot(ccs_data, aes(x=npass, y=Accuracy)) + 
-  geom_point(pch=20, cex=0.75, col="grey60") +
-  labs(x = "CCS pass number", y = "CCS accuracy") +
-  stat_density_2d(aes(fill = after_stat(level)), geom="polygon") +
-  scale_fill_gradient(low="blue", high="red") +
-  geom_hline(aes(yintercept=0.999), linewidth=0.5, colour="green", lty=1) +
-  geom_hline(aes(yintercept=0.9999), linewidth=0.5, colour="blue", lty=2) +
-  theme_linedraw() +
-  theme(plot.title = element_text(margin=margin(b=0), size = 14),
-        legend.position = "none") +
-  annotate(geom="text", 
-           x=minpass+2/3*(maxpass-minpass), 
-           y=minaccu+1/4*(maxaccu-minaccu), 
-           label="green line:Q30\n dashed-blue line Q40",
-           color="grey25",
-           cex=4) +
-  ggtitle(paste0("read-count: ", nrow(ccs_data)))
+  # plot accuracy
+  p3 <- ggplot() + 
+    geom_density(data=ccs_data, aes(Accuracy, colour="red"), lwd=1.25, show.legend=FALSE) +
+    labs(x = "CCS accuracy", y = "density") +
+    theme_linedraw() +
+    theme(plot.title = element_text(margin=margin(b=0), size = 14)) +
+    coord_flip() +
+    ggtitle(paste0("CCS accuracy ([", minaccu, "..", maxaccu, "], median=" ,medaccu, ")"))
+  
+  # biplot npass x accuracy
+  p4 <- ggplot(ccs_data, aes(x=npass, y=Accuracy)) + 
+    geom_point(pch=20, cex=0.75, col="grey60") +
+    labs(x = "CCS pass number", y = "CCS accuracy") +
+    stat_density_2d(aes(fill = after_stat(level)), geom="polygon") +
+    scale_fill_gradient(low="blue", high="red") +
+    geom_hline(aes(yintercept=0.999), linewidth=0.5, colour="green", lty=1) +
+    geom_hline(aes(yintercept=0.9999), linewidth=0.5, colour="blue", lty=2) +
+    theme_linedraw() +
+    theme(plot.title = element_text(margin=margin(b=0), size = 14),
+          legend.position = "none") +
+    annotate(geom="text", 
+             x=minpass+2/3*(maxpass-minpass), 
+             y=minaccu+1/4*(maxaccu-minaccu), 
+             label="green line:Q30\n dashed-blue line Q40",
+             color="grey25",
+             cex=4) +
+    ggtitle(paste0("read-count: ", nrow(ccs_data)))
 
-ggarrange(p2, p1, p4, p3, 
-          labels = c("A", "B", "C", "D"),
-          ncol = 2, nrow = 2)
+  ggarrange(p2, p1, p4, p3, 
+            labels = c("A", "B", "C", "D"),
+            ncol = 2, nrow = 2)
+} else if (opt$qualitymetric == "Qvalue") {
+
+  # plot Qvalue
+  p3Q <- ggplot() + 
+    geom_density(data=ccs_data, aes(Qvalue, colour="red"), lwd=1.25, show.legend=FALSE) +
+    labs(x = "CCS Qvalue", y = "density") +
+    theme_linedraw() +
+    theme(plot.title = element_text(margin=margin(b=0), size = 14)) +
+    coord_flip() +
+    ggtitle(paste0("CCS Qvalue ([", minQ, "..", maxQ, "], median=" ,medQ, ")"))
+  
+  
+  # biplot npass x accuracy
+  p4Q <- ggplot(ccs_data, aes(x=npass, y=Qvalue)) + 
+    geom_point(pch=20, cex=0.75, col="grey60") +
+    labs(x = "CCS pass number", y = "CCS Qvalue") +
+    stat_density_2d(aes(fill = after_stat(level)), geom="polygon") +
+    scale_fill_gradient(low="blue", high="red") +
+    geom_hline(aes(yintercept=30), linewidth=0.5, colour="green", lty=1) +
+    geom_hline(aes(yintercept=40), linewidth=0.5, colour="blue", lty=2) +
+    theme_linedraw() +
+    theme(plot.title = element_text(margin=margin(b=0), size = 14),
+          legend.position = "none") +
+    annotate(geom="text", 
+             x=minpass+2/3*(maxpass-minpass), 
+             y=minaccu+1/4*(maxQ-minQ), 
+             label="green line:Q30\n dashed-blue line Q40",
+             color="grey25",
+             cex=4) +
+    ggtitle(paste0("read-count: ", nrow(ccs_data)))
+
+  ggarrange(p2, p1, p4Q, p3Q, 
+            labels = c("A", "B", "C", "D"),
+            ncol = 2, nrow = 2)
+}
 
 null <- dev.off()
 
