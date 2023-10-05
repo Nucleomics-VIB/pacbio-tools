@@ -22,7 +22,9 @@ option_list = list(
   make_option(c("-M", "--maxlength"), type="numeric", default="1000000", 
               help="maximal HiFi length [default= %default]", metavar="numeric"),
   make_option(c("-a", "--minaccuracy"), type="numeric", default="0", 
-              help="minimal HiFi accuracy [default= %default]", metavar="numeric")
+              help="minimal HiFi accuracy [default= %default]", metavar="numeric"),
+  make_option(c("-f", "--format"), type="character", default="png", 
+              help="output format (png or pdf) [default= %default]", metavar="character")
 ); 
 
 opt_parser = OptionParser(option_list=option_list);
@@ -69,7 +71,15 @@ minaccu <- min(c(0.999, min(ccs_data$Accuracy)))
 maxaccu <- max(ccs_data$Accuracy)
 medaccu <- median(ccs_data$Accuracy)
 
-pdf(gsub("_hifi_metrics.txt", "_plots.pdf", basename(opt$infile)), width = 10, height = 10)
+# Determine the output file extension based on the chosen format
+output_file_extension <- ifelse(opt$format == "pdf", "pdf", "png")
+
+# Save plots in the chosen format (PDF or PNG)
+if (opt$format == "pdf") {
+  pdf(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 10, height = 10)
+} else {
+  png(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 2000, height = 2000)
+}
 
 # plot lengths
 p1 <- ggplot() + 
@@ -100,10 +110,10 @@ p3 <- ggplot() +
 p4 <- ggplot(ccs_data, aes(x=npass, y=Accuracy)) + 
   geom_point(pch=20, cex=0.75, col="grey60") +
   labs(x = "CCS pass number", y = "CCS accuracy") +
-  stat_density_2d(aes(fill = ..level..), geom="polygon") +
+  stat_density_2d(aes(fill = after_stat(level)), geom="polygon") +
   scale_fill_gradient(low="blue", high="red") +
-  geom_hline(aes(yintercept=0.999), size=0.5, colour="green", lty=1) +
-  geom_hline(aes(yintercept=0.9999), size=0.5, colour="blue", lty=2) +
+  geom_hline(aes(yintercept=0.999), linewidth=0.5, colour="green", lty=1) +
+  geom_hline(aes(yintercept=0.9999), linewidth=0.5, colour="blue", lty=2) +
   theme_linedraw() +
   theme(plot.title = element_text(margin=margin(b=0), size = 14),
         legend.position = "none") +
