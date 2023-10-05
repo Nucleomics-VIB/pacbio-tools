@@ -78,7 +78,7 @@ output_file_extension <- ifelse(opt$format == "pdf", "pdf", "png")
 if (opt$format == "pdf") {
   pdf(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 10, height = 10)
 } else {
-  png(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 2000, height = 2000)
+  png(gsub("_hifi_metrics.txt", paste0("_plots.", output_file_extension), basename(opt$infile)), width = 800, height = 800, res = 300)
 }
 
 # plot lengths
