@@ -77,7 +77,7 @@ minaccu <- min(c(0.999, min(ccs_data$Accuracy)))
 maxaccu <- max(ccs_data$Accuracy)
 medaccu <- round(median(ccs_data$Accuracy),1)
 minQ <- min(c(20, min(ccs_data$Qvalue)))
-maxQ <- max(c(60, ccs_data$Qvalue))
+maxQ <- min(c(60, max(ccs_data$Qvalue)))
 medQ <- round(median(ccs_data$Qvalue),1)
 
 # Determine the output file extension based on the chosen format
