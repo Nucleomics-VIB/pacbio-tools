@@ -165,7 +165,7 @@ if (opt$qualitymetric == "accuracy") {
           legend.position = "none") +
     annotate(geom="text", 
              x=minpass+2/3*(maxpass-minpass), 
-             y=minaccu+1/4*(maxQ-minQ), 
+             y=minQ+1/4*(maxQ-minQ), 
              label="green line:Q30\n dashed-blue line Q40",
              color="grey25",
              cex=4) +
