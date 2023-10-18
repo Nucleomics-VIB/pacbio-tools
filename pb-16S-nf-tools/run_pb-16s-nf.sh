@@ -12,7 +12,7 @@ infolder="/mnt/nuc-data/ResearchDev/_NC_Long-Read_DATA/PacBio/pb-16S-nf_data/rea
 outfolder="/mnt/syn_lts/analyses/metagenomics_analysis/16S_analysis/Zymo-SequelIIe-Hifi/results_11smpl_auto"
 
 # set rarefaction manually in case samples would have too few
-# when not set; teh rarefaction will be set automatically based on, the smallest sample
+# when not set; the rarefaction will be set automatically based on, the smallest sample
 # rardepth=10000
 
 # color by (default "condition")
