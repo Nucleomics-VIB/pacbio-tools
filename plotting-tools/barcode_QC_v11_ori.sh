@@ -3,14 +3,11 @@
 # optional: -f <pdf|html (default pdf)>
 #
 # plot mosaic from barcode CCS results (runID.lima_counts.txt)
-# opt: copy bams to new folder
-# opt: convert bam to fastq to new folder
 #
-# Stephane Plaisance - VIB-Nucleomics Core - November-26-2018 v1.1
+# Stephane Plaisance - VIB-Nucleomics Core - November-26-2018 v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 # 1.0, 2022_08_16
-# 1,1, 2023_10_19
 
 # requirements
 # R with packages listed on top of the .Rmd scrips
@@ -46,14 +43,14 @@ done
 # infile
 if [ -z "${opt_infile}" ]; then
    echo
-   echo "# no <runid>.lima_counts.txt file provided!"
+   echo "# no barcode_ccs file provided!"
    echo "${usage}"
    exit 1
 fi
 
 if [ ! -f "${opt_infile}" ]; then
 	echo
-	echo "${opt_infile} file not found!"
+	echo "${ipt_infile} file not found!"
 	exit 1
 fi
 
@@ -84,57 +81,32 @@ cmd="R --slave -e 'rmarkdown::render(
 echo "# ${cmd}"
 eval ${cmd}
 
-# store path to runfolder
-runfolder=$(dirname ${opt_infile})
-
 # create fastq versions of the bam files
 if [[ $convertbam == "true" ]]; then
 mkdir -p fastq_results
 
-# count original bam input files
-bamcnt="$(find ${runfolder}/bc* -type f -name "*.bam" | wc -l)"
-echo "# found ${bamcnt} BAM files to convert to FASTQ"
+# good-old way
+#for b in $(find . -name "*.bam" -not -name "*unbarcoded*");
+#do pfx=$(basename ${b} ".bam")
+#echo "# converting ${b} to fastq"
+#bam2fastq ${b} -o fastq_results/${pfx}
+#done
 
-echo "# converting barcode BAM files to FASTQ"
+echo "# converting barcode data to fastq"
 # use parallel for speedup
 parallel --plus \
   -j4 \
   "bam2fastq {} -o fastq_results/{= s#^\.\/##; s#.*\/##; s#.bam\$##; s#.*\.##; =}" \
-  ::: ${runfolder}/bc*/*.bam
-
-touch "bam2fastq_done.flag"
-
-# check if the count of BAM and the count of FASTQ match
-fastqcnt=$(find fastq_results -type f -name "*.fastq.gz" | wc -l)
-
-echo "# ${fastqcnt} FASTQ files written to fastq_results/"
-
-if [[ ${fastqcnt} -ne ${bamcnt} ]]; then
-  echo "# the number of created FASTQ files does not match the number of BAM input files"
-  exit 1
-fi
-
+  ::: $(dirname ${opt_infile})/bc*/*.bam
 fi
 
 # cp bam data to subfolder
 if [[ $copybam == "true" ]]; then
 mkdir -p bam_results
-echo "# copying ${bamcnt} barcode BAM files"
-
-for bcf in $(find ${runfolder} -type d -name "bc*"); do
+echo "# copying barcode BAM data"
+for bcf in $(find $(dirname ${opt_infile}) -type d -name "bc*"); do
 cp -r ${bcf} bam_results/
 done
-
-# check if the count of copied BAM and the count original BAM match
-bamcnt2=$(find bam_results -type f -name "*.bam" | wc -l)
-
-echo "# ${bamcnt2} BAM files copied to bam_results/"
-
-if [[ ${bamcnt2} -ne ${bamcnt} ]]; then
-  echo "# the number of copied BAM files doe not match the number of BAM input files"
-  exit 1
-fi
-
 fi
 
 exit 0
