@@ -119,7 +119,7 @@ rsync -av --copy-links ${outfolder}/results/* ${final_results}/
 cp -r ${outfolder}/report ${final_results}/nextflow_reports
 
 # add files containing key info to the new folder
-cp ${outfolder}/run_log.txt ${final_results}/nextflow_reports/
+cp ${tooldir}/.nextflow.log ${final_results}/nextflow_reports/nextflow.log
 cp ${tooldir}/nextflow.config ${final_results}/nextflow_reports/
 cp ${outfolder}/parameters.txt ${final_results}/nextflow_reports/
 cp ${outfolder}/${outpfx}_samples.tsv ${final_results}/nextflow_reports/
