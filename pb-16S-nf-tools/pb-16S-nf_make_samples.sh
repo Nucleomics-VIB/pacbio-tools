@@ -17,7 +17,11 @@ readfolder=${1:-fastq_results}
 # for custom read names like bc1024--bc1044.fastq.gz
 pos=1
 
+# get the real full path even when it is a link with readlink
 for fq in $(find ${readfolder} -name "*.fastq.gz" -exec readlink -f {} \;);
-do bc=$(basename ${fq} | cut -d "." -f 3)
+do
+# extract barcode pair from file name
+bc=$(basename ${fq} | cut -d "." -f 3)
+# echo both to the run_sample file
 echo -e "${bc}\t${fq}";
 done | tr -d '\r' >> run_samples.tsv

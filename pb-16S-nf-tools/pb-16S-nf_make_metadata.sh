@@ -18,9 +18,12 @@ readfolder=${2:-fastq_results}
 # read files are named like
 #  m64279e_221217_093107.hifi_reads.bc1024--bc1044.fastq.gz
 
-
 for fq in $(find ${readfolder} -name "*.fastq.gz" -exec readlink -f {} \;);
-do bc=$(basename ${fq} | cut -d "." -f 3)
+do 
+# isolate bc1024--bc1044 from the full name
+bc=$(basename ${fq} | cut -d "." -f 3)
+# get user label from sequel sample to barcode file
 label=$(cat $1 | grep ${bc} | cut -d "," -f 2)
+# write both to the metadata file
 echo -e "${bc}\t${condition}\t${label}";
 done >> run_metadata.tsv
