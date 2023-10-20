@@ -2,28 +2,51 @@
 
 # pb-16S-nf_make_metadata.sh
 # create pb-16S-nf metadata file from barcode-name.csv and HiFi read folder
+#
+# Stephane Plaisance (VIB-NC) 2023/10/20; v1.1
+#
+# visit our Git: https://github.com/Nucleomics-VIB
 
-if [ $# -lt 1 ]; then
-    echo "usage: make_metadata.sh <barcode_name.csv>"
-    exit
+while getopts ":c:r:p:" opt; do
+  case $opt in
+    c) barcode_file="$OPTARG";;
+    r) readfolder="$OPTARG";;
+    p) pos="$OPTARG";;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      echo "Usage: $0 [-c <barcode_file>] [-r <readfolder>] [-p <pos>]"
+      exit 1
+      ;;
+  esac
+done
+
+# Set default values
+if [ -z "$readfolder" ]; then
+  readfolder="fastq_results"
+fi
+
+if [ -z "$pos" ]; then
+  pos=3
+fi
+
+if [ -z "$barcode_file" ]; then
+  barcode_file="barcode_name.csv"
 fi
 
 echo -e "sample_name\tcondition\tsample_label" > run_metadata.tsv
 
-condition="condition"
-
-# find all fastq and add rows to tsv
-readfolder=${2:-fastq_results}
-
-# read files are named like
-#  m64279e_221217_093107.hifi_reads.bc1024--bc1044.fastq.gz
-
-for fq in $(find ${readfolder} -name "*.fastq.gz" -exec readlink -f {} \;);
-do 
-# isolate bc1024--bc1044 from the full name
-bc=$(basename ${fq} | cut -d "." -f 3)
-# get user label from sequel sample to barcode file
-label=$(cat $1 | grep ${bc} | cut -d "," -f 2)
-# write both to the metadata file
-echo -e "${bc}\t${condition}\t${label}";
+# Find all fastq and add rows to tsv
+for fq in $(find "$readfolder" -name "*.fastq.gz" -exec readlink -f {} \;); do
+    # Extract the barcode from the full name at the specified position
+    bc=$(basename "$fq" | cut -d "." -f "$pos")
+    # Get user label from the barcode to sample file
+    label=$(cat "$barcode_file" | grep "$bc" | cut -d "," -f 2)
+    # Check if the label contains "_ctrl_16S"
+    if [[ $label == *"_ctrl_16S"* ]]; then
+        condition="control"
+    else
+        condition="sample"
+    fi
+    # Write both to the metadata file
+    echo -e "${bc}\t${condition}\t${label}";
 done >> run_metadata.tsv
