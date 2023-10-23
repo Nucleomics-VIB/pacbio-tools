@@ -2,9 +2,10 @@
 
 # script: run_pb-16s-nf.sh
 # run pacbio nf-16s-nf pipeline
-# SP@NC, 2023/10/17, v1.1
+# SP@NC, 2023/10/23, v1.2
 # depends on modified nextflow.config file as described in:
 # https://github.com/PacificBiosciences/pb-16S-nf/issues/39
+
 tooldir="/opt/biotools/pb-16S-nf"
 cd ${tooldir}
 
@@ -29,11 +30,79 @@ readcnt=$(ls ${infolder}/*.fastq.gz | wc -l)
 outpfx="run_${readcnt}"
 default_group="group1"
 
+######################
+# amplicon parameters
+######################
+
+#  --front_p   Forward primer sequence. Default to F27. (default: AGRGTTYGATYMTGGCTCAG)
+#  --adapter_p Reverse primer sequence. Default to R1492. (default: AAGTCGTAACAAGGTARCY)
+#  --min_len   Minimum length of sequences to keep (default: 1000)
+#  --max_len   Maximum length of sequences to keep (default: 1600)
+
+fprimer="AGRGTTYGATYMTGGCTCAG"
+rprimer="AAGTCGTAACAAGGTARCY"
+
+minl=1000
+maxl=1600
+
+# --filterQ  Filter input reads above this Q value (default: 20).
+readminq=20
+
+#################
+# DADA parameters
+#################
+
+#  --max_ee  DADA2 max_EE parameter. Reads with number of expected errors higher than
+#            this value will be discarded (default: 2)
+maxee=2
+
+#  --minQ  DADA2 minQ parameter. Reads with any base lower than this score
+#          will be removed (default: 0)
+minq=0
+
+# --pooling_method    QIIME 2 pooling method for DADA2 denoise see QIIME 2
+#   documentation for more details (default: "pseudo", alternative: "independent")
+poolm="pseudo"
+  
+###############
+# ASV filtering
+###############
+
+# Minimum number of reads required to keep any ASV: 5
+# --min_asv_totalfreq (5)
+min_asv_totalfreq=5
+
+# Minimum number of samples required to keep any ASV: 1
+# --min_asv_sample (1; 0 to disable)
+min_asv_sample=1
+
+####################
+# VSEARCH parameters
+####################
+
+# --maxreject  max-reject parameter for VSEARCH taxonomy classification method in QIIME 2
+#              (default: 100)
+# --maxaccept  max-accept parameter for VSEARCH taxonomy classification method in QIIME 2
+#              (default: 100)
+maxrej=100
+maxacc=100
+
+# --vsearch_identity    Minimum identity to be considered as hit (default 0.97)
+vsid="0.97"
+
+##############
+# publish mode
+##############
+
+# --publish_dir_mode    Outputs mode based on Nextflow "publishDir" directive. Specify "copy"
+#                       if requires hard copies. (default: symlink)
+pmod="copy"
+
 # set rarefaction manually in case samples would have too few reads in some samples
 # when not set; the rarefaction will be set automatically to include 80% of the samples
 
 # --rarefaction_depth    Rarefaction curve "max-depth" parameter. By default the pipeline
-#                        automatically select a cut-off above the minimum of the denoised 
+#                        automatically select a cut-off above the minimum of the denoised
 #                        reads for >80% of the samples. This cut-off is stored in a file called
 #                        "rarefaction_depth_suggested.txt" file in the results folder
 #                        (default: null)
@@ -50,19 +119,9 @@ rarefaction="--rarefaction_depth ${rardepth}"
 colorby="condition"
 
 # use >= 32 cpu for good performance
-cpu=64
-
-######################
-# filtering parameters
-######################
-
-# Minimum number of reads required to keep any ASV: 5
-# --min_asv_totalfreq (5)
-min_asv_totalfreq=5
-
-# Minimum number of samples required to keep any ASV: 1
-# --min_asv_sample (1; 0 to disable)
-min_asv_sample=1
+ccpu=64
+dcpu=64
+vcpu=64
 
 ###########################
 # create sample file (once)
@@ -97,21 +156,32 @@ nextflow run main.nf \
   --input "${outfolder}/${outpfx}_samples.tsv" \
   --metadata "${outfolder}/${outpfx}_metadata.tsv" \
   --outdir "${outfolder}" \
-  --dada2_cpu "${cpu}" \
-  --vsearch_cpu "${cpu}" \
-  --cutadapt_cpu "${cpu}" \
-  ${rarefaction} \
+  --front_p "${fprimer}" \
+  --adapter_p "${rprimer}" \
+  --min_len "${minl}" \
+  --max_len "${maxl}" \
+  --filterQ "${readminq}" \
+  --pooling_method "${poolm}" \
+  --max_ee "${maxee}" \
+  --minQ "${minq}"\
+  --maxreject "${maxrej}" \
+  --maxaccept "${maxacc}" \
   --min_asv_totalfreq "${min_asv_totalfreq}" \
   --min_asv_sample "${min_asv_sample}" \
+  --vsearch_identity "${vsid}" \
+  ${rarefaction} \
   --colorby "${colorby}" \
-  --publish_dir_mode "copy" \
+  --dada2_cpu "${dcpu}" \
+  --vsearch_cpu "${vcpu}" \
+  --cutadapt_cpu "${ccpu}" \
+  --publish_dir_mode "${pmod}" \
   -profile docker 2>&1 | tee ${outfolder}/run_log.txt
 
 #################
 # post-processing
 #################
 
-final_results="${outfolder}/results
+final_results="${outfolder}/results"
 
 # obsolete with --publish_dir_mode "copy"
 # copy results containing symlinks to a full local copy for transfer
