@@ -104,21 +104,25 @@ nextflow run main.nf \
   --min_asv_totalfreq "${min_asv_totalfreq}" \
   --min_asv_sample "${min_asv_sample}" \
   --colorby "${colorby}" \
+  --publish_dir_mode "copy" \
   -profile docker 2>&1 | tee ${outfolder}/run_log.txt
 
 #################
 # post-processing
 #################
 
+final_results="${outfolder}/results
+
+# obsolete with --publish_dir_mode "copy"
 # copy results containing symlinks to a full local copy for transfer
-final_results="${outfolder}/final_results"
-rsync -av --copy-links ${outfolder}/results/* ${final_results}/
+#final_results="${outfolder}/final_results"
+#rsync -av --copy-links ${outfolder}/results/* ${final_results}/
 
 # increase reproducibility by storing run info with the final data
 # copy the nextflow report folder with runtime info summaries
 cp -r ${outfolder}/report ${final_results}/nextflow_reports
 
-# add files containing key info to the new folder
+# add files containing key info to the nextflow_reports folder
 cp ${tooldir}/.nextflow.log ${final_results}/nextflow_reports/nextflow.log
 cp ${tooldir}/nextflow.config ${final_results}/nextflow_reports/
 cp ${outfolder}/run_log.txt ${final_results}/nextflow_reports/
