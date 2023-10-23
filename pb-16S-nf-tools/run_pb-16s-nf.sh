@@ -39,7 +39,7 @@ default_group="group1"
 #                        (default: null)
 
 # automatic rarefaction based on 80%
-# rarefaction=''
+# rarefaction=""
 
 # manual rarefaction
 rardepth=10000
@@ -100,7 +100,7 @@ nextflow run main.nf \
   --dada2_cpu "${cpu}" \
   --vsearch_cpu "${cpu}" \
   --cutadapt_cpu "${cpu}" \
-  "${rarefaction}" \
+  ${rarefaction} \
   --min_asv_totalfreq "${min_asv_totalfreq}" \
   --min_asv_sample "${min_asv_sample}" \
   --colorby "${colorby}" \
