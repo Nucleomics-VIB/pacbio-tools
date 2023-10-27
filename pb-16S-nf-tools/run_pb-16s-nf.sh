@@ -63,7 +63,7 @@ minq=0
 # --pooling_method    QIIME 2 pooling method for DADA2 denoise see QIIME 2
 #   documentation for more details (default: "pseudo", alternative: "independent")
 poolm="pseudo"
-  
+
 ###############
 # ASV filtering
 ###############
