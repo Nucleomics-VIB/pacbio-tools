@@ -135,18 +135,33 @@ echo -e "${pfx}\t$(readlink -f ${fq})"
 done) > "${outfolder}/${outpfx}_samples.tsv"
 fi
 
-#############################
+##############################
 # create metadata file (once)
-#############################
+##############################
 
 if [ ! -e "${outfolder}/${outpfx}_metadata.tsv" ]; then
-(echo -e "sample_name\tcondition\tbarcode";
+(echo -e "sample_name\tcondition\tlabel";
 for fq in ${infolder}/*.fastq.gz; do
-pfx="$(basename ${fq%.fastq.gz})"
-bc=$(echo "${fq}" | grep -o -E 'bc[0-9]{4}--bc[0-9]{4}')
-echo -e "${pfx}\t${default_group}\t${bc}"
-done) > "${outfolder}/${outpfx}_metadata.tsv"
+
+# get barcode
+bc=$(basename "$fq" | cut -d "." -f 1)
+
+# add condition=group if provided in the Barcodefile (col#3)
+grp=$(cat "${barcode_file}" | grep "${bc}" | cut -d "," -f 3 | tr -d '\r')
+# set grp to ${default_group} if undef
+if [ -z "${grp}" ]; then
+  grp="${default_group}"
 fi
+
+# add user provided label
+label=$(cat "${barcode_file}" | grep "${bc}" | cut -d "," -f 2)
+
+echo -e "${bc}\t${grp}\t${label}"
+
+done) > "${outfolder}/../${outpfx}_metadata.tsv" && \
+cp  "${outfolder}/../${outpfx}_metadata.tsv"  "${outfolder}/${outpfx}_metadata.tsv"
+fi
+
 
 ##############
 # run nextflow
