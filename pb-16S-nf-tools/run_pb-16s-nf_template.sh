@@ -140,7 +140,7 @@ fi
 ##############################
 
 if [ ! -e "${outfolder}/${outpfx}_metadata.tsv" ]; then
-(echo -e "sample_name\tcondition\tlabel";
+(echo -e "sample_name\tcondition\tlabel\tgroup";
 for fq in ${infolder}/*.fastq.gz; do
 
 # get barcode
@@ -156,7 +156,14 @@ fi
 # add user provided label
 label=$(cat "${barcode_file}" | grep "${bc}" | cut -d "," -f 2)
 
-echo -e "${bc}\t${grp}\t${label}"
+# add extra metadata column
+meta2=$(cat "${barcode_file}" | grep "${bc}" | cut -d "," -f 4 | tr -d '\r')
+# set meta2 to na if undef
+if [ -z "${meta2}" ]; then
+  meta2="na"
+fi
+
+echo -e "${bc}\t${grp}\t${label}\t${meta2}"
 
 done) > "${outfolder}/../${outpfx}_metadata.tsv" && \
 cp  "${outfolder}/../${outpfx}_metadata.tsv"  "${outfolder}/${outpfx}_metadata.tsv"
