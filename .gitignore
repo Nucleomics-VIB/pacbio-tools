@@ -1,6 +1,0 @@
-.DS_Store
-.gitignore
-.Rhistory
-pbcromwell_scripts/ref-config.json
-pbcromwell_scripts/atWork/*
-nextflow-pipelines/Kinnex_16S_decat_demux.nextflow/nextflow_version
