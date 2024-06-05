@@ -220,7 +220,7 @@ cp ${lima_results}/HiFi.lima.* ${final_results}/
 # move fastq to save room
 mv ${fastq_results} ${final_results}/
 
-# create barcode plots
+echo -e "# Creating barcode QC report"
 projectnum=$(echo ${samplesheet} | cut -d "_" -f 1 | tr -d "\n")
 cmd="$PLOT_SH -i ${final_results}/HiFi.lima.counts -m ${mincnt} -f ${qc_format} -p ${projectnum} -s ${inputs}/${samplesheet}"
 
@@ -235,7 +235,8 @@ function createArchive {
 local flag_file="Archive_ok"
 
 # Check if the flag file exists and echo "already done" if it does
-if [ -f "${flag_file}" ]; then
+if [ -f "# create barcode plots
+${flag_file}" ]; then
     echo "createArchive: already done."
     return 0 # Exit the function successfully
 fi
