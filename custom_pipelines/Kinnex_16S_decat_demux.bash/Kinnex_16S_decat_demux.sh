@@ -10,7 +10,8 @@
 # requirements:
 # yq
 # SMRTLink (crated using v13.1)
-# config.yaml (edited and pointing to existing files
+# pigz for archiving speedup
+# config.yaml (edited and pointing to existing files)
 
 # All parameters have been externalised from the code and are listed in config.yaml
 
@@ -31,7 +32,9 @@ if [ ! -f "config.yaml" ]; then
 fi
 
 # Load variables from config.yaml
-eval $(yq e '. as $item ireduce (""; . + "export " + ($item | to_entries | .[] | .key + "=\"" + .value + "\" "))' config.yaml)
+eval $(yq e '. as $item ireduce (""; \
+  . + "export " + ($item | to_entries | .[] | \
+  .key + "=\"" + .value + "\" "))' config.yaml)
 
 ########## FUNCTIONS ###########
 
@@ -174,7 +177,8 @@ for bam in $(find ${lima_results} -name "*.bam"); do
 # rename sample from samplesheet 'Bio Sample'
 pfx=$(basename ${bam%.bam})
 bcpair=${pfx#HiFi.}
-biosample=$(grep ${bcpair} ${inputs}/${samplesheet} | dos2unix | cut -d, -f 2 | tr -d "\n")
+biosample=$(grep ${bcpair} ${inputs}/${samplesheet} | \
+  dos2unix | cut -d, -f 2 | tr -d "\n")
 
 echo "${BAM2FASTQ_PATH} \
     ${bam} \
@@ -183,7 +187,8 @@ echo "${BAM2FASTQ_PATH} \
 done
 
 # execute job list in batches of \${nthr_bam2fastq_par}
-cmd="parallel -j ${par_bam2fastq} --joblog my_job_log.log < job.list && (rm job.list my_job_log.log)"
+cmd="parallel -j ${par_bam2fastq} --joblog my_job_log.log \
+  < job.list && (rm job.list my_job_log.log)"
 
 echo -e "\n# Executing job list in parallel batches"
 
@@ -222,7 +227,12 @@ mv ${fastq_results} ${final_results}/
 
 echo -e "# Creating barcode QC report"
 projectnum=$(echo ${samplesheet} | cut -d "_" -f 1 | tr -d "\n")
-cmd="$PLOT_SH -i ${final_results}/HiFi.lima.counts -m ${mincnt} -f ${qc_format} -p ${projectnum} -s ${inputs}/${samplesheet}"
+cmd="$PLOT_SH \
+  -i ${final_results}/HiFi.lima.counts \
+  -m ${mincnt} \
+  -f ${qc_format} \
+  -p ${projectnum} \
+  -s ${inputs}/${samplesheet}"
 
 echo "# ${cmd}"
 eval ${cmd} && cp barcode_QC_Kinnex.${qc_format} ${final_results}/
@@ -246,7 +256,10 @@ echo -e "\n# Creating TGZ archive of ${final_results} and its md5sum"
 thr=8
 pfx="$(echo ${samplesheet} | cut -d '_' -f 1 | tr -d '\n')_archive"
 
-{ tar cvf - "${final_results}" | pigz -p ${thr} | tee >(md5sum > ${pfx}.tgz_md5.txt) > ${pfx}.tgz; } 2> ${pfx}_content.log
+{ tar cvf - "${final_results}" \
+  | pigz -p ${thr} \
+  | tee >(md5sum > ${pfx}.tgz_md5.txt) > ${pfx}.tgz; \
+  } 2> ${pfx}_content.log
 
 echo -e "# archive ${pfx}.tgz and md5sum ${pfx}.tgz_md5.txt were created"
 # fix file path in md5sum
