@@ -1,0 +1,25 @@
+runfolder: "/data/Sequel_data/4767_KDePaepe_PacBio/240524.Sequel2e.FCA"
+movie: "m64279e_240524_094336"
+adapterfolder: "bcM0002--bcM0002"
+samplesheet: "Exp4767_SMRTLink_Barcodefile.csv"
+SMRT_BUNDLES: "/opt/pacbio/smrtlink/install/current/bundles"
+SKERA_PATH: "/opt/pacbio/smrtlink/smrtcmds/bin/skera"
+LIMA_PATH: "/opt/pacbio/smrtlink/smrtcmds/bin/lima"
+BAM2FASTQ_PATH: "/opt/pacbio/smrtlink/smrtcmds/bin/bam2fastq"
+PLOT_SH: "/opt/scripts/barcode_QC_Kinnex.sh"
+qc_format: "html"
+ZYMOCTRL: "/data/NC_projects/Rmd-report_template/pictures/ds1706_zymobiomics_microbial_community_standards_data_sheet.pdf"
+README: "/data/NC_projects/Rmd-report_template/README.txt"
+reference: "reference"
+inputs: "inputs"
+skera_results: "skera_results"
+lima_results: "lima_results"
+fastq_results: "fastq_results"
+log_skera: "INFO"
+log_lima: "INFO"
+nthr_skera: 64
+nthr_lima: 64
+par_bam2fastq: 16
+nthr_bam2fastq: 4
+mincnt : 12000
+final_results: "final_results"
