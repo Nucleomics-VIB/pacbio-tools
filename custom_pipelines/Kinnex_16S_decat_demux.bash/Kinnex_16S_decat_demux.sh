@@ -4,12 +4,14 @@
 # run skera and lima on a Kinnex 16S RUN
 # 
 # Stephane Plaisance - VIB-NC 2024-06-03 v1.0
+# small edits in the header below v1.0.1
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # requirements:
-# yq
-# SMRTLink (crated using v13.1)
+# yq (to read the yaml confog file into bash variables)
+# SMRTLink (created using v13.1) - inclused skera and lima executables
+# barcode files from the SMRTLink install (also copied to barcode_files)
 # pigz for archiving speedup
 # config.yaml (edited and pointing to existing files)
 
