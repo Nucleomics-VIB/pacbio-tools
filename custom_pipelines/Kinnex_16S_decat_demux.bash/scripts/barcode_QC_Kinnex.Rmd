@@ -1,0 +1,170 @@
+---
+title: "Barcode QC Report"
+params:
+  expRef:
+    value: x,
+  inputFile:
+    value: x,
+  samplesheet:
+    value: x,
+  mincnt:
+    value: x,
+---
+
+```{r setup, include=FALSE}
+# call with:
+# R --slave -e 'rmarkdown::render(
+#  input=\"${rmd_path}\",
+#  output_format=\"${outformat}\",
+#  output_dir=\"$PWD\",
+#  params=list(expRef=\"${opt_project}\",inputFile=\"$PWD/${opt_infile}\",mincnt=\"${mincnt}\",samplesheet=\"$PWD/${opt_samplesheet}\")
+#  )'
+
+library("readr")
+library("treemap")
+library("ggplot2")
+library("knitr")
+library("kableExtra")
+library("dplyr")
+library("stringr")
+
+knitr::opts_chunk$set(echo = FALSE)
+
+# logo for document end page
+nclogo <- "NC_logo_200.png"
+
+# Convert mincnt to an integer
+mincnt <- as.integer(params$mincnt)
+```
+
+# Sequel-IIe demultiplexing report for project: **`r params$expRef`**
+#### Nucleomics Core, [nucleomics@vib.be]
+#### date: `r Sys.Date()`
+
+\bigskip
+
+\bigskip
+
+### Mosaic plot with polygon area based on barcode counts 
+
+The read count per barcode was obtained from the regular **lima** demultiplexing analysis and used to produce the plots and tables below.
+
+* (*`r basename(params$inputFile)`*)
+
+```{r load data}
+# load PB Lima demux counts
+ccs_summary <- suppressMessages(
+  read_delim(params$inputFile,
+    delim = "\t",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    show_col_types = FALSE)
+)
+
+# load samplesheet to get sample names from
+samplenames <- suppressMessages(
+  read_delim(params$samplesheet,
+    delim = ",",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    show_col_types = FALSE)
+)
+
+# add combined barcode string in new column
+ccs_summary$BC.pairs <- paste0(ccs_summary$IdxFirstNamed, sep="--", ccs_summary$IdxCombinedNamed, sep='')
+
+# add user provided sample names
+suppressWarnings(merged_data <- merge(ccs_summary, samplenames, by.x = "BC.pairs", by.y = "Barcode", all.x = TRUE))
+
+```
+
+The mosaic plot of barcode counts is shown next.
+
+
+```{r plot mosaic, fig.width=8, fig.height=6}
+treemap(merged_data,
+        index='Bio Sample',
+        vSize="Counts",
+        type="index",
+        title="",
+        fontsize.labels=8,
+        lowerbound.cex.labels=0)
+```
+
+*Note:* very low barcode counts will result into small polygons without a readable label, please refer to next table for full details.
+
+\newpage
+
+### Barcode count distribution across all samples (N=`r nrow(ccs_summary)`)
+
+```{r plot distribution, fig.width=8, fig.height=6}
+# plot histogram
+su <- summary(merged_data$Counts)
+mean <- su[[4]]
+median <- su[[3]]
+pc5 <- quantile(merged_data$Counts,0.05)
+pc95 <- quantile(merged_data$Counts,0.95)
+
+# plot density histogram
+ggplot(merged_data, aes(x=Counts)) +
+  geom_histogram(bins=100, fill="grey", color="black") +
+  geom_vline(aes(xintercept=mincnt), color="red", linewidth=0.75, lty=2) +
+  geom_vline(aes(xintercept=mean(Counts)), color="blue", linewidth=1) +
+  geom_vline(aes(xintercept=median(Counts)), color="green", linewidth=1) +
+  geom_vline(aes(xintercept=pc5), color="black", linewidth=1) +
+  geom_vline(aes(xintercept=pc95), color="black", linewidth=1) +
+  labs(title="", x="Barcode Read Count (log-scale)", y="Frequency") +
+  scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) # Log10 scale for X axis
+
+```
+
+**legend:** the dashed-red line indicates the threshold count of 12000 reads considered too low for proper 16S classification, black lines indicate the **bottom 5%** and **top 5%** limits [`r as.integer(pc5)`; `r as.integer(pc95)`], the blue line indicates the **mean** count value across all barcodes (`r as.integer(mean)`), the green line refers to the **median** count value (`r as.integer(median)`).
+
+### Full result table
+
+\footnotesize
+
+```{r allcounts}
+full_table <- merged_data[,c("Bio Sample", "BC.pairs", "Counts", "MeanScore")]
+suppressWarnings(full_table$prefix <- as.numeric(sub("_.*", "", full_table$`Bio Sample`)))
+full_table <- full_table[order(full_table$prefix), ]
+
+kable(full_table[,-ncol(full_table)], row.names = FALSE,
+  longtable = T) %>%
+kable_styling(latex_options = c("repeat_header"),
+  repeat_header_continued = "\\textit{(Continued on Next Page...)}")
+```
+
+### Samples below threshold
+
+Drop-OFF samples (*) with **less than `r mincnt` reads** (PacBio arbitrary minimum value for proper 16S classification) are shown in the next table.
+
+```{r low counts}
+low_output <- na.omit(full_table[full_table$Counts <= mincnt, ])
+kable(low_output[,-ncol(low_output)], row.names = FALSE,
+  longtable = T) %>%
+kable_styling(latex_options = c("repeat_header"),
+  repeat_header_continued = "\\textit{(Continued on Next Page...)}")
+
+```
+
+(*) N=`r nrow(low_output)`
+
+\normalsize
+
+\bigskip
+
+\bigskip
+
+\bigskip
+
+*`r Sys.Date()`*
+
+```{r, eval=FALSE}
+# Print session information
+cat("R version: ", R.version.string, "\n")
+cat("Session info:\n")
+sessionInfo()
+```
+
+![logo](`r nclogo`) more at **<http://www.nucleomics.be>**
