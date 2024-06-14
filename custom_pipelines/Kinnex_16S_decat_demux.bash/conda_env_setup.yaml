@@ -17,6 +17,7 @@ dependencies:
   - r-kableExtra
   - r-dplyr
   - r-stringr
+  - dos2unix
   - pigz
 variables:
   R_HOME: /opt/miniconda3/envs/Kinnex_16S_decat_demux_env/lib/R
