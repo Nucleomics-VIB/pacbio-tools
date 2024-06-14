@@ -27,6 +27,8 @@ conda activate ${myenv} || (
   exit 1
 )
 
+# Add yq to the conda env from the binary build
+# yq version 4 is not available on conda-forge
 # Current latest version and platform
 vers="4.44.1"
 kernel="linux"
