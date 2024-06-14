@@ -11,7 +11,11 @@
 # Check if the environment exists
 if ! conda env list | grep -q "Kinnex_16S_decat_demux_env"; then
   # Create the conda environment if it does not exist
-  conda env create -f conda_env_setup.yaml
+  conda env create -f conda_env_setup.yaml || (
+    echo "# Failed to create the conda environment ${myenv}"
+    echo "# Please check the conda_env_setup.yaml file and try again."
+    exit 1
+  )
 fi
 
 # Activate the conda environment
