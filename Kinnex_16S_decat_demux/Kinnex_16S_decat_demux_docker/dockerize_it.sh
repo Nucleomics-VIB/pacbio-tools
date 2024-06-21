@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # script: dockerize_it.sh
-# Aim: create a  docker image from the bash Kinnex_16S_decat_demux/ pipeline
+# Aim: create a  docker image from the bash Kinnex_16S_decat_demux / pipeline
 #
-# Stéphane Plaisance - VIB-Nucleomics Core - 2024-06-17 v1.0b
+# Stephane Plaisance - VIB-Nucleomics Core - 2024-06-21 v1.0.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -24,16 +24,6 @@ fi
 # Create the Dockerfile
 cat << EOF > Dockerfile
 FROM continuumio/miniconda3:24.4.0-0
-
-# Set the user and group IDs
-#ARG DEFAULT_USER=$(id -u)
-#ARG DEFAULT_GROUP=$(id -g)
-
-# Create the app directory and set the ownership
-#RUN mkdir -p /app && chown -R ${DEFAULT_USER}:${DEFAULT_GROUP} /app
-
-# Set the user and group IDs
-#USER ${DEFAULT_USER}:${DEFAULT_GROUP}
 
 # this seems to work
 RUN apt-get update -y && \
