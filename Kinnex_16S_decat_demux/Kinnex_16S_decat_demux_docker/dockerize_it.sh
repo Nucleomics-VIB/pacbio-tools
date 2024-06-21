@@ -7,11 +7,9 @@
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
-# NOTES:
-# created after seing your demo this morning
-# out of my memory and with probably several eerrors
-
 # Set the name of the Docker image
+# stored at: splaisan/kinnex_16s_tools:1.0.0
+
 DOCKER_IMAGE_NAME="kinnex_16s_tools"
 DOCKER_IMAGE_TAG="1.0.0"
 
