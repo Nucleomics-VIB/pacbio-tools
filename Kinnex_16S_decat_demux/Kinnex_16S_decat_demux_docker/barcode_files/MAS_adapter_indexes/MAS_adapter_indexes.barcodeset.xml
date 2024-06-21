@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:BarcodeSet xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" UniqueId="cf5d7a6e-d95b-3360-cde5-d579f9abf06b" Tags="pacbio,mas_seq" MetaType="PacBio.DataSet.BarcodeSet" TimeStampedName="pacbio_dataset_barcodeset-230329_154027347" Name="MAS SMRTbell barcoded adapters (v2)" CreatedAt="2023-03-29T08:40:27" Version="3.0.1" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource UniqueId="e5a98f2c-b66c-4a1d-859c-f9723d411a39" TimeStampedName="pacbio_barcodefile_barcodefastafile-230329_154027346" ResourceId="MAS_adapter_indexes.fasta" MetaType="PacBio.BarcodeFile.BarcodeFastaFile">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex UniqueId="ea7d3135-a59c-49c2-97a4-df9c2f73ddeb" TimeStampedName="pacbio_index_samindex-230329_154027344" ResourceId="MAS_adapter_indexes.fasta.fai" MetaType="PacBio.Index.SamIndex"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbbase:SupplementalResources/>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>24</pbds:TotalLength>
+		<pbds:NumRecords>4</pbds:NumRecords>
+		<pbds:BarcodeConstruction/>
+	</pbds:DataSetMetadata>
+</pbds:BarcodeSet>

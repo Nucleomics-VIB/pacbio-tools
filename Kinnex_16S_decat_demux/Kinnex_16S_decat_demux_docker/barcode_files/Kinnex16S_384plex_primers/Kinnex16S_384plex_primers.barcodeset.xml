@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pbds:BarcodeSet xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" UniqueId="965b3839-7a1f-c26c-2183-3d0f4ee9ac02" Tags="kinnex,mas_seq,pacbio,barcodes" MetaType="PacBio.DataSet.BarcodeSet" TimeStampedName="pacbio_dataset_barcodeset-231010_161438705" Name="Kinnex 16S 384-plex primers" CreatedAt="2023-10-10T09:14:38" Version="3.0.1" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource UniqueId="2d343f5b-30b0-4761-a70c-bae21de2a7e0" TimeStampedName="pacbio_barcodefile_barcodefastafile-231010_161438704" ResourceId="Kinnex16S_384plex_primers.fasta" MetaType="PacBio.BarcodeFile.BarcodeFastaFile">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex UniqueId="6942c2af-3434-4c15-a7e8-cc258beac37d" TimeStampedName="pacbio_index_samindex-231010_161438703" ResourceId="Kinnex16S_384plex_primers.fasta.fai" MetaType="PacBio.Index.SamIndex"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbbase:SupplementalResources/>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>1420</pbds:TotalLength>
+		<pbds:NumRecords>44</pbds:NumRecords>
+		<pbds:BarcodeConstruction/>
+	</pbds:DataSetMetadata>
+</pbds:BarcodeSet>

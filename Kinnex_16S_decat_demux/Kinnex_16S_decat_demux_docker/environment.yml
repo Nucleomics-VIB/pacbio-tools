@@ -1,0 +1,24 @@
+name: Kinnex_16S_decat_demux_env
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.8
+  - lima=2.9.0
+  - pbskera=1.2.0
+  - pbtk=3.1.1
+  - r-base
+  - r-essentials
+  - r-rmarkdown
+  - r-readr
+  - r-treemap
+  - r-ggplot2
+  - r-knitr
+  - r-kableExtra
+  - r-dplyr
+  - r-stringr
+  - dos2unix
+  - pigz
+variables:
+  R_HOME: /opt/miniconda3/envs/Kinnex_16S_decat_demux_env/lib/R
+  R_LIBS: /opt/miniconda3/envs/Kinnex_16S_decat_demux_env/lib/R/library
