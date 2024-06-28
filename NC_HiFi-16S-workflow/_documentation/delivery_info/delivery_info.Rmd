@@ -1,0 +1,398 @@
+---
+title:  |
+  | PacBio **pb-16S-nf** pipeline
+author: 
+- "[VIB - Nucleomics Core, nucleomics@vib.be]"
+date: $`r format(Sys.time(), "%a %b %d, %Y")`$ - version 1.0
+fontsize: 10pt
+geometry: top=1cm, bottom=1cm, left=2.5cm, right=1.5cm, includeheadfoot=true
+papersize: a4paper
+bibliography: tex_data/bibliography.bib
+output:
+  rmarkdown::pdf_document:
+    toc: false
+    toc_depth: 3
+    number_sections: false
+    fig_caption: no
+    fig_width: 5
+    fig_height: 4
+    includes:  
+      in_header: tex_data/preamble.tex
+---
+
+```{r setup, include=FALSE}
+
+# set default parameters [echo=TRUE to include code]
+# general
+library("knitr")
+library("readr")
+library("ggplot2")
+library("RColorBrewer")
+
+# from R730
+wd <- "/opt/biotools/pb-16S-nf"
+
+opts_chunk$set(message=FALSE, 
+               warning=FALSE, 
+               eval=FALSE,
+               echo=FALSE,
+               include=TRUE,
+               fig.cap=".",
+               fig.show="asis",
+               fig.keep="high",
+               cache=TRUE,
+               comment = NA,
+               root.dir=wd)
+setwd(wd)
+
+# edit the rarefaction limit value here
+rarefaction="'auto'"
+```
+
+\bigskip
+
+\bigskip
+
+# General Information
+
+Analyse demultiplexed data obtained from one or more Sequel-IIe 16S amplicon sequencing runs and return user-readable summary data and data objects that the end-user can evaluate further using the QIIME2 toolbox.
+
+The analysis was performed using default pipeline parameters except for the Rarefaction which was set to **`r rarefaction`** in order to better compare separate run experiments (this value is generally optimal for a regular run where most of the samples return more than 8000-10000 HiFi reads). Please refer to the separate **barcode_QC_v11.html** document to find out about your sample depth and see which samples were below that arbitrary limit.
+
+**Note:** Some of the default options might not be ideal for every biological question and project. If a new analysis needs be done with other parameters, the user can contact us for a quote or use the pb-16S-nf tool on their own bioinformatics infrastructure ^[https://github.com/PacificBiosciences/HiFi-16S-workflow].
+
+\begin{center}
+
+\includegraphics[width=350pt]{pictures/pipeline_workflow.png}
+
+\tiny
+(https://github.com/PacificBiosciences/HiFi-16S-workflow)
+\normalsize
+
+\end{center}
+
+\bigskip
+
+![logo](NC_logo.png) more at **<http://www.nucleomics.be>**
+
+\newpage
+
+# Analysis settings
+
+The version of the **pb-16S-nf** pipeline used here was **v0.6** ^[https://github.com/PacificBiosciences/HiFi-16S-workflow].
+
+**Table 1:** list of analysis arguments accepted by the pb-16S-nf pipeline
+
+\footnotesize
+
+|  Other important options:                                                                                | SET                  |
+|----------------------------------------------------------------------------------------------------------|----------------------|
+|  --front_p      Forward primer sequence. Default to F27. (default:   AGRGTTYGATYMTGGCTCAG)               | AGRGTTYGATYMTGGCTCAG |
+|  --adapter_p    Reverse primer sequence. Default to   R1492. (default: AAGTCGTAACAAGGTARCY)              | AAGTCGTAACAAGGTARCY  |
+|  --filterQ      Filter input reads above this Q value (default: 20).                                     | 20                   |
+|  --downsample    Limit reads to a maximum of N reads if   there are more than N reads (default: off)     | OFF                  |
+|  --max_ee      DADA2 max_EE parameter. Reads with number of expected errors higher   than                |                      |
+|              this value will be discarded   (default: 2)                                                 | 2                    |
+|  --minQ      DADA2 minQ parameter. Reads with any base lower than this score                             |                      |
+|              will be removed (default: 0)                                                                | 0                    |
+|  --min_len      Minimum length of sequences to keep (default: 1000)                                      | 1000                 |
+|  --max_len      Maximum length of sequences to keep (default: 1600)                                      | 1600                 |
+|  --pooling_method    QIIME 2 pooling method for DADA2 denoise   see QIIME 2                              |                      |
+|                      documentation for more   details (default: "pseudo", alternative:   "independent")  | pseudo               |
+|  --maxreject    max-reject parameter for VSEARCH taxonomy   classification method in QIIME 2             |                      |
+|                 (default: 100)                                                                           | 100                  |
+|  --maxaccept    max-accept parameter for VSEARCH taxonomy   classification method in QIIME 2             |                      |
+|                 (default: 100)                                                                           | 100                  |
+|  --min_asv_totalfreq    Total frequency of any ASV must be above   this threshold                        |                      |
+|                         across all samples to   be retained. Set this to 0 to disable filtering          |                      |
+|                         (default 5)                                                                      | 5                    |
+|  --min_asv_sample    ASV must exist in at least min_asv_sample   to be retained.                         |                      |
+|                      Set this to 0 to   disable. (default 1)                                             | 1                    |
+|  --vsearch_identity    Minimum identity to be considered as hit   (default 0.97)                         | 0.97                 |
+|  --rarefaction_depth    Rarefaction curve "max-depth"   parameter. By default the pipeline               |                      |
+|                         automatically select   a cut-off above the minimum of the denoised               |                      |
+|                         reads for >80% of   the samples. This cut-off is stored in a file called         |                      |
+|                           "rarefaction_depth_suggested.txt" file in the results folder                   |                      |
+|                         (default: null)                                                                  | `r rarefaction` (*)                |
+|  --skip_primer_trim    Skip all primers trimming (switch off   cutadapt and DADA2 primers                |                      |
+|                        removal) (default:   trim with cutadapt)                                          | trim                 |
+|  --skip_nb      Skip Naive-Bayes classification (only uses VSEARCH) (default: false)                     |                      |
+|  --colorby      Columns in metadata TSV file to use for coloring the MDS plot                            |                      |
+|               in HTML report (default:   condition)                                                      | condition=run#       |
+|  --run_picrust2    Run PICRUSt2 pipeline. Note that pathway   inference with 16S using PICRUSt2          |                      |
+|                    has not been tested   systematically (default: false)                                 | FALSE                |
+
+\normalsize
+
+NOTE: We used mostly default values unless noted by (\*). The list of applied parameters can be found in **nextflow_reports/parameters.txt**.
+
+# Zymo Control sample
+
+When performing the amplification of the 16S V1V9 amplicon for the customer, we usually include a negative control (buffer) and a positive control from the Zymo mock community ^[https://zymoresearch.eu/collections/zymobiomics-microbial-community-standards/products/zymobiomics-microbial-community-dna-standard] (ref:**D6305**). These samples are labelled 'Neg_ctrl' and 'Pos_ctrl' in our results and will correspond to different barcode pairs in each experiment (amplified alongside with the customer samples).
+
+A PDF file found on the Zymo site describes the mock sample in details ^[https://files.zymoresearch.com/datasheets/ds1706_zymobiomics_microbial_community_standards_data_sheet.pdf]
+
+\footnotesize
+
+```{bash run_pb-16s-nf_template.sh}
+
+#!/bin/bash
+
+# script: run_pb-16s-nf.sh
+# run pacbio nf-16s-nf pipeline
+# SP@NC, 2023/10/23, v1.2
+# depends on modified nextflow.config file as described in:
+# https://github.com/PacificBiosciences/pb-16S-nf/issues/39
+
+tooldir="/opt/biotools/pb-16S-nf"
+cd ${tooldir}
+
+##################################
+# path to input and output folders
+##################################
+
+# folder with barcoded reads fastq files named as sample-id in ${outpfx}_samples.tsv
+infolder="<...READPATH...>"
+barcode_file="<...FILEPATH.csv...>"
+
+# destination folder for the nextflow outputs
+outfolder="<...DESTPATH...>"
+
+# create outfolder and put sample list and metadata files in it
+mkdir -p "${outfolder}"
+
+###############################
+# experiment related parameters
+###############################
+
+readcnt=$(ls ${infolder}/*.fastq.gz | wc -l)
+outpfx="run_${readcnt}"
+default_group="group1"
+
+######################
+# amplicon parameters
+######################
+
+#  --front_p   Forward primer sequence. Default to F27. (default: AGRGTTYGATYMTGGCTCAG)
+#  --adapter_p Reverse primer sequence. Default to R1492. (default: AAGTCGTAACAAGGTARCY)
+#  --min_len   Minimum length of sequences to keep (default: 1000)
+#  --max_len   Maximum length of sequences to keep (default: 1600)
+
+fprimer="AGRGTTYGATYMTGGCTCAG"
+rprimer="AAGTCGTAACAAGGTARCY"
+
+minl=1000
+maxl=1600
+
+# --filterQ  Filter input reads above this Q value (default: 20).
+readminq=20
+
+#################
+# DADA parameters
+#################
+
+#  --max_ee  DADA2 max_EE parameter. Reads with number of expected errors higher than
+#            this value will be discarded (default: 2)
+maxee=2
+
+#  --minQ  DADA2 minQ parameter. Reads with any base lower than this score
+#          will be removed (default: 0)
+minq=0
+
+# --pooling_method    QIIME 2 pooling method for DADA2 denoise see QIIME 2
+#   documentation for more details (default: "pseudo", alternative: "independent")
+poolm="pseudo"
+
+###############
+# ASV filtering
+###############
+
+# Minimum number of reads required to keep any ASV: 5
+# --min_asv_totalfreq (5)
+min_asv_totalfreq=5
+
+# Minimum number of samples required to keep any ASV: 1
+# --min_asv_sample (1; 0 to disable)
+min_asv_sample=1
+
+####################
+# VSEARCH parameters
+####################
+
+# --maxreject  max-reject parameter for VSEARCH taxonomy classification method in QIIME 2
+#              (default: 100)
+# --maxaccept  max-accept parameter for VSEARCH taxonomy classification method in QIIME 2
+#              (default: 100)
+maxrej=100
+maxacc=100
+
+# --vsearch_identity    Minimum identity to be considered as hit (default 0.97)
+vsid="0.97"
+
+##############
+# publish mode
+##############
+
+# --publish_dir_mode    Outputs mode based on Nextflow "publishDir" directive. Specify "copy"
+#                       if requires hard copies. (default: symlink)
+pmod="copy"
+
+# set rarefaction manually in case samples would have too few reads in some samples
+# when not set; the rarefaction will be set automatically to include 80% of the samples
+
+# --rarefaction_depth    Rarefaction curve "max-depth" parameter. By default the pipeline
+#                        automatically select a cut-off above the minimum of the denoised
+#                        reads for >80% of the samples. This cut-off is stored in a file called
+#                        "rarefaction_depth_suggested.txt" file in the results folder
+#                        (default: null)
+
+# automatic rarefaction based on 80%
+# rarefaction=""
+
+# manual rarefaction
+rardepth=10000
+rarefaction="--rarefaction_depth ${rardepth}"
+
+# color by (default "condition")
+# can be set to other categorical variable if present in the metadata file
+colorby="condition"
+
+# use >= 32 cpu for good performance
+# 44 for chicken
+# 84 for pacbio01
+ccpu=44
+dcpu=44
+vcpu=44
+
+###########################
+# create sample file (once)
+###########################
+
+if [ ! -e "${outfolder}/${outpfx}_samples.tsv" ]; then
+(echo -e "sample-id\tabsolute-file-path"
+for fq in ${infolder}/*.fastq.gz; do
+pfx="$(basename ${fq%.fastq.gz})"
+echo -e "${pfx}\t$(readlink -f ${fq})"
+done) > "${outfolder}/${outpfx}_samples.tsv"
+fi
+
+##############################
+# create metadata file (once)
+##############################
+
+if [ ! -e "${outfolder}/../${outpfx}_metadata_nolabels.tsv" ]; then
+(echo -e "sample_name\tcondition\tbarcode";
+for fq in ${infolder}/*.fastq.gz; do
+pfx="$(basename ${fq%.fastq.gz})"
+bc=$(echo "${fq}" | grep -o -E 'bc[0-9]{4}--bc[0-9]{4}')
+grp="${default_group}"
+echo -e "${pfx}\t${grp}\t${bc}"
+done) > "${outfolder}/../${outpfx}_metadata_nolabels.tsv"
+fi
+
+#####################################
+# add labels to metadata file (once)
+#####################################
+
+if [ ! -e "${outfolder}/${outpfx}_metadata.tsv" ]; then
+# Use awk to process both files together
+awk -v FS=',' -v OFS='\t' '
+    NR == FNR {
+        split($0, csv_columns, ",")
+        key = csv_columns[1]
+        value = csv_columns[2]
+        array[key] = value
+        # Print the array during creation for demonstration
+        # print "Array[" key "] =", array[key]
+        next
+    }
+    BEGIN {FS = "\t"; OFS="\t"}
+    { if (FNR == 1) {print $0,"label"}
+      else {
+        key = $1
+        print $0,array[key]};
+    }
+' "${barcode_file}" "${outfolder}/../${outpfx}_metadata_nolabels.tsv" \
+  > "${outfolder}/${outpfx}_metadata.tsv"
+fi
+
+##############
+# run nextflow
+##############
+
+nextflow run main.nf \
+  --input "${outfolder}/${outpfx}_samples.tsv" \
+  --metadata "${outfolder}/${outpfx}_metadata.tsv" \
+  --outdir "${outfolder}" \
+  --front_p "${fprimer}" \
+  --adapter_p "${rprimer}" \
+  --min_len "${minl}" \
+  --max_len "${maxl}" \
+  --filterQ "${readminq}" \
+  --pooling_method "${poolm}" \
+  --max_ee "${maxee}" \
+  --minQ "${minq}"\
+  --maxreject "${maxrej}" \
+  --maxaccept "${maxacc}" \
+  --min_asv_totalfreq "${min_asv_totalfreq}" \
+  --min_asv_sample "${min_asv_sample}" \
+  --vsearch_identity "${vsid}" \
+  ${rarefaction} \
+  --colorby "${colorby}" \
+  --dada2_cpu "${dcpu}" \
+  --vsearch_cpu "${vcpu}" \
+  --cutadapt_cpu "${ccpu}" \
+  --publish_dir_mode "${pmod}" \
+  -profile docker \
+  -c extra.config 2>&1 | tee ${outfolder}/run_log.txt
+
+#################
+# post-processing
+#################
+
+echo "# copying results to the final_results folder"
+
+final_results="${outfolder}/results"
+
+# obsolete with --publish_dir_mode "copy"
+# copy results containing symlinks to a full local copy for transfer
+#final_results="${outfolder}/final_results"
+#rsync -av --copy-links ${outfolder}/results/* ${final_results}/
+
+# increase reproducibility by storing run info with the final data
+# copy the nextflow report folder with runtime info summaries
+cp -r ${outfolder}/report ${final_results}/nextflow_reports
+
+# add files containing key info to the nextflow_reports folder
+cp ${tooldir}/.nextflow.log ${final_results}/nextflow_reports/nextflow.log
+cp ${tooldir}/nextflow.config ${final_results}/nextflow_reports/
+cp ${outfolder}/run_log.txt ${final_results}/nextflow_reports/
+cp ${outfolder}/parameters.txt ${final_results}/nextflow_reports/
+cp ${outfolder}/${outpfx}_samples.tsv ${final_results}/nextflow_reports/
+cp ${outfolder}/${outpfx}_metadata.tsv ${final_results}/nextflow_reports/
+
+
+```
+
+\normalsize
+
+
+
+\bigskip
+
+\footnotesize
+
+last edits: $`r format(Sys.time(), "%a %b %d, %Y")`$
+
+\normalsize
+
+
+\footnotesize
+
+```{r}
+sessionInfo()
+```
+
+\normalsize
+
+\footnotesize
