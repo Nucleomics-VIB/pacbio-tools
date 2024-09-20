@@ -137,9 +137,27 @@ if (opt$qualitymetric == "accuracy") {
              cex=4) +
     ggtitle(paste0("read-count: ", nrow(ccs_data)))
 
-  ggarrange(p2, p1, p4, p3, 
-            labels = c("A", "B", "C", "D"),
-            ncol = 2, nrow = 2)
+  # biplot length x accuracy
+  p5 <- ggplot() + 
+    geom_point(data=ccs_data, aes(x=len, y=Accuracy), pch=20, cex=0.75, col="grey60") +
+    labs(x = "CCS length", y = "CCS accuracy") +
+    stat_density_2d(aes(fill = after_stat(level)), geom="polygon") +
+    scale_fill_gradient(low="blue", high="red") +
+    geom_hline(aes(yintercept=0.999), linewidth=0.5, colour="green", lty=1) +
+    geom_hline(aes(yintercept=0.9999), linewidth=0.5, colour="blue", lty=2) +
+    theme_linedraw() +
+    theme(plot.title = element_text(margin=margin(b=0), size = 14),
+          legend.position = "none") +
+    annotate(geom="text", 
+             x=minl+2/3*(maxl-minl), 
+             y=minaccu+1/4*(maxaccu-minaccu), 
+             label="green line:Q30\n dashed-blue line Q40",
+             color="grey25",
+             cex=4) +
+    ggtitle(paste0("read-count: ", nrow(ccs_data)))
+  ggarrange(p2, p1, p4, p3, p5,
+            labels = c("A", "B", "C", "D", E),
+            ncol = 2, nrow = 3)
 } else if (opt$qualitymetric == "Qvalue") {
 
   # plot Qvalue
@@ -171,9 +189,28 @@ if (opt$qualitymetric == "accuracy") {
              cex=4) +
     ggtitle(paste0("read-count: ", nrow(ccs_data)))
 
-  ggarrange(p2, p1, p4Q, p3Q, 
-            labels = c("A", "B", "C", "D"),
-            ncol = 2, nrow = 2)
+  # biplot length x Qvalue
+  p5Q <- ggplot() + 
+    geom_point(data=ccs_data, aes(x=len, y=Qvalue), pch=20, cex=0.75, col="grey60") +
+    labs(x = "CCS length", y = "CCS Qvalue") +
+    stat_density_2d(aes(fill = after_stat(level)), geom="polygon") +
+    scale_fill_gradient(low="blue", high="red") +
+    geom_hline(aes(yintercept=30), linewidth=0.5, colour="green", lty=1) +
+    geom_hline(aes(yintercept=40), linewidth=0.5, colour="blue", lty=2) +
+    theme_linedraw() +
+    theme(plot.title = element_text(margin=margin(b=0), size = 14),
+          legend.position = "none") +
+    annotate(geom="text", 
+             x=minl+2/3*(maxl-minl), 
+             y=minQ+1/4*(maxQ-minQ), 
+             label="green line:Q30\n dashed-blue line Q40",
+             color="grey25",
+             cex=4) +
+    ggtitle(paste0("read-count: ", nrow(ccs_data)))
+
+  ggarrange(p2, p1, p4Q, p3Q, p5Q,
+            labels = c("A", "B", "C", "D", "E"),
+            ncol = 2, nrow = 3)
 }
 
 null <- dev.off()

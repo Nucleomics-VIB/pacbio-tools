@@ -37,7 +37,7 @@ nclogo <- "/opt/scripts/NC_logo_200.png"
 mincnt <- as.integer(params$mincnt)
 ```
 
-# Sequel-IIe demultiplexing report for project: **`r params$expRef`**
+# PacBio demultiplexing report for project: **`r params$expRef`**
 #### Nucleomics Core, [nucleomics@vib.be]
 #### date: `r Sys.Date()`
 
@@ -61,6 +61,9 @@ ccs_summary <- suppressMessages(
     show_col_types = FALSE)
 )
 
+# remove row with unbarcoded
+ccs_summary <- ccs_summary[ccs_summary$IdxFirst != -1,]
+
 # load samplesheet to get sample names from
 samplenames <- suppressMessages(
   read_delim(params$samplesheet,
@@ -75,7 +78,7 @@ ccs_summary$BC.pairs <- paste0(ccs_summary$IdxFirstNamed, sep="--", ccs_summary$
 
 # add user provided sample names
 suppressWarnings(merged_data <- merge(ccs_summary, samplenames, by.x = "BC.pairs", by.y = "Barcode", all.x = TRUE))
-
+suppressWarnings(merged_data$Label <- sub("^[^_]*_", "", merged_data$`Bio Sample`))
 ```
 
 The mosaic plot of barcode counts is shown next.
@@ -83,7 +86,7 @@ The mosaic plot of barcode counts is shown next.
 
 ```{r plot mosaic, fig.width=8, fig.height=6}
 treemap(merged_data,
-        index='Bio Sample',
+        index='Label',
         vSize="Counts",
         type="index",
         title="",
@@ -114,8 +117,9 @@ ggplot(merged_data, aes(x=Counts)) +
   geom_vline(aes(xintercept=pc5), color="black", linewidth=1) +
   geom_vline(aes(xintercept=pc95), color="black", linewidth=1) +
   labs(title="", x="Barcode Read Count (log-scale)", y="Frequency") +
-  scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) # Log10 scale for X axis
-
+  scale_x_log10()
+  
+# scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) # Log10 scale for X axis
 ```
 
 **legend:** the dashed-red line indicates the threshold count of 12000 reads considered too low for proper 16S classification, black lines indicate the **bottom 5%** and **top 5%** limits [`r as.integer(pc5)`; `r as.integer(pc95)`], the blue line indicates the **mean** count value across all barcodes (`r as.integer(mean)`), the green line refers to the **median** count value (`r as.integer(median)`).
@@ -127,6 +131,7 @@ ggplot(merged_data, aes(x=Counts)) +
 ```{r allcounts}
 full_table <- merged_data[,c("Bio Sample", "BC.pairs", "Counts", "MeanScore")]
 suppressWarnings(full_table$prefix <- as.numeric(sub("_.*", "", full_table$`Bio Sample`)))
+suppressWarnings(full_table$`Bio Sample` <- sub("^[^_]*_", "", full_table$`Bio Sample`))
 full_table <- full_table[order(full_table$prefix), ]
 
 kable(full_table[,-ncol(full_table)], row.names = FALSE,
