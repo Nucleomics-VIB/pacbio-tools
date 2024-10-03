@@ -3,13 +3,15 @@
 # hifiBam2metrics_auto.sh:
 # parse a PB HIFI BAM file (PB v13)
 # https://pacbiofileformats.readthedocs.io/en/13.0/BAM.html
-# extract molecule ID, read length, pass number,and quality score
-# save results to a text table (TSV) for stats in R
-# for multiplexed data, run with: 'find . -name "*.bam" -exec hifiBam2metrics_v13.sh {} \;'
-# or in parallel: 'find . -name "*.bam" | parallel -j 4 hifiBam2metrics.sh {}'
+# extract readID, read length, pass number, read quality score, barcode quality score
+# save results to a text table (TSV) for stats and plotting in R
+# for multiplexed data, run with: 'find . -name "*.bam" -exec hifiBam2metrics_auto.sh {} \;'
+# or in parallel: 'find . -name "*.bam" | parallel -j 4 hifiBam2metrics_auto.sh {}'
 # followed by: 'find . -name "*_hifi_metrics.txt" | parallel -j 4 sequel_hifi_plots.R -i {}'
 #
 # Stéphane Plaisance - VIB-NC 2024-09-09 v1.4
+# added extraction of the barcode quality score for more plots
+# Stéphane Plaisance - VIB-NC 2024-09-09 v1.5
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -30,26 +32,29 @@ $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 
 $( hash awk 2>/dev/null ) || ( echo "# awk not found in PATH"; exit 1 )
 
 # identify the two fields to export
-read PASS_NUM_FIELD QUALITY_FIELD <<< $(samtools view ${hifibam} | head -1 | awk -F'\t' '
+read PASS_NUM_FIELD QUALITY_FIELD BARCODE_QUALITY_FIELD <<< $(samtools view ${hifibam} | head -1 | awk -F'\t' '
 {
     np_position = 0;
     rq_position = 0;
+    bq_position = 0;
     for (i = 1; i <= NF; i++) {
         if ($i ~ /^np:i:/) np_position = i;
         if ($i ~ /^rq:f:/) rq_position = i;
+        if ($i ~ /^bq:i:/) bq_position = i;
     }
-    print np_position, rq_position;
+    print np_position, rq_position, bq_position;
 }')
 
 # Output the results (optional)
 echo "Position of np:i: field: $PASS_NUM_FIELD" >&2
 echo "Position of rq:f: field: $QUALITY_FIELD" >&2
+echo "Position of bq:i: field: $BARCODE_QUALITY_FIELD" >&2
 
 # see data example bellow (truncated at 80 columns)
 
 samtools view ${hifibam} | \
-  awk -v pass_num_field=${PASS_NUM_FIELD} -v quality_field=${QUALITY_FIELD} 'BEGIN{FS="\t"; OFS=","; 
-           print "Mol.ID","len","npass","Accuracy";
+  awk -v pass_num_field=${PASS_NUM_FIELD} -v quality_field=${QUALITY_FIELD} -v barcode_quality_field=${BARCODE_QUALITY_FIELD} 'BEGIN{FS="\t"; OFS=","; 
+           print "Mol.ID","len","npass","Accuracy","bcqual";
            }
 	{split($1,hd,"/");
 	  if( $(pass_num_field) ~ /np:i:/ ){
@@ -61,8 +66,12 @@ samtools view ${hifibam} | \
             if (rqual ~ /+inf/){
                 rqual = 60;
             };
+	  if( $(barcode_quality_field) ~ /bq:i:/ ){
+            split($(barcode_quality_field),bq,":");
         };
-	print hd[2],length($10),np[3],rq[3] 
+
+        };
+	print hd[2],length($10),np[3],rq[3],bq[3] 
 	}' > $(basename ${hifibam%%.bam})_hifi_metrics.txt
 
 
@@ -100,7 +109,7 @@ exit 0
 #   27  qs:i:16
 #   28  qe:i:15366
 #   29  bc:B:S,0,0
-#   30  bq:i:68
+##   30  bq:i:68
 #   31  cx:i:12
 #   32  bl:Z:ATCGTGCGACGAGTAT
 #   33  bt:Z:ATACTCGG
