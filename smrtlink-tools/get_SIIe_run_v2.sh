@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# scripts: get_Pacbio_run.sh
+# scripts: get_SIIe_run_v2.sh
 # download run files from bucket
 # matches the new folder structure (05-2022)
 # Stephane Plaisance (VIB-NC) 2021/12/20; v1.0
@@ -9,7 +9,7 @@
 
 version="2.0, 2022-05-12"
 
-usage='# Usage: get_pacbio_run.sh <args>
+usage='# Usage: get_SIIe_run_v2.sh <args>
 # -R <runs_dir (obtained from "gsutil ls gs://gcpi-rvvnc/")>
 # -r <run_id (obtained from "gsutil ls gs://gcpi-rvvnc/<runs_dir>")>
 # -l <show the list of runs_dir currently present on the server>]
