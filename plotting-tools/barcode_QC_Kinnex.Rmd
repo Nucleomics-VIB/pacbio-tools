@@ -130,8 +130,11 @@ ggplot(merged_data, aes(x=Counts)) +
 
 ```{r allcounts}
 full_table <- merged_data[,c("Bio Sample", "BC.pairs", "Counts", "MeanScore")]
-suppressWarnings(full_table$prefix <- as.numeric(sub("_.*", "", full_table$`Bio Sample`)))
-suppressWarnings(full_table$`Bio Sample` <- sub("^[^_]*_", "", full_table$`Bio Sample`))
+
+# does not work on all files
+#suppressWarnings(full_table$prefix <- as.numeric(sub("_.*", "", full_table$`Bio Sample`)))
+#suppressWarnings(full_table$`Bio Sample` <- sub("^[^_]*_", "", full_table$`Bio Sample`))
+
 full_table <- full_table[order(full_table$prefix), ]
 
 kable(full_table[,-ncol(full_table)], row.names = FALSE,
