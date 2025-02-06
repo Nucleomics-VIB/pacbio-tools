@@ -3,6 +3,7 @@
 # Script: renameLimaBam.sh
 # Author: SP@NC (AI)
 # Date: 2025-02-06
+# version 1.1
 # Description: Renames and copies .bam and .bam.bai files from Lima output
 # based on a mapping CSV file, organizing files in a new directory.
 # also create fastq version for data delivery
