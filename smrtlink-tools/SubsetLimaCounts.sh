@@ -1,9 +1,20 @@
 #!/bin/bash
 
-# script: subset_lima-counts.sh
+# script: SubsetLimaCounts.sh
 # create subset of a .lima_counts.txt file based on a barcode file
 # SP@NC 2023-12-20
-# v1.0
+# v1.1 (modified to use optargs and renamed)
+
+# Function to display usage information
+usage() {
+    echo "Usage: $0 -b <barcodes.csv> -l <lima-counts.txt> -o <output.txt>"
+    echo "Options:"
+    echo "  -b    Path to the barcodes CSV file"
+    echo "  -l    Path to the lima-counts.txt file"
+    echo "  -o    Path to the output file"
+    echo "  -h    Display this help message"
+    exit 1
+}
 
 # Function to read barcodes from file1
 read_barcodes() {
@@ -43,19 +54,31 @@ filter_rows() {
     echo "Matching rows written to $output_path"
 }
 
-# Check if the correct number of command-line arguments are provided
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 barcodes.csv lima-counts.txt output.txt"
-    exit 1
+# Initialize variables
+barcodes_file=""
+lima_counts_file=""
+output_file=""
+
+# Parse command-line options
+while getopts ":b:l:o:h" opt; do
+    case $opt in
+        b) barcodes_file="$OPTARG" ;;
+        l) lima_counts_file="$OPTARG" ;;
+        o) output_file="$OPTARG" ;;
+        h) usage ;;
+        \?) echo "Invalid option: -$OPTARG" >&2; usage ;;
+        :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
+    esac
+done
+
+# Check if all required options are provided
+if [ -z "$barcodes_file" ] || [ -z "$lima_counts_file" ] || [ -z "$output_file" ]; then
+    echo "Error: Missing required options."
+    usage
 fi
 
-# Get file paths from command-line arguments
-file1_path=$1
-file2_path=$2
-output_path=$3
-
 # Read barcodes from file1 into an array
-file1_barcodes=($(read_barcodes "$file1_path"))
+file1_barcodes=($(read_barcodes "$barcodes_file"))
 
 # Filter rows from file2 based on matching barcodes and write to a new file
-filter_rows "${file1_barcodes[*]}" "$file2_path" "$output_path"
+filter_rows "${file1_barcodes[*]}" "$lima_counts_file" "$output_file"
