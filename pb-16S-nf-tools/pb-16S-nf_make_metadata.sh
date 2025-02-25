@@ -4,6 +4,7 @@
 # create pb-16S-nf metadata file from barcode-name.csv and HiFi read folder
 #
 # Stephane Plaisance (VIB-NC) 2023/10/20; v1.1
+# replace _ 2025/02/25; v1.2
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -34,6 +35,8 @@ echo -e "sample_name\tcondition\tsample_label" > run_metadata.tsv
 for fq in $(find "$readfolder" -name "*.fastq.gz" -exec readlink -f {} \;); do
     # Extract the barcode from the full name at the specified position
     bc=$(basename "$fq" | cut -d "." -f 1)
+    # replace _ by - to comply with qiime rules
+    bc="${bc//_/-}"
     # get group from column3 of the barcode file (added manually)
     condition=$(cat "$barcode_file" | grep "$bc" | cut -d "," -f 3 | tr -d '\r')
     # Get user label from the barcode to sample file

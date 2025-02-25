@@ -4,6 +4,7 @@
 # create pb-16S-nf run_samples.tsv file from HiFi demultiplexed read folder
 #
 # Stephane Plaisance (VIB-NC) 2023/10/20; v1.1
+# replace _ 2025/02/25; v1.2
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -40,6 +41,8 @@ echo -e "sample-id\tabsolute-file-path" > run_samples.tsv
 find "$readfolder" -name "*.fastq.gz" -exec readlink -f {} \; | while read -r fq; do
   # extract barcode pair from file name at the specified position
   bc=$(basename "$fq" | cut -d "." -f "$pos")
+  # replace _ by - to comply with qiime rule
+  bc="${bc//_/-}"
   # echo both to the run_sample file
   echo -e "${bc}\t${fq}";
 done | tr -d '\r' >> run_samples.tsv
