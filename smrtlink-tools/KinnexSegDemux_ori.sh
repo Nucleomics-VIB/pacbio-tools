@@ -7,8 +7,6 @@
 #  conversion processes for Kinnex 16S BAM files using skera and lima
 # Version: 1.1; 2025-02-10
 # Version: 1.2; 2025-04-11
-# Version: 1.3; 2025-04-11 - Added global command logging
-# Version: 1.4; 2025-04-11 - Added command version logging
 
 # Define usage function at the top
 usage() {
@@ -23,50 +21,13 @@ usage() {
     echo "  -h  Show this help message"
 }
 
-# Create global log file with timestamp
-GLOBAL_LOG="KinnexDemux_$(date +%Y%m%d_%H%M%S).log"
-echo "KinnexSegDemux execution log - $(date)" > "$GLOBAL_LOG"
-echo "Command: $0 $@" >> "$GLOBAL_LOG"
-
-# Function to get detailed version information
-get_command_versions() {
-    echo >> "$GLOBAL_LOG"
-    echo "=== Command Versions ===" >> "$GLOBAL_LOG"
-    
-    # Get lima version
-    echo "lima --version output:" >> "$GLOBAL_LOG"
-    lima --version 2>&1 | sed 's/^/  /' >> "$GLOBAL_LOG"
-    echo >> "$GLOBAL_LOG"
-    
-    # Get skera version
-    echo "skera --version output:" >> "$GLOBAL_LOG"
-    skera --version 2>&1 | sed 's/^/  /' >> "$GLOBAL_LOG"
-    echo >> "$GLOBAL_LOG"
-}
-
-# Function to log and execute commands
-log_and_exec() {
-    local cmd="$1"
-    echo >> "$GLOBAL_LOG"
-    echo "=== $(date '+%Y-%m-%d %H:%M:%S') ===" >> "$GLOBAL_LOG"
-    echo "# $cmd" | tee -a "$GLOBAL_LOG"
-    eval "$cmd" 2>&1 | tee -a "$GLOBAL_LOG"
-    local status=$?
-    echo "Exit status: $status" >> "$GLOBAL_LOG"
-    return $status
-}
-
 # Load conda environment
 myenv="Kinnex_16S_decat_demux_env"
-log_and_exec "source /opt/miniconda3/etc/profile.d/conda.sh"
-log_and_exec "conda activate ${myenv}" || {
-    echo "# The conda environment ${myenv} was not found on this machine." | tee -a "$GLOBAL_LOG"
-    echo "# Please read the top part of the script!" | tee -a "$GLOBAL_LOG"
-    exit 1
+source /opt/miniconda3/etc/profile.d/conda.sh
+conda activate ${myenv} || {
+    echo "# The conda environment ${myenv} was not found on this machine."
+    echo "# Please read the top part of the script!" && exit 1
 }
-
-# Get command versions after activating environment
-get_command_versions
 
 # Default values for optional arguments
 movie=""
@@ -90,17 +51,18 @@ done
 
 # Check if the movie variable is set, else exit with error
 if [[ -z "$movie" ]]; then
-    echo "Error: Movie name (-m) is required." >&2 | tee -a "$GLOBAL_LOG"
+    echo "Error: Movie name (-m) is required." >&2
     exit 1
 fi
 
 # Segmentation from a single Kinnex BAM barcode
-log_and_exec "mkdir -p bc{01..04}/skera_out"
+mkdir -p bc{01..04}/skera_out
 
 for bc in {01..04}; do
+
     # Validate input files exist or die
     if [[ ! -f "hifi_reads/${movie}.hifi_reads.bcM00${bc}.bam" ]]; then
-        echo "Error: Input file hifi_reads/${movie}.hifi_reads.bcM00${bc}.bam not found." >&2 | tee -a "$GLOBAL_LOG"
+        echo "Error: Input file hifi_reads/${movie}.hifi_reads.bcM00${bc}.bam not found." >&2
         exit 1
     fi
 
@@ -112,17 +74,20 @@ for bc in {01..04}; do
       ${barcodes} \
       bc${bc}/skera_out/seg_hifi-reads.bam &"
 
-    log_and_exec "$cmd"
+    echo
+    echo "# ${cmd}"
+    eval ${cmd}
+
 done
 
 wait  # Ensure all background processes finish before proceeding
-echo "Segmentation completed at $(date)" >> "$GLOBAL_LOG"
 
 # Demultiplexing step using lima
 for skera in $(find . -type d -name skera_out | sort -u); do
+
     bc=$(basename $(dirname ${skera})) # eg. bc01
 
-    log_and_exec "mkdir -p ${bc}/lima_out"
+    mkdir -p ${bc}/lima_out
 
     cmd="lima \
       -j ${nthr} \
@@ -137,10 +102,12 @@ for skera in $(find . -type d -name skera_out | sort -u); do
       Kinnex16S_384plex_primers.fasta \
       ${bc}/lima_out/${pfx}.bam &"
 
-    log_and_exec "$cmd"
+    echo
+    echo "# ${cmd}"
+    eval ${cmd}
+
 done
 
 wait  # Ensure all background processes finish before exiting
-echo "Demultiplexing completed at $(date)" >> "$GLOBAL_LOG"
 
-echo "Processing completed successfully." | tee -a "$GLOBAL_LOG"
+echo "Processing completed successfully."
