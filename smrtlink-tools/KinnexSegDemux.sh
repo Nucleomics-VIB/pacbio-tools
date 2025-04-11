@@ -19,7 +19,7 @@ conda activate ${myenv} || {
 movie=""
 nthr=10
 barcodes="mas12_primers.fasta"
-minlen=500
+minlen=50
 pfx="hifi-reads"
 
 # Parse optional arguments using getopts
