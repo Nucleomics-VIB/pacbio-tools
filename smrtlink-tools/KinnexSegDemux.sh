@@ -6,6 +6,20 @@
 # Description: This script automates the segmentation, demultiplexing, and
 #  conversion processes for Kinnex 16S BAM files using skera and lima
 # Version: 1.1; 2025-02-10
+# Version: 1.2; 2025-04-11
+
+# Define usage function at the top
+usage() {
+    echo "Usage: $0 [-m movie] [-t threads] [-b barcodes] [-l minlen] [-p prefix]"
+    echo "Required:"
+    echo "  -m  Movie name (input BAM prefix)"
+    echo "Options:"
+    echo "  -t  Number of threads (default: 10)"
+    echo "  -b  Barcode file (default: mas12_primers.fasta)"
+    echo "  -l  Minimum length for lima (default: 50)"
+    echo "  -p  Prefix for output files (default: hifi-reads)"
+    echo "  -h  Show this help message"
+}
 
 # Load conda environment
 myenv="Kinnex_16S_decat_demux_env"
@@ -25,22 +39,15 @@ pfx="hifi-reads"
 # Parse optional arguments using getopts
 while getopts "m:t:b:l:p:h" opt; do
     case $opt in
-        m) movie="$OPTARG" ;;  # Movie name
-        t) nthr="$OPTARG" ;;   # Number of threads
-        b) barcodes="$OPTARG" ;; # Barcode file
-        l) minlen="$OPTARG" ;; # Minimum length for lima
-        p) pfx="$OPTARG" ;;    # Prefix for output files
-        h) 
-            echo "Usage: $0 [-m movie] [-t threads] [-b barcodes (mas12_primers.fasta)] [-l minlen (50)] [-p prefix (hifi-reads)]"
-            exit 0 ;;
-        *)
-            echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
+        m) movie="$OPTARG" ;;
+        t) nthr="$OPTARG" ;;
+        b) barcodes="$OPTARG" ;;
+        l) minlen="$OPTARG" ;;
+        p) pfx="$OPTARG" ;;
+        h) usage; exit 0 ;;
+        *) usage >&2; exit 1 ;;
     esac
 done
-
-# change defaults
-
-
 
 # Check if the movie variable is set, else exit with error
 if [[ -z "$movie" ]]; then
