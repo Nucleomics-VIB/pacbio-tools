@@ -11,11 +11,11 @@
 # Version: 1.4; 2025-04-11 - Added command version logging
 # Version: 1.5; 2025-04-14 - Added -k parameter for Kinnex primers file
 # Version: 1.6; 2025-04-15 - Fixed Conda initialization issues
-# Version: 1.7; 2025-04-15 - added parallel processing with limit for Lima
+# Version: 1.7; 2025-04-15 - Simplified with full parallel processing
 
 # Define usage function at the top
 usage() {
-    echo "Usage: $0 [-m movie] [-t threads] [-b barcodes] [-k kinnex_primers] [-l minlen] [-p prefix] [-x max_parallel]"
+    echo "Usage: $0 [-m movie] [-t threads] [-b barcodes] [-k kinnex_primers] [-l minlen] [-p prefix]"
     echo "Required:"
     echo "  -m  Movie name (input BAM prefix)"
     echo "Options:"
@@ -24,7 +24,6 @@ usage() {
     echo "  -k  lima barcode file (default: Kinnex16S_384plex_primers.fasta)"
     echo "  -l  Minimum length for lima (default: 50)"
     echo "  -p  Prefix for output files (default: hifi-reads)"
-    echo "  -x  Maximum parallel jobs (default: 4)"
     echo "  -h  Show this help message"
 }
 
@@ -107,10 +106,9 @@ barcodes="mas12_primers.fasta"
 kinnex_primers="Kinnex16S_384plex_primers.fasta"
 minlen=50
 pfx="hifi-reads"
-max_parallel=4  # New variable to control parallelization
 
 # Parse optional arguments using getopts
-while getopts "m:t:b:k:l:p:x:h" opt; do
+while getopts "m:t:b:k:l:p:h" opt; do
     case $opt in
         m) movie="$OPTARG" ;;
         t) nthr="$OPTARG" ;;
@@ -118,7 +116,6 @@ while getopts "m:t:b:k:l:p:x:h" opt; do
         k) kinnex_primers="$OPTARG" ;;
         l) minlen="$OPTARG" ;;
         p) pfx="$OPTARG" ;;
-        x) max_parallel="$OPTARG" ;;  # Allow user to specify max parallel jobs
         h) usage; exit 0 ;;
         *) usage >&2; exit 1 ;;
     esac
@@ -144,6 +141,7 @@ fi
 # Segmentation from a single Kinnex BAM barcode
 log_and_exec "mkdir -p bc{01..04}/skera_out"
 
+# Run all skera commands in parallel
 for bc in {01..04}; do
     # Check if the skera step has already been completed
     if [[ -f "bc${bc}/skera_out/done.flag" ]]; then
@@ -165,14 +163,14 @@ for bc in {01..04}; do
       ${barcodes} \
       bc${bc}/skera_out/seg_hifi-reads.bam"
 
-    log_and_exec "$cmd" && touch "bc${bc}/skera_out/done.flag"  # Create flag file on success
+    # Run skera in background and create flag on success
+    (log_and_exec "$cmd" && touch "bc${bc}/skera_out/done.flag") &
 done
 
-wait  # Ensure all background processes finish before proceeding
+wait  # Ensure all skera processes finish before proceeding
 echo "Segmentation completed at $(date)" >> "$GLOBAL_LOG"
 
-# Demultiplexing step using lima with controlled parallelization
-parallel_jobs=0  # Counter for parallel jobs
+# Demultiplexing step using lima - all in parallel
 for skera in $(find . -type d -name skera_out | sort -u); do
     bc=$(basename $(dirname ${skera})) # eg. bc01
 
@@ -204,21 +202,11 @@ for skera in $(find . -type d -name skera_out | sort -u); do
       ${kinnex_primers} \
       ${bc}/lima_out/${pfx}.bam"
 
-    # Run the lima command in the background
-    log_and_exec "$cmd" &
-    ((parallel_jobs++))
-
-    # Wait if the number of parallel jobs reaches the limit
-    if [[ $parallel_jobs -ge $max_parallel ]]; then
-        wait  # Wait for all background jobs to finish
-        parallel_jobs=0  # Reset the counter after waiting
-    fi
-
-    # Create flag file on success
-    touch "${bc}/lima_out/done.flag"
+    # Run lima in background and create flag on success
+    (log_and_exec "$cmd" && touch "${bc}/lima_out/done.flag") &
 done
 
-wait  # Ensure all remaining background processes finish before exiting
+wait  # Ensure all lima processes finish before exiting
 echo "Demultiplexing completed at $(date)" >> "$GLOBAL_LOG"
 
 echo "Processing completed successfully." | tee -a "$GLOBAL_LOG"
