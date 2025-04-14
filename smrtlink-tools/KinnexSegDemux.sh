@@ -18,6 +18,7 @@ usage() {
     echo "Usage: $0 [-m movie] [-t threads] [-b barcodes] [-k kinnex_primers] [-l minlen] [-p prefix]"
     echo "Required:"
     echo "  -m  Movie name (input BAM prefix)"
+    echo "      the BAM file is present in the local 'hifi_reads' folder"
     echo "Options:"
     echo "  -t  Number of threads (default: 10)"
     echo "  -b  skera barcode file (default: mas12_primers.fasta)"
