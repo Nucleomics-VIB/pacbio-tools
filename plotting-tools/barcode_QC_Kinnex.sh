@@ -1,10 +1,12 @@
 #!/bin/bash
-# usage: barcode_QC_Kinnex.sh 
-# -i <pfx.lima.counts.txt> 
-# -p <project#>
-# -s <samplesheet>
-# optional: -m <min read count per sample>
-# optional: -f <pdf|html (default pdf)>
+# usage: barcode_QC_Kinnex.sh
+# -r <path to the Rmd plotting script>
+# -i <runid>.lima_counts file from SMRTlink
+# -m <min read count (default 12000>
+# -p <NC project code or title>
+# -s <samplesheet (ExpXXXX_SMRTLink_Barcodefile.csv)>
+# -f <output format pdf or HTML (default pdf)>
+# -h <this help text>
 #
 # plot mosaic from 16S HiFi amplicon results (pfx.lima.counts)
 #
@@ -12,16 +14,15 @@
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 # 1.0, 2024_05_30
+# 1.1, 2024_06_11 ; fixed for running inside conda anv
 
 # requirements
-# R with packages listed on top of the .Rmd scrips
+# R with packages listed on top of the .Rmd scripts
 
-version="1.0, 2024_05_30"
-
-# path to the barcode_QC.Rmd file (edit to match yours)
-rmd_path="/opt/scripts/barcode_QC_Kinnex.Rmd"
+version="1.1, 2024_06_11"
 
 usage='# Usage: barcode_QC_Kinnex.sh
+# -r <path to the Rmd plotting script>
 # -i <runid>.lima_counts file from SMRTlink
 # -m <min read count (default 12000>
 # -p <NC project code or title>
@@ -30,8 +31,9 @@ usage='# Usage: barcode_QC_Kinnex.sh
 # -h <this help text>
 # script version '${version}
 
-while getopts "i:m:p:s:f:h" opt; do
+while getopts "r:i:m:p:s:f:h" opt; do
   case $opt in
+    r) opt_rmdfile=${OPTARG} ;;
     i) opt_infile=${OPTARG} ;;
     m) opt_mincnt=${OPTARG} ;;
     p) opt_project=${OPTARG} ;;
@@ -44,6 +46,20 @@ while getopts "i:m:p:s:f:h" opt; do
 done
 
 #############################
+# rmdfile
+if [ -z "${opt_rmdfile}" ]; then
+   echo
+   echo "# no barcode_QC_Kinnex.Rmd script provided!"
+   echo "${usage}"
+   exit 1
+fi
+
+if [ ! -f "${opt_rmdfile}" ]; then
+        echo
+        echo "${opt_rmdfile} file not found!"
+        exit 1
+fi
+
 # infile
 if [ -z "${opt_infile}" ]; then
    echo
@@ -92,11 +108,11 @@ else
 outformat="html_document"
 fi
 
-cmd="R --slave -e 'rmarkdown::render(
-  input=\"${rmd_path}\",
+cmd="Rscript --vanilla -e 'rmarkdown::render(
+  input=\"${opt_rmdfile}\",
   output_format=\"${outformat}\",
   output_dir=\"$PWD\",
-  params=list(expRef=\"${opt_project}\",inputFile=\"$PWD/${opt_infile}\",mincnt=\"${mincnt}\",samplesheet=\"$PWD/${opt_samplesheet}\")
+  params=list(expRef=\"${opt_project}\",inputFile=\"${opt_infile}\",mincnt=\"${mincnt}\",samplesheet=\"${opt_samplesheet}\")
   )'"
 
 echo "# ${cmd}"

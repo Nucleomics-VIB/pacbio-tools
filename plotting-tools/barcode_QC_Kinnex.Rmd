@@ -147,8 +147,8 @@ full_table <- full_table[order(full_table$prefix), ]
 
 kable(full_table[,-ncol(full_table)], row.names = FALSE,
   longtable = T) %>%
-kable_styling(latex_options = c("repeat_header"),
-  repeat_header_continued = "\\textit{(Continued on Next Page...)}")
+  kable_styling(latex_options = c("repeat_header"),
+    repeat_header_continued = "\\textit{(Continued on Next Page...)}")
 ```
 
 ### Samples below threshold
@@ -159,8 +159,8 @@ Drop-OFF samples (*) with **less than `r mincnt` reads** (PacBio arbitrary minim
 low_output <- na.omit(full_table[full_table$Counts <= mincnt, ])
 kable(low_output[,-ncol(low_output)], row.names = FALSE,
   longtable = T) %>%
-kable_styling(latex_options = c("repeat_header"),
-  repeat_header_continued = "\\textit{(Continued on Next Page...)}")
+  kable_styling(latex_options = c("repeat_header"),
+    repeat_header_continued = "\\textit{(Continued on Next Page...)}")
 
 ```
 
