@@ -29,7 +29,7 @@ usage() {
 }
 
 # Create global log file with timestamp
-GLOBAL_LOG="KinnexDemux_$(date +%Y%m%d_%H%M%S).log"
+GLOBAL_LOG="KinnexSegDemux_$(date +%Y%m%d_%H%M%S).log"
 echo "KinnexSegDemux execution log - $(date)" > "$GLOBAL_LOG"
 echo "Command: $0 $@" >> "$GLOBAL_LOG"
 
