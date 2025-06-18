@@ -36,21 +36,19 @@ echo "Command: $0 $@" >> "$GLOBAL_LOG"
 # Function to initialize conda properly
 init_conda() {
     # Try to find conda installation
-    local conda_path
-    conda_path=$(which conda 2>/dev/null || command -v conda 2>/dev/null)
+    CONDA_PATH=$(which conda 2>/dev/null || command -v conda 2>/dev/null)
     
-    if [ -z "$conda_path" ]; then
+    if [ -z "$CONDA_PATH" ]; then
         echo "Error: Conda not found in PATH" | tee -a "$GLOBAL_LOG"
         exit 1
     fi
 
     # Get the base conda directory
-    local conda_base
-    conda_base=$(dirname "$(dirname "$conda_path")")
+    CONDA_BASE=$(dirname "$(dirname "$CONDA_PATH")")
     
     # Source the conda.sh script
-    if [ -f "$conda_base/etc/profile.d/conda.sh" ]; then
-        source "$conda_base/etc/profile.d/conda.sh"
+    if [ -f "$CONDA_BASE/etc/profile.d/conda.sh" ]; then
+        source "$CONDA_BASE/etc/profile.d/conda.sh"
     else
         echo "Error: Could not find conda.sh initialization script" | tee -a "$GLOBAL_LOG"
         exit 1
@@ -90,7 +88,7 @@ log_and_exec() {
 
 # Load conda environment
 myenv="Kinnex_16S_decat_demux_env"
-log_and_exec "source /opt/miniconda3/etc/profile.d/conda.sh"
+log_and_exec "source $CONDA_BASE/etc/profile.d/conda.sh"
 log_and_exec "conda activate ${myenv}" || {
     echo "# The conda environment ${myenv} was not found on this machine." | tee -a "$GLOBAL_LOG"
     echo "# Please read the top part of the script!" | tee -a "$GLOBAL_LOG"
