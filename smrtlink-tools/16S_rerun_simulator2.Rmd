@@ -1,0 +1,271 @@
+---
+title: "16S Re-run Simulator Analysis Report"
+author: "SP@NC (+AI)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+params:
+  folder: NULL
+  max_value: 100000
+  project_id: "Unknown"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(gridExtra)
+library(grid)
+library(scales)
+library(kableExtra)
+```
+
+# Introduction
+
+This report analyzes PacBio HiFi 16S sequencing data by comparing **original counts** vs **simulated re-run counts** (2x original) across multiple cutoff thresholds.  
+The goal is to evaluate whether re-running the same libraries would provide sufficient reads to meet quality thresholds.
+
+---
+
+# Data Import and Processing
+
+**All `bc0X_HiFi.lima.counts` files from the specified folder are imported and processed for analysis.**
+
+```{r data-import}
+pattern <- "bc0[0-9]+_HiFi\\.lima\\.counts$"
+folder <- params$folder
+max_value <- params$max_value
+project_id <- params$project_id
+
+files <- list.files(folder, pattern = pattern, recursive = TRUE, full.names = TRUE)
+stopifnot(length(files) > 0)
+
+cutoffs <- c(6000, 8000, 10000, 12000)
+data_frames <- list()
+individual_tables <- list()
+
+for (file_path in files) {
+  parent_folder <- basename(dirname(file_path))
+  file_name <- tools::file_path_sans_ext(basename(file_path))
+  df_name <- paste(parent_folder, file_name, sep = "_")
+  df <- read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+  df$Counts_2x <- 2 * df$Counts
+  data_frames[[df_name]] <- df
+  summary_table <- data.frame(
+    cutoff = cutoffs,
+    counts_greater_equal = sapply(cutoffs, function(x) sum(df$Counts >= x)),
+    counts_less_than = sapply(cutoffs, function(x) sum(df$Counts < x)),
+    counts_2x_greater_equal = sapply(cutoffs, function(x) sum(df$Counts_2x >= x)),
+    counts_2x_less_than = sapply(cutoffs, function(x) sum(df$Counts_2x < x)),
+    file = df_name,
+    total_rows = nrow(df)
+  )
+  individual_tables[[df_name]] <- summary_table
+}
+```
+
+<!--
+---
+
+# Individual File Summaries
+
+**Summary tables for each input file, showing the number of samples above and below each cutoff for both the original and simulated re-run counts.**
+
+```{r individual-summaries, results='asis'}
+for (name in names(individual_tables)) {
+  cat(paste0("### File: ", name, "\n"))
+  table_subset <- individual_tables[[name]][, c("cutoff", "counts_greater_equal", "counts_less_than", 
+                                                "counts_2x_greater_equal", "counts_2x_less_than")]
+  colnames(table_subset) <- c("Cutoff", "Original >=", "Original <", "Re-run >=", "Re-run <")
+  print(
+    kable(table_subset, caption = paste("Summary for", name)) %>%
+      kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+  )
+  cat("\n")
+}
+```
+---
+-->
+
+# Overall Summary
+
+**Total number of samples above and below each cutoff across all files, for both original and simulated re-run counts.**
+
+```{r overall-summary}
+combined_table <- do.call(rbind, individual_tables)
+summary_overall_counts <- combined_table %>%
+  group_by(cutoff) %>%
+  summarise(
+    counts_total_greater_equal = sum(counts_greater_equal),
+    counts_total_less_than = sum(counts_less_than),
+    counts_2x_total_greater_equal = sum(counts_2x_greater_equal),
+    counts_2x_total_less_than = sum(counts_2x_less_than),
+    total_files = n(),
+    .groups = 'drop'
+  )
+
+kable(summary_overall_counts, caption = "Overall Summary Table") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+---
+
+# Visualizations
+
+## Comparison: Original vs Simulated Re-run
+
+**Bar plot comparing the number of samples meeting each cutoff for original and simulated re-run counts.**
+
+```{r comparison-barplot, fig.width=8, fig.height=5}
+comparison_data <- summary_overall_counts %>%
+  select(cutoff, counts_total_greater_equal, counts_2x_total_greater_equal) %>%
+  pivot_longer(cols = c(counts_total_greater_equal, counts_2x_total_greater_equal),
+               names_to = "type", values_to = "count") %>%
+  mutate(type = ifelse(type == "counts_total_greater_equal", "Original Counts", "Simulated Re-run"))
+
+ggplot(comparison_data, aes(x = factor(cutoff), y = count, fill = type)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  labs(title = "Comparison: Original Counts vs Simulated Re-run",
+       subtitle = "Number of samples meeting each cutoff threshold",
+       x = "Cutoff Value",
+       y = "Number of Samples ≥ Cutoff",
+       fill = "Count Type") +
+  scale_fill_manual(values = c("Original Counts" = "darkblue", "Simulated Re-run" = "red")) +
+  scale_x_discrete(labels = function(x) scales::comma(as.numeric(x))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "top")
+```
+
+---
+
+## Distribution by Simulated Re-run Cutoffs
+
+**Stacked bar plot showing the proportion of samples above and below each cutoff for the simulated re-run counts.**
+
+```{r stacked-barplot, fig.width=8, fig.height=5}
+summary_overall_counts$total_samples <- summary_overall_counts$counts_2x_total_greater_equal + summary_overall_counts$counts_2x_total_less_than
+summary_overall_counts$pct_2x_greater_equal <- (summary_overall_counts$counts_2x_total_greater_equal / summary_overall_counts$total_samples) * 100
+summary_overall_counts$pct_2x_less_than <- (summary_overall_counts$counts_2x_total_less_than / summary_overall_counts$total_samples) * 100
+
+summary_long <- summary_overall_counts %>%
+  select(cutoff, pct_2x_greater_equal, pct_2x_less_than) %>%
+  pivot_longer(cols = c(pct_2x_greater_equal, pct_2x_less_than), 
+               names_to = "category", values_to = "percentage") %>%
+  mutate(category = ifelse(category == "pct_2x_greater_equal", "≥ Cutoff", "< Cutoff"))
+
+ggplot(summary_long, aes(x = factor(cutoff), y = percentage, fill = category)) +
+  geom_col(position = "stack") +
+  labs(title = "Distribution by Simulated Re-run Cutoffs",
+       subtitle = "Proportion of samples above/below each threshold (simulated re-run)",
+       x = "Cutoff Value",
+       y = "Percentage (%)",
+       fill = "Category") +
+  scale_fill_manual(values = c("≥ Cutoff" = "darkblue", "< Cutoff" = "red")) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  scale_x_discrete(labels = function(x) scales::comma(as.numeric(x))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "top")
+```
+
+---
+
+## Trend Comparison
+
+**Line plot showing how the number of samples meeting each cutoff changes for original and simulated re-run counts.**
+
+```{r trend-lineplot, fig.width=8, fig.height=5}
+ggplot(comparison_data, aes(x = as.numeric(cutoff), y = count, color = type)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  labs(title = "Trend Comparison: Samples Meeting Cutoffs",
+       subtitle = "How original counts vs simulated re-run perform across thresholds",
+       x = "Cutoff Value",
+       y = "Number of Samples ≥ Cutoff",
+       color = "Count Type") +
+  scale_color_manual(values = c("Original Counts" = "darkblue", "Simulated Re-run" = "red")) +
+  scale_x_continuous(labels = scales::comma_format()) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "top")
+```
+
+---
+
+## Individual File Comparison
+
+**Comparison of original and simulated re-run counts for each file, across all cutoffs.**
+
+```{r file-comparison, eval=length(individual_tables) > 1, fig.width=10, fig.height=7}
+if (length(individual_tables) > 1) {
+  file_data <- do.call(rbind, individual_tables) %>%
+    select(file, cutoff, counts_greater_equal, counts_2x_greater_equal) %>%
+    pivot_longer(cols = c(counts_greater_equal, counts_2x_greater_equal),
+                 names_to = "type", values_to = "count") %>%
+    mutate(type = ifelse(type == "counts_greater_equal", "Original Counts", "Simulated Re-run"))
+  
+  ggplot(file_data, aes(x = factor(cutoff), y = count, fill = type)) +
+    geom_col(position = "dodge", alpha = 0.8) +
+    facet_wrap(~file, scales = "free_y", ncol = 2) +
+    labs(title = "Individual File Comparison",
+         subtitle = "Original vs Simulated Re-run performance by file",
+         x = "Cutoff Value",
+         y = "Number of Samples ≥ Cutoff",
+         fill = "Count Type") +
+    scale_fill_manual(values = c("Original Counts" = "darkblue", "Simulated Re-run" = "red")) +
+    scale_x_discrete(labels = function(x) scales::comma(as.numeric(x))) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "top",
+          strip.text = element_text(size = 8))
+}
+```
+
+---
+
+## Histogram: Distribution of Read Counts
+
+**Histogram showing the distribution of read counts for all samples, comparing original and simulated re-run counts.**
+
+```{r histogram, fig.width=10, fig.height=6}
+all_original_counts <- unlist(lapply(data_frames, function(df) df$Counts))
+all_2x_counts <- unlist(lapply(data_frames, function(df) df$Counts_2x))
+histogram_data <- data.frame(
+  counts = c(all_original_counts, all_2x_counts),
+  type = rep(c("Original Counts", "Simulated Re-run"), 
+             c(length(all_original_counts), length(all_2x_counts)))
+)
+histogram_data_filtered <- histogram_data[histogram_data$counts <= max_value, ]
+
+ggplot(histogram_data_filtered, aes(x = counts, fill = type)) +
+  geom_histogram(alpha = 0.6, position = "identity", bins = 50) +
+  labs(title = "Distribution of Read Counts: Original vs Simulated Re-run",
+       subtitle = paste("Frequency histogram (log10 scale, max value:", scales::comma(max_value), ")"),
+       x = "Read Counts (log10 scale)",
+       y = "Frequency",
+       fill = "Count Type") +
+  scale_fill_manual(values = c("Original Counts" = "darkblue", "Simulated Re-run" = "red")) +
+  scale_x_log10(labels = scales::comma_format(), limits = c(1, max_value),
+                breaks = scales::trans_breaks("log10", function(x) 10^x),
+                minor_breaks = scales::trans_breaks("log10", function(x) 10^x, n = 10)) +
+  annotation_logticks(sides = "b") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+---
+
+# Conclusion
+
+This report provides a comprehensive overview of your 16S re-run simulation, including summary tables, effectiveness comparisons, and publication-ready plots.
+
+---
+
+*For more information, visit: [https://github.com/Nucleomics-VIB](https://github.com/Nucleomics-VIB)*
