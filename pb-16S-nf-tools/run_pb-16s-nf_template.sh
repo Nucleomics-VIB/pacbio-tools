@@ -6,7 +6,7 @@
 # depends on modified nextflow.config file as described in:
 # https://github.com/PacificBiosciences/pb-16S-nf/issues/39
 tooldir="/opt/biotools/pb-16S-nf"
-cd ${tooldir}
+cd "${tooldir}" || exit 1
 
 ##################################
 # path to input and output folders

@@ -32,15 +32,15 @@ fi
 echo -e "sample_name\tcondition\tsample_label" > run_metadata.tsv
 
 # Find all fastq and add rows to tsv
-for fq in $(find "$readfolder" -name "*.fastq.gz" -exec readlink -f {} \;); do
+find "$readfolder" -name "*.fastq.gz" -exec readlink -f {} \; | while read -r fq; do
     # Extract the barcode from the full name at the specified position
     bc=$(basename "$fq" | cut -d "." -f 1)
     # replace _ by - to comply with qiime rules
     bc="${bc//_/-}"
     # get group from column3 of the barcode file (added manually)
-    condition=$(cat "$barcode_file" | grep "$bc" | cut -d "," -f 3 | tr -d '\r')
+    condition=$(grep "$bc" "$barcode_file" | cut -d "," -f 3 | tr -d '\r')
     # Get user label from the barcode to sample file
-    label=$(cat "$barcode_file" | grep "$bc" | cut -d "," -f 2)
+    label=$(grep "$bc" "$barcode_file" | cut -d "," -f 2)
     # Write both to the metadata file
     echo -e "${bc}\t${condition}\t${label}";
 done >> run_metadata.tsv

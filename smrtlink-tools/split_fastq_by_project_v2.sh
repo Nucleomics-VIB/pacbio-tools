@@ -2,12 +2,14 @@
 
 # script: split_fastq_by_project_v2.sh
 # Copy fastq files to project-specific folders based on barcode mapping
-# Author: SP@NC (+AI)
+# Author: SP@NC
 # Date: 2025-05-05
-# Version: 2.0 - Complete rewrite with improved functionality
+# Version: 2.2 - Fixed file copying logic and improved error handling
 #   - Added support for barcode2name.csv format
 #   - Added parallel processing
 #   - Added more flexible input/output options
+#   - Fixed pipe subshell variable scope issue
+#   - Fixed file copying logic for multiple files
 
 # Default values
 infolder="fastq_results"
@@ -84,50 +86,82 @@ echo "----------------------------------------" >> "$logfile"
 copy_file() {
     local sample="$1"
     local barcode="$2"
+    local success=0
     
     # Find files matching the barcode pattern
     local files=$(find "$infolder" -type f -name "*${barcode}*.fastq.gz" | sort)
     
     if [ -z "$files" ]; then
-        echo "No files found for barcode: $barcode (sample: $sample)" >> "$logfile"
+        echo "No files found for barcode: $barcode (sample: $sample)" | tee -a "$logfile"
         return 1
     fi
     
-    # Determine output filename
-    local outname
-    if [ -n "$prefix" ]; then
-        outname="${prefix}_${sample}.fastq.gz"
-    else
-        outname="${sample}.fastq.gz"
-    fi
-    
-    echo "Copying files for barcode: $barcode (sample: $sample)" >> "$logfile"
+    echo "Processing barcode: $barcode (sample: $sample)" | tee -a "$logfile"
     echo "Found files:" >> "$logfile"
     echo "$files" >> "$logfile"
-    echo "Target: $outfolder/$outname" >> "$logfile"
     
-    # Copy the file
-    cp $files "$outfolder/$outname" 2>> "$logfile"
+    # Process each file found
+    while IFS= read -r file; do
+        [ -z "$file" ] && continue
+        
+        # Get the base filename
+        local basename=$(basename "$file")
+        
+        # Determine output filename
+        local outname
+        if [ -n "$prefix" ]; then
+            # If multiple files, append counter or use original name structure
+            if [ $(echo "$files" | wc -l) -gt 1 ]; then
+                outname="${prefix}_${sample}_${basename}"
+            else
+                outname="${prefix}_${sample}.fastq.gz"
+            fi
+        else
+            # If multiple files, use sample name with original structure
+            if [ $(echo "$files" | wc -l) -gt 1 ]; then
+                outname="${sample}_${basename}"
+            else
+                outname="${sample}.fastq.gz"
+            fi
+        fi
+        
+        echo "Copying: $file -> $outfolder/$outname" | tee -a "$logfile"
+        
+        # Copy the file with proper quoting
+        if cp "$file" "$outfolder/$outname" 2>> "$logfile"; then
+            echo "Success: $outname" >> "$logfile"
+            ((success++))
+        else
+            echo "Failed to copy: $file" | tee -a "$logfile"
+        fi
+        
+    done <<< "$files"
     
-    return $?
+    echo "Copied $success files for sample: $sample" | tee -a "$logfile"
+    echo "----------------------------------------" >> "$logfile"
+    
+    return 0
 }
 
 # Process the barcode file and filter for the requested project
 echo "Processing barcode file and filtering for project: $project"
 job_count=0
+total_samples=0
 
-# Read CSV file line by line (skip header)
-tail -n +2 "$barcode_file" | while IFS=',' read -r barcode bio_sample; do
+# Read and process the CSV file
+while IFS=',' read -r barcode bio_sample; do
     # Remove carriage returns and newlines
-    barcode=$(echo "$barcode" | tr -d '\r\n')
-    bio_sample=$(echo "$bio_sample" | tr -d '\r\n')
+    barcode=$(echo "$barcode" | tr -d '\r\n' | xargs)
+    bio_sample=$(echo "$bio_sample" | tr -d '\r\n' | xargs)
     
-    # Skip empty lines
+    # Skip empty lines or header
     [ -z "$barcode" ] || [ -z "$bio_sample" ] && continue
+    [ "$barcode" = "Barcode" ] && continue
     
     # Check if the bio_sample contains the project name
     if [[ "$bio_sample" == *"$project"* ]]; then
         echo "Found matching sample: $bio_sample (barcode: $barcode)"
+        ((total_samples++))
         
         # Run copy in background for parallelization
         copy_file "$bio_sample" "$barcode" &
@@ -136,16 +170,21 @@ tail -n +2 "$barcode_file" | while IFS=',' read -r barcode bio_sample; do
         
         # Wait if reached max parallel jobs
         if [ $job_count -ge $threads ]; then
+            echo "Waiting for $job_count background jobs to complete..."
             wait
             job_count=0
         fi
     fi
-done
+done < <(cat "$barcode_file")
 
 # Wait for any remaining jobs
+echo "Waiting for remaining background jobs to complete..."
 wait
 
 echo "----------------------------------------" >> "$logfile"
 echo "Copy operation completed at $(date)" >> "$logfile"
+echo "Total samples processed: $total_samples" >> "$logfile"
+
 echo "Copy operation completed! Results are in $outfolder"
+echo "Total samples processed: $total_samples"
 echo "Log file: $logfile"
