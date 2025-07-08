@@ -19,7 +19,7 @@ usage() {
     echo "  -i INFO_TSV     : Path to the information TSV file"
     echo "  -h              : Display this help message"
     exit 1
-}1
+}
 
 # Parse command line options
 while getopts ":b:i:h" opt; do
