@@ -31,7 +31,7 @@ while getopts "i:1:2:r:t:T:m:h" opt; do
     r) opt_rounds=${OPTARG} ;;
     t) opt_thr=${OPTARG} ;;
     T) opt_thr2=${OPTARG} ;;
-    m) opt_mem==${OPTARG} ;;
+    m) opt_mem=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -101,11 +101,14 @@ if [[ ! -f "${read2}" ]]; then
 fi
 
 # check executables present
-declare -a arr=( "bwa" "samtools" "pilon.jar" "egrep" )
+declare -a arr=( "bwa" "samtools" "java" "grep" )
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || \
+hash "${prog}" 2>/dev/null || \
     ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
+
+# check pilon.jar exists
+[ -f "$PILON/pilon.jar" ] || ( echo "# pilon.jar not found in $PILON"; exit 1 )
 
 ##############################################
 # setup defaults
@@ -119,10 +122,10 @@ destfolder="${currpath}/pilon-polished-${draftname%.fa*}"
 mkdir -p ${destfolder} || ( echo "# could not create destination folder"; exit 1 )
 
 # get raw data in place
-cp ${draft} ${destfolder}/draft.fa
-cd ${destfolder}
-ln -f -s ../${read1} .
-ln -f -s ../${read2} .
+cp "${draft}" "${destfolder}/draft.fa"
+cd "${destfolder}" || exit
+ln -f -s "../${read1}" .
+ln -f -s "../${read2}" .
 
 rounds=${opt_rounds:-1}
 
@@ -182,4 +185,4 @@ dur=$(echo "${endts}-${startts}" | bc)
 echo "Done in ${dur} sec"
 
 # collect results of 3 rounds
-egrep "Confirmed|Corrected" pilon*.log > pilon_summary.txt
+grep -E "Confirmed|Corrected" pilon*.log > pilon_summary.txt

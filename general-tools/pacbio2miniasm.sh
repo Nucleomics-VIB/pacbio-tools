@@ -18,7 +18,7 @@ version="1.0, 2017_09_21"
 # check if executables are present
 declare -a arr=("samtools" "minimap2" "miniasm" "samtools" "gzip")
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+hash "${prog}" 2>/dev/null || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
 
 usage='# Usage: pacbio2miniasm.sh
@@ -31,10 +31,10 @@ usage='# Usage: pacbio2miniasm.sh
 
 while getopts "r:x:o:t:h" opt; do
   case $opt in
-    r | --fasta-reads) reads=${OPTARG} ;;
-    x | --preset) opt_x=${OPTARG} ;;
-    o | --out_prefix) outpfx=${OPTARG} ;;
-    t | --max_treads) opt_t=${OPTARG} ;;
+    r) reads=${OPTARG} ;;
+    x) opt_x=${OPTARG} ;;
+    o) outpfx=${OPTARG} ;;
+    t) opt_t=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -79,7 +79,7 @@ eval ${cmd}
 if [ $? -eq 0 ]; then
 
 # assemble from alignments
-cmd="miniasm -f ${reads} ${outdir}/overlaps.paf.gz \	
+cmd="miniasm -f ${reads} ${outdir}/overlaps.paf.gz \
 	> ${outdir}/${outpref}.gfa"
 
 echo

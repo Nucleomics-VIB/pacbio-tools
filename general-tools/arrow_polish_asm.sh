@@ -37,7 +37,7 @@ while getopts "a:b:c:C:p:P:o:t:h" opt; do
     c) mincoverage=${OPTARG} ;;
     C) maxcoverage=${OPTARG} ;;
     p) smrtbinpath=${OPTARG} ;;
-    p) picardpath=${OPTARG} ;;
+    P) picardpath=${OPTARG} ;;
     o) outpath=${OPTARG} ;;
     t) threads=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
@@ -80,10 +80,10 @@ picard=${picardpath:-${PICARD}}
 currpath=$(pwd)
 
 # check if requirements are present
-$( hash ${binpath}/blasr 2>/dev/null ) || ( echo "# blasr not found in ${binpath}"; exit 1 )
-$( hash ${binpath}/arrow 2>/dev/null ) || ( echo "# arrow not found in ${binpath}"; exit 1 )
-$( hash java -jar ${picard}/picard.jar 2>/dev/null ) || \
-	( echo "# picard.jar not found in ${picard} (or not correctly installed)"; exit 1 )
+hash "${binpath}/blasr" 2>/dev/null || ( echo "# blasr not found in ${binpath}"; exit 1 )
+hash "${binpath}/arrow" 2>/dev/null || ( echo "# arrow not found in ${binpath}"; exit 1 )
+hash java 2>/dev/null || ( echo "# java not found"; exit 1 )
+[ -f "${picard}/picard.jar" ] || ( echo "# picard.jar not found in ${picard}"; exit 1 )
 
 # files and folders
 draftname=$(basename ${draftassembly})

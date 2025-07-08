@@ -51,7 +51,7 @@ while getopts "q:d:t:h" opt; do
 done
 
 # is STARlong in PATH?
-if [ ! $(type -P STARlong) ]
+if [ ! "$(type -P STARlong)" ]
 then
 	echo "# STARlong not found in PATH!";
 	#exit 1	
