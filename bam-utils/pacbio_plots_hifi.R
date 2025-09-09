@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 
-# Plot from PacBio Sequel CCS BAM
+# Plot from PacBio HiFi BAM
 # usage: pacbio_plots_hifi.R <output of hifiBam2metrics.sh on HIFI bam>
 #
 # Stephane Plaisance VIB-NC September-16-2022 v1.0
@@ -46,7 +46,6 @@ p2 <- ggplot(data, aes(x=len, y=bcqual)) +
   geom_bin2d() +
   scale_fill_gradient(low="blue", high="red") + # Color gradient for density
   labs(x = "CCS len", y = "CCS bc quality") +
-  ggtitle(paste0("read-count: ", nrow(data))) +
   theme_minimal() # Optional: Apply a minimal theme for better aesthetics
 
 p3 <- ggplot(data, aes(x=npass, y=bcqual)) + 
@@ -54,7 +53,6 @@ p3 <- ggplot(data, aes(x=npass, y=bcqual)) +
   geom_bin2d() +
   scale_fill_gradient(low="blue", high="red") + # Color gradient for density
   labs(x = "CCS numpass", y = "CCS bc quality") +
-  ggtitle(paste0("read-count: ", nrow(data))) +
   theme_minimal() # Optional: Apply a minimal theme for better aesthetics
 
 p4 <- ggplot(data, aes(x=len, y=npass)) + 
@@ -62,7 +60,6 @@ p4 <- ggplot(data, aes(x=len, y=npass)) +
   geom_bin2d() +
   scale_fill_gradient(low="blue", high="red") + # Color gradient for density
   labs(x = "CCS len", y = "CCS numpass") +
-  ggtitle(paste0("read-count: ", nrow(data))) +
   theme_minimal() # Optional: Apply a minimal theme for better aesthetics
 
 p5 <- ggplot() + 
