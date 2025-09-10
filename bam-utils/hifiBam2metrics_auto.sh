@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # hifiBam2metrics_auto.sh:
-# parse a PB HIFI BAM file (PB v13)
+# parse a PB HiFi BAM file (PB v13+)
 # https://pacbiofileformats.readthedocs.io/en/13.0/BAM.html
 # extract readID, read length, pass number, read quality score, barcode quality score
 # save results to a text table (TSV) for stats and plotting in R
 # for multiplexed data, run with: 'find . -name "*.bam" -exec hifiBam2metrics_auto.sh {} \;'
 # or in parallel: 'find . -name "*.bam" | parallel -j 4 hifiBam2metrics_auto.sh {}'
-# followed by: 'find . -name "*_hifi_metrics.txt" | parallel -j 4 sequel_hifi_plots.R -i {}'
+# followed by: 'find . -name "*_hifi_metrics.txt" | parallel -j 4 pacbio_plots_hifi.R -i {}'
 #
 # Stéphane Plaisance - VIB-NC 2024-09-09 v1.4
 # added extraction of the barcode quality score for more plots

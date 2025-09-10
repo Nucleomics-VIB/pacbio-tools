@@ -1,7 +1,8 @@
 #!/usr/bin/Rscript
 
 # Plot from PacBio HiFi BAM
-# usage: pacbio_plots_hifi.R <output of hifiBam2metrics.sh on HIFI bam>
+# usage: pacbio_plots_hifi.R <output of hifiBam2metrics_auto.sh on HiFi bam>
+# find . -name "*_hifi_metrics.txt" | parallel -j 4 pacbio_plots_hifi.R -i {}
 #
 # Stephane Plaisance VIB-NC September-16-2022 v1.0
 # October 2023 - version 1.1: add Qvalues and PNG output, and fix syntax changes
