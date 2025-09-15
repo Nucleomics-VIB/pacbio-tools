@@ -6,7 +6,7 @@
 # extract readID, read length, pass number, read quality score, barcode quality score
 # save results to a text table (TSV) for stats and plotting in R
 # for multiplexed data, run with: 'find . -name "*.bam" -exec hifiBam2metrics_auto.sh {} \;'
-# or in parallel: 'find . -name "*.bam" | parallel -j 4 hifiBam2metrics_auto.sh {}'
+# or in parallel: 'find . -name "*.bam" | parallel --tag --line-buffer -j 4 hifiBam2metrics_auto.sh {}'
 # followed by: 'find . -name "*_hifi_metrics.txt" | parallel -j 4 pacbio_plots_hifi.R -i {}'
 #
 # Stéphane Plaisance - VIB-NC 2024-09-09 v1.4
@@ -31,8 +31,8 @@ fi
 $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
 $( hash awk 2>/dev/null ) || ( echo "# awk not found in PATH"; exit 1 )
 
-# identify the two fields to export
-read PASS_NUM_FIELD QUALITY_FIELD BARCODE_QUALITY_FIELD <<< $(samtools view ${hifibam} | head -1 | awk -F'\t' '
+# identify the three fields to export
+read PASS_NUM_FIELD QUALITY_FIELD BARCODE_QUALITY_FIELD <<< $(samtools view ${hifibam} 2>/dev/null | head -1 | awk -F'\t' '
 {
     np_position = 0;
     rq_position = 0;
@@ -43,7 +43,7 @@ read PASS_NUM_FIELD QUALITY_FIELD BARCODE_QUALITY_FIELD <<< $(samtools view ${hi
         if ($i ~ /^bq:i:/) bq_position = i;
     }
     print np_position, rq_position, bq_position;
-}')
+}' 2>/dev/null)
 
 # Output the results (optional)
 echo "Position of np:i: field: $PASS_NUM_FIELD" >&2
@@ -52,8 +52,9 @@ echo "Position of bq:i: field: $BARCODE_QUALITY_FIELD" >&2
 
 # see data example bellow (truncated at 80 columns)
 
-samtools view ${hifibam} | \
-  awk -v pass_num_field=${PASS_NUM_FIELD} -v quality_field=${QUALITY_FIELD} -v barcode_quality_field=${BARCODE_QUALITY_FIELD} 'BEGIN{FS="\t"; OFS=","; 
+# Suppress broken pipe errors and process BAM data
+(samtools view ${hifibam} 2>/dev/null || true) | \
+  awk -v pass_num_field=${PASS_NUM_FIELD} -v quality_field=${QUALITY_FIELD} -v barcode_quality_field=${BARCODE_QUALITY_FIELD} 'BEGIN{FS="\t"; OFS=",";
            print "Mol.ID","len","npass","Accuracy","bcqual";
            }
 	{split($1,hd,"/");
@@ -71,7 +72,7 @@ samtools view ${hifibam} | \
         };
 
         };
-	print hd[2],length($10),np[3],rq[3],bq[3] 
+	print hd[2],length($10),np[3],rq[3],bq[3]
 	}' > $(basename ${hifibam%%.bam})_hifi_metrics.txt
 
 
