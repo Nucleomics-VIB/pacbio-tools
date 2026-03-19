@@ -6,6 +6,7 @@
 # extract readID, read length, pass number, read quality score, barcode quality score
 # save results to a text table (TSV) for stats and plotting in R
 # for multiplexed data, run with: 'find . -name "*.bam" -exec hifiBam2metrics_auto.sh {} \;'
+# using xargs: find . -name "*.bam" -print0 | xargs -0 -P 4 -n 1 hifiBam2metrics_auto.sh
 # or in parallel: 'find . -name "*.bam" | parallel --tag --line-buffer -j 4 hifiBam2metrics_auto.sh {}'
 # followed by: 'find . -name "*_hifi_metrics.txt" | parallel -j 4 pacbio_plots_hifi.R -i {}'
 #
