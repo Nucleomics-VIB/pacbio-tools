@@ -14,7 +14,7 @@ version="2.1, 2022-06-18"
 
 usage='# Usage: get_Pacbio_run.sh <args>
 # -R <runs_dir (default: "runs")>
-# -r <run_id (obtained from "-l" or "gcloud storage ls gs://gcpi-rvvnc/<runs_dir>")>
+# -r <run_id (obtained from "-l" or "gsutil ls gs://gcpi-rvvnc/<runs_dir>")>
 # -l <show the current list of runs_dir on the server>]
 # -h <this help>
 # script version '${version}'
@@ -28,9 +28,7 @@ while getopts "R:r:lh" opt; do
     R) rundir=${OPTARG} ;;
     r) runid=${OPTARG} ;;
     l) echo "# Runs data currently available on the bucket";
-       # gsutil ls gs://gcpi-rvvnc/${rundir}/${runid:-""};
-       gcloud storage ls "gs://gcpi-rvvnc/${rundir}/${runid:-""}/"
-
+       gsutil ls gs://gcpi-rvvnc/${rundir}/${runid:-""};
        exit 0 ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -45,7 +43,6 @@ if [ -n "${runid}" ]; then
 
   # get run folder
   echo -e "\n# getting run data"
-  # gsutil -m rsync -r "gs://gcpi-rvvnc/${rundir}/${runid}/" .
-  gcloud storage rsync -r "gs://gcpi-rvvnc/${rundir}/${runid}/" .
+  gsutil -m rsync -r "gs://gcpi-rvvnc/${rundir}/${runid}/" .
   echo -e "\n\n# copy done"
 fi
