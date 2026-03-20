@@ -27,14 +27,25 @@ while getopts "R:r:lh" opt; do
   case $opt in
     R) rundir="${OPTARG}" ;;
     r) runid="${OPTARG}" ;;
-    l) echo "# Runs data currently available on the bucket";
-       gcloud storage ls "gs://gcpi-rvvnc/${rundir}/${runid:-}";
-       exit 0 ;;
+    l) listmode=1 ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
   esac
 done
+
+# List mode: all options are now parsed
+if [ -n "${listmode}" ]; then
+  echo "# Runs data currently available on the bucket"
+  if [ -n "${runid}" ]; then
+    # list files and subfolders inside the specified run folder
+    gcloud storage ls "gs://gcpi-rvvnc/${rundir}/${runid}/"
+  else
+    # list run folders only
+    gcloud storage ls "gs://gcpi-rvvnc/${rundir}/"
+  fi
+  exit 0
+fi
 
 # Transfer mode requires runid
 if [ -n "${runid}" ]; then
