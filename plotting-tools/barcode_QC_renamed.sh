@@ -231,11 +231,11 @@ else
   echo "# WARNING: fastq_results/ not found, not included in archive"
 fi
 
-archive_name="${bam_prefix}.results.tar.gz"
+archive_name="${bam_prefix}.results.tar"
 contents_file="${bam_prefix}.results.contents.txt"
 echo "# Creating archive: ${archive_name}"
-tar -czf "${archive_name}" "${tar_items[@]}"
-tar -tzf "${archive_name}" > "${contents_file}"
+tar -cf "${archive_name}" "${tar_items[@]}"
+tar -tf "${archive_name}" > "${contents_file}"
 echo "# Archive contents written to: ${contents_file}"
 
 # md5 checksum (portable: md5sum on Linux, md5 on macOS)
