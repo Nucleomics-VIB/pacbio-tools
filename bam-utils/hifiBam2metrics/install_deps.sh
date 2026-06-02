@@ -18,7 +18,7 @@ download_and_extract() {
     
     echo "Downloading $filename..."
     if [ ! -f "$filename" ]; then
-        wget -q --show-progress "$url" -O "$filename"
+        wget -q --show-progress --tries=3 --timeout=30 "$url" -O "$filename"
         echo "✓ Downloaded $filename"
     else
         echo "✓ $filename already exists, skipping download"
@@ -50,8 +50,11 @@ download_and_extract \
     "tar -xjf htslib-1.20.tar.bz2"
 
 # Download zlib (compression library)
+# Use the permanent GitHub release asset: zlib.net only serves the current
+# release at its root path (https://zlib.net/zlib-1.3.1.tar.gz 404s once a newer
+# zlib is published), which broke downstream Docker builds.
 download_and_extract \
-    "https://zlib.net/zlib-1.3.1.tar.gz" \
+    "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz" \
     "zlib-1.3.1.tar.gz" \
     "tar -xzf zlib-1.3.1.tar.gz"
 
