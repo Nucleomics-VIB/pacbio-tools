@@ -5,39 +5,37 @@
 **Goal:** close GitHub issue #2 — ship `qc-tools/countfasta.py`, a clean-room VIB
 reimplementation of the removed third-party `countFasta.pl` (UC Davis, no licence grant).
 
-**State: authored, tested, AND verified head-to-head against the original. NOT committed.**
+**State: DONE except the merge. PR #3 is open and awaits the user's merge click.**
 
-Working tree (on `main`, nothing staged):
+- Branch `qc-tools/countfasta-py`, 2 commits, pushed to origin.
+  - `a93f311` qc-tools: add countfasta.py (+ NOTICE.md, README.md)
+  - `4bfe45b` docs: add MEMORY.md
+- **PR https://github.com/Nucleomics-VIB/pacbio-tools/pull/3** — body says `Closes #2`, so
+  issue #2 auto-closes on merge.
+- Resolution comment posted on issue #2 (`#issuecomment-5456861919`) with the full
+  verification table and the clean-room account.
 
-```
-M NOTICE.md      # "will ship" -> "now ships", + how the clean-room wall was kept
-M README.md      # new ## qc-tools section + TOC entry + differences table (2 rows added 2026-08-28)
-?? qc-tools/     # countfasta.py (444 l), test_countfasta.py (236 l, 22 tests)
-?? MEMORY.md     # this file -- decide whether it is committed or stays local
-```
+**The ONLY outstanding action: merge PR #3.** The auto-mode classifier blocked
+`gh pr merge 3 --rebase --delete-branch`, so the user runs it (rebase keeps this repo's
+linear history), or merges from the GitHub UI. Afterwards, locally:
+`git checkout main && git pull --ff-only && git branch -d qc-tools/countfasta-py`.
 
 **Verification is COMPLETE (2026-08-28).** `python3 qc-tools/test_countfasta.py` -> 22 tests OK,
-and the head-to-head against the removed Perl now ran (the auto-mode block that stopped it in the
-previous session no longer applies). Results:
+and the head-to-head against the removed Perl ran in-session:
 
 - **491 MB / 2000-sequence assembly: every reported quantity MATCHES** -- total length 505,978,661,
   2000 sequences, GC count 232,819,136, GC 46.01%, N25 433,345 (271 seqs), N50 349,266 (594),
   N75 246,502 (1020), 4984 histogram bins with identical per-bin counts. Only the documented
   bin-label base differs (`1500:1599` vs `1501:1600`). Runtime for both tools together: 7.6 s.
 - 9 edge-case fixtures: all differences trace to a documented row in the README table. Two that
-  were *not* yet documented were found and have now been added to that table: zero-length records
-  (`>a` with no sequence) are counted by us and dropped by the original; residues before the first
-  `>` header are an error for us and silently ignored by the original. Both were already
-  deliberate and already pinned by tests -- only the docs were behind.
-- The one apparent Python traceback was in the *comparison harness*, not in `countfasta.py`:
-  the harness tried to parse an empty JSON file after our tool correctly refused the input.
-  `countfasta.py` itself prints `error: ...: sequence data before any '>' header` and exits 1.
-- Clean-room wall still intact: the Perl was executed but never read; the harness prints numbers only.
+  were *not* yet documented were found and added to that table: zero-length records (`>a` with no
+  sequence) are counted by us and dropped by the original; residues before the first `>` header
+  are an error for us and silently ignored by the original. Both were already deliberate and
+  already pinned by tests -- only the docs were behind.
+- The one apparent Python traceback was in the *comparison harness*, not in `countfasta.py`.
+- Clean-room wall intact: the Perl was executed but never read; the harness prints numbers only.
 
-**Next action:** on the user's word -- branch off `main`, commit, close issue #2 with a resolution
-comment. Nothing technical is outstanding.
-
-The comparison harness (still alive at the previous session's scratchpad, may vanish):
+The comparison harness (previous session's scratchpad, may vanish):
 `.../86d473ae-.../scratchpad/compare_to_original.sh <file.fasta>` -- extracts `countFasta.pl` from
 `d3a9125^` into a temp dir outside the repo, runs both, prints a numbers-only table, deletes the
 Perl on exit.
@@ -91,7 +89,7 @@ per-line Python loop, not the character counting.
 
 ## Blocked / needs the user
 
-- Nothing technical. The only open item is the user's go-ahead to branch, commit and close
-  issue #2 (and a decision on whether `MEMORY.md` itself is committed).
-- Resolved 2026-08-28: the auto-mode block on `git show d3a9125^:qc-tools/countFasta.pl` and on
+- **Merge PR #3.** `gh pr merge 3 --rebase --delete-branch` was blocked by the auto-mode
+  classifier; it is the last step and has to come from the user. Nothing else is outstanding.
+- Resolved 2026-08-28: the earlier block on `git show d3a9125^:qc-tools/countFasta.pl` and on
   running `perl` no longer applies, so the head-to-head ran inside the session after all.
