@@ -204,11 +204,9 @@ The facilitating bash script **[pb_STARlong.sh](general-tools/pb_STARlong.sh)** 
 
 <hr>
 
-![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![Licence: mixed content — none asserted](https://img.shields.io/badge/Licence-mixed%20content%20%E2%80%94%20none%20asserted-red.svg)
 
-Licensed under the **GNU General Public License v3.0** — see [`LICENSE`](LICENSE) for the
-full text, and [`NOTICE.md`](NOTICE.md) for attribution and the relicensing history.
-
-Attribute the work to *VIB Nucleomics Core*, and licence derived work under the same terms.
-Relicensed on 2026-08-27; copies obtained before that date remain available to their
-holders under the previous CC BY-SA 3.0 terms.
+**Mixed content — no licence asserted.** This repository contains material from more than
+one copyright holder. VIB Nucleomics Core claims no ownership of the third-party files and
+asserts no licence over the repository as a whole. See [`NOTICE.md`](NOTICE.md) for exactly
+which paths belong to whom, and contact us before reusing anything.

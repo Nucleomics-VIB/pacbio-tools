@@ -1,26 +1,41 @@
-# Notice
+# Notice — MIXED CONTENT, NO LICENCE ASSERTED
 
-This work is owned by the **VIB Nucleomics Core**, the sequencing facility of
-[VIB](https://www.vib.be) — <https://nucleomicscore.sites.vib.be/en>.
+**This repository contains material from more than one copyright holder, and no single
+licence covers it.** VIB Nucleomics Core asserts **no licence** over this repository as a
+whole and claims **no ownership** of the third-party material listed below.
 
-Licensed under the **GNU General Public License v3.0** — see [`LICENSE`](LICENSE) for the full text.
-Attribute the work to *VIB Nucleomics Core*, and licence derived work under the same terms.
+If you wish to reuse anything here, contact
+[VIB Nucleomics Core](https://nucleomicscore.sites.vib.be/en) for the parts it authored,
+and the respective third-party authors for theirs. Do not assume permission.
 
-Previously distributed under a Creative Commons Attribution-ShareAlike 3.0 Unported
-licence, summarised in a `LICENSE.md` that no licence scanner could read, and which Creative Commons itself recommends against for source code. Relicensed
-on 2026-08-27 by the copyright holder. Copies obtained before that date remain available to
-their holders under CC BY-SA 3.0.
+## Third-party material — not ours, not ours to license
 
-## Third-party material
-
-`qc-tools/countFasta.pl` is **not** covered by the [`LICENSE`](LICENSE) of this
-repository.
+### `qc-tools/countFasta.pl`
 
 - **Author:** Joseph Fass, modified from a script by Brad Sickler
 - **Origin:** Bioinformatics Core, UC Davis Genome Center —
   <http://bioinformatics.ucdavis.edu>, obtained via the PacBio FALCON tutorial
 - **Copyright:** (c) 2009 The Regents of the University of California, Davis Campus.
-  All rights reserved.
+  All rights reserved. **No licence grant accompanies this file.**
 
-VIB Nucleomics Core claims **no copyright** in this file and applies **no licence** to
-it. It is redistributed as obtained. Contact the original authors for reuse terms.
+## Parts authored by VIB Nucleomics Core
+
+Everything not listed above was written at the **VIB Nucleomics Core**, the sequencing
+facility of [VIB](https://www.vib.be). Attribute it to *VIB Nucleomics Core*. No licence
+is granted here; ask before reuse.
+
+## Licensing history — read this before assuming terms
+
+- Originally distributed under **CC BY-SA 3.0 Unported**, summarised in a `LICENSE.md`
+  that no licence scanner could read.
+- On **2026-08-27** an organisation-wide sweep replaced that with a **GPL-3.0** `LICENSE`
+  and a notice claiming VIB ownership of the whole repository. **That claim was wrong for
+  this repository** — it covered third-party files VIB does not own.
+- On **2026-08-28** the GPL-3.0 `LICENSE` was withdrawn and this repository was marked
+  mixed-content with no asserted licence, so that no third-party work is misrepresented.
+
+**A licence already granted cannot be retracted.** Copies obtained while this repository
+carried CC BY-SA 3.0, or GPL-3.0 between 2026-08-27 and 2026-08-28, remain available to
+their holders under those terms **for the parts VIB Nucleomics Core authored**. The
+withdrawal applies to new copies, and it never applied to the third-party files above,
+which were never VIB's to license.
