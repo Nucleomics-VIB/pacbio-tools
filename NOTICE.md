@@ -8,15 +8,26 @@ If you wish to reuse anything here, contact
 [VIB Nucleomics Core](https://nucleomicscore.sites.vib.be/en) for the parts it authored,
 and the respective third-party authors for theirs. Do not assume permission.
 
-## Third-party material — not ours, not ours to license
+## Third-party material — removed 2026-08-28
 
-### `qc-tools/countFasta.pl`
+**No third-party material remains in this repository at `HEAD`.**
+
+`qc-tools/countFasta.pl` was removed on **2026-08-28**. It was:
 
 - **Author:** Joseph Fass, modified from a script by Brad Sickler
 - **Origin:** Bioinformatics Core, UC Davis Genome Center —
   <http://bioinformatics.ucdavis.edu>, obtained via the PacBio FALCON tutorial
 - **Copyright:** (c) 2009 The Regents of the University of California, Davis Campus.
-  All rights reserved. **No licence grant accompanies this file.**
+  All rights reserved. **No licence grant accompanied it**, so VIB Nucleomics Core had no
+  permission to redistribute it and never had any ownership of it.
+
+It was removed rather than relicensed. Obtain it from the UC Davis Bioinformatics Core or
+the PacBio FALCON tutorial if you need it. Earlier commits in this repository's history
+still contain the file; that history is a record of what was distributed, not a claim of
+ownership.
+
+A VIB-authored Python replacement is tracked separately — it will reproduce the same
+*features* from a behavioural specification, with none of the original code.
 
 ## Parts authored by VIB Nucleomics Core
 
