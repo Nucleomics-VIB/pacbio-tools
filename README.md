@@ -16,6 +16,10 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/pacb
 
 - **[pb2polymerase.sh](#pb2polymerasesh)** - **[SEQUELstats4one.sh](#sequelstats4onesh)** - **[sequel_read_lengths.R](#sequel_read_lengthsr)**  - **[bam_size-filter.pl](#bam_size-filterpl)** - **[bam2sizedist.sh](#bam2sizedistsh)** -
 
+**[[qc-tools](#qc-tools)]**
+
+- **[countfasta.py](#countfastapy)** -
+
 **[[general-tools](#general-tools)]**
 
 - **[arrow_polish_asm.sh](#arrow_polish_asmsh)** - **[pb_STARlong.sh](#pb_starlongsh)** - 
@@ -166,6 +170,71 @@ Aim: Filter a BAM file by read length
 # optional <-b to also create a BAM output (default only text file of lengths)>
 # <-h to display this help>
 ```
+
+## qc-tools
+*[[back-to-top](#top)]*  
+
+### **countfasta.py**
+*[[qc-tools](#qc-tools)]*
+
+The python file **[countfasta.py](/qc-tools/countfasta.py)** reports the length distribution
+and summary statistics of one or more FASTA files: a length histogram, total residues,
+sequence count, N25/N50/N75 with the number of sequences at or above each threshold, GC
+content, and N / ambiguous-base tallies. Input may be plain or gzipped, or read from stdin,
+and statistics are aggregated across all files. Only the python3 standard library is
+required.
+
+This is an **independent VIB Nucleomics Core implementation**. It replaces the third-party
+`countFasta.pl` (UC Davis Genome Center) that was removed from this repository on
+2026-08-28 for lack of any licence grant; that script was not consulted while writing this
+one. See [`NOTICE.md`](NOTICE.md). Output is *not* byte-compatible with the original — see
+the Notes below.
+
+```bash
+# Usage: countfasta.py [-h] [-i BIN] [--sparse] [--json] [--n50-only] [--version] FASTA [FASTA ...]
+# script version 1.0.0, 2026_08_28
+## input files
+# [required: FASTA ... one or more FASTA files (plain or gzipped), or '-' for stdin]
+# [-i <bin size in residues> (default 100; a non-integer or non-positive value warns and falls back)]
+# [--sparse omit empty histogram bins (useful for assemblies with few long contigs)]
+# [--json emit the report as JSON instead of plain text]
+# [--n50-only print only the N50 length in bp, for use in pipelines]
+# [-h for this help]
+```
+
+Examples:
+```bash
+# plain report, default 100-residue bins
+countfasta.py assembly.fasta
+
+# aggregate several gzipped files, 1kb bins, skip empty bins
+countfasta.py -i 1000 --sparse contigs_*.fasta.gz
+
+# N50 straight into a variable
+n50=$(countfasta.py --n50-only assembly.fasta)
+
+# machine-readable, for a pipeline report
+countfasta.py --json assembly.fasta > asm_stats.json
+```
+
+**Notes on differences from the removed UC Davis script.** Reported quantities are a
+superset of the original's, but the output is deliberately not byte-identical, and several
+original behaviours were bugs that are not reproduced:
+
+| Behaviour | removed `countFasta.pl` | `countfasta.py` |
+|---|---|---|
+| Histogram bin labels | 0-based (`0:99`, `100:199`) | 1-based (`1:100`, `101:200`) |
+| FASTA records sharing an identical header | merged into one sequence of summed length | counted separately |
+| CRLF (Windows) FASTA | every sequence line dropped, reports all zeros | read correctly |
+| Empty / unusable input | fatal division-by-zero part-way through the report | reports zeros, N-stats as `n/a` |
+| N25/50/75 sequence count on tied lengths | rank of the threshold sequence | all sequences at or above the threshold |
+| Header with no sequence (`>a` followed by another header, or a header-only file) | excluded from the sequence count | counted as a zero-length record |
+| Residues before the first `>` header | silently ignored, exit status 0 | reported as an error, exit status 1 |
+| gzip / stdin / `--json` / `-h` | not supported | supported |
+
+If you have a parser reading the old output, the two changes that will affect it are the
+**bin label base** and **duplicate-header merging**.
+
 
 ## general-tools
 *[[back-to-top](#top)]*  
