@@ -26,8 +26,12 @@ the PacBio FALCON tutorial if you need it. Earlier commits in this repository's 
 still contain the file; that history is a record of what was distributed, not a claim of
 ownership.
 
-A VIB-authored Python replacement is tracked separately — it will reproduce the same
-*features* from a behavioural specification, with none of the original code.
+A VIB-authored Python replacement now ships as `qc-tools/countfasta.py` (added
+**2026-08-28**). It reproduces the same *features* from a behavioural specification and
+contains none of the original code; its output is deliberately not byte-identical. The
+author of that file never read the removed script — the original's observable behaviour was
+recorded by a separate reviewer as a behaviour-only manifest, which carried no code,
+identifiers or algorithm description across.
 
 ## Parts authored by VIB Nucleomics Core
 
