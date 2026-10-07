@@ -1,56 +1,58 @@
-# Notice — MIXED CONTENT, NO LICENCE ASSERTED
+# Notice
 
-**This repository contains material from more than one copyright holder, and no single
-licence covers it.** VIB Nucleomics Core asserts **no licence** over this repository as a
-whole and claims **no ownership** of the third-party material listed below.
-
-If you wish to reuse anything here, contact
-[VIB Nucleomics Core](https://nucleomicscore.sites.vib.be/en) for the parts it authored,
-and the respective third-party authors for theirs. Do not assume permission.
-
-## Third-party material — removed 2026-08-28
-
-**No third-party material remains in this repository at `HEAD`.**
-
-`qc-tools/countFasta.pl` was removed on **2026-08-28**. It was:
-
-- **Author:** Joseph Fass, modified from a script by Brad Sickler
-- **Origin:** Bioinformatics Core, UC Davis Genome Center —
-  <http://bioinformatics.ucdavis.edu>, obtained via the PacBio FALCON tutorial
-- **Copyright:** (c) 2009 The Regents of the University of California, Davis Campus.
-  All rights reserved. **No licence grant accompanied it**, so VIB Nucleomics Core had no
-  permission to redistribute it and never had any ownership of it.
-
-It was removed rather than relicensed. Obtain it from the UC Davis Bioinformatics Core or
-the PacBio FALCON tutorial if you need it. Earlier commits in this repository's history
-still contain the file; that history is a record of what was distributed, not a claim of
-ownership.
-
-A VIB-authored Python replacement now ships as `qc-tools/countfasta.py` (added
-**2026-08-28**). It reproduces the same *features* from a behavioural specification and
-contains none of the original code; its output is deliberately not byte-identical. The
-author of that file never read the removed script — the original's observable behaviour was
-recorded by a separate reviewer as a behaviour-only manifest, which carried no code,
-identifiers or algorithm description across.
+**This repository is licensed under the [GNU General Public License v3.0](LICENSE)**, except
+for the four files listed under *Third-party material* below. Those files keep the licence of
+their upstream source.
 
 ## Parts authored by VIB Nucleomics Core
 
-Everything not listed above was written at the **VIB Nucleomics Core**, the sequencing
-facility of [VIB](https://www.vib.be). Attribute it to *VIB Nucleomics Core*. No licence
-is granted here; ask before reuse.
+Everything not listed below was written at the **VIB Nucleomics Core**, the sequencing
+facility of [VIB](https://www.vib.be). Copyright © VIB Nucleomics Core. Licensed under
+GPL-3.0. Attribute it to *VIB Nucleomics Core*.
+
+## Third-party material at `HEAD`
+
+These files are adapted from code that VIB Nucleomics Core did not write. VIB claims no
+ownership of the adapted code. Each file states its licence in its header, and the full
+licence text is in [`LICENSES/`](LICENSES/).
+
+| Path | Adapted from | Licence | Licence text |
+|---|---|---|---|
+| `plotting-tools/plot_reads.R` | pb-falcon documentation, Pacific Biosciences | BSD-3-Clause | [`LICENSES/BSD-3-Clause_PacBio.txt`](LICENSES/BSD-3-Clause_PacBio.txt) |
+| `plotting-tools/plot_ovlp-stats.R` | pb-falcon documentation, Pacific Biosciences | BSD-3-Clause | [`LICENSES/BSD-3-Clause_PacBio.txt`](LICENSES/BSD-3-Clause_PacBio.txt) |
+| `plotting-tools/data/plot_reads-demo.R` | pb-falcon documentation, Pacific Biosciences | BSD-3-Clause | [`LICENSES/BSD-3-Clause_PacBio.txt`](LICENSES/BSD-3-Clause_PacBio.txt) |
+| `smrtlink-tools/explain-LocalContextFlags.html` | Picard `explain-flags.html`, Broad Institute | MIT | [`LICENSES/MIT_Broad-Institute.txt`](LICENSES/MIT_Broad-Institute.txt) |
+
+Upstream sources: <https://github.com/PacificBiosciences/pb-falcon> and
+<https://github.com/broadinstitute/picard>.
+
+## Third-party material removed
+
+- **2026-10-07 — two PacBio brand images.** `pictures/pacbio_icon.png` (the README logo) and
+  `smrtlink-tools/Sequel_reports/data/pacbio-sequel-hero.jpg` (not used by any file) came
+  from Pacific Biosciences with no licence grant. They were removed, not relicensed.
+- **2026-08-28 — `qc-tools/countFasta.pl`.** Author Joseph Fass, modified from a script by
+  Brad Sickler; Bioinformatics Core, UC Davis Genome Center, obtained via the PacBio FALCON
+  tutorial. Copyright (c) 2009 The Regents of the University of California, Davis Campus,
+  with no licence grant. It was removed, not relicensed. A VIB-authored replacement,
+  `qc-tools/countfasta.py`, was written from a behaviour-only specification by an author who
+  never read the original. It contains none of the original code.
+
+Earlier commits in this repository's history still contain the removed files. That history
+is a record of what was distributed, not a claim of ownership.
 
 ## Licensing history — read this before assuming terms
 
 - Originally distributed under **CC BY-SA 3.0 Unported**, summarised in a `LICENSE.md`
   that no licence scanner could read.
-- On **2026-08-27** an organisation-wide sweep replaced that with a **GPL-3.0** `LICENSE`
-  and a notice claiming VIB ownership of the whole repository. **That claim was wrong for
-  this repository** — it covered third-party files VIB does not own.
-- On **2026-08-28** the GPL-3.0 `LICENSE` was withdrawn and this repository was marked
-  mixed-content with no asserted licence, so that no third-party work is misrepresented.
+- **2026-08-27:** an organisation-wide sweep replaced it with **GPL-3.0** and claimed VIB
+  ownership of the whole repository. That claim was wrong: it covered third-party files.
+- **2026-08-28:** the GPL-3.0 `LICENSE` was withdrawn and the repository was marked "mixed
+  content, no licence asserted". That notice wrongly said no third-party material remained.
+- **2026-10-07:** GPL-3.0 restored for the VIB-authored parts. The four adapted files above
+  are marked with their upstream licences, and the two PacBio images were removed.
 
 **A licence already granted cannot be retracted.** Copies obtained while this repository
-carried CC BY-SA 3.0, or GPL-3.0 between 2026-08-27 and 2026-08-28, remain available to
-their holders under those terms **for the parts VIB Nucleomics Core authored**. The
-withdrawal applies to new copies, and it never applied to the third-party files above,
+carried CC BY-SA 3.0 or GPL-3.0 remain available to their holders under those terms **for
+the parts VIB Nucleomics Core authored**. Those licences never applied to third-party files,
 which were never VIB's to license.

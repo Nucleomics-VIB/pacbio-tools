@@ -1,5 +1,5 @@
 [(Nucleomics-VIB)](https://github.com/Nucleomics-VIB)
-![pacbio-tools](pictures/pacbio_icon.png) - PacBio-Tools
+PacBio-Tools
 ==========
 
 *All tools presented below have only been tested by me and may contain bugs, please let me know if you find some. Each tool relies on dependencies normally listed at the top of the code (cpan for perl and cran for R will help you add them)*
@@ -47,7 +47,7 @@ The bash file **[bam_subset_smrt.sh](/smrtlink-tools/bam_subset_smrt.sh)** creat
 ### **explain-LocalContextFlags.html**
 *[[smrtlink-tools](#smrtlink-tools)]*
 
-The html file **[explain-LocalContextFlags.html](/smrtlink-tools/bam_subset_smrt.sh)** explains explain **LocalContext Flags** present in PacBio BAM data as a binary value in plain english. The content of this page is fully taken and adapted from a similar page dedicated to explaining SAM flags and hosted **<a href="http://picard.sourceforge.net/explain-flags.html">here</a>**. Please cite the PICARD source and not our version when using this code.
+The html file **[explain-LocalContextFlags.html](/smrtlink-tools/explain-LocalContextFlags.html)** explains explain **LocalContext Flags** present in PacBio BAM data as a binary value in plain english. The content of this page is fully taken and adapted from a similar page dedicated to explaining SAM flags and hosted **<a href="https://broadinstitute.github.io/picard/explain-flags.html">here</a>**. Please cite the PICARD source and not our version when using this code. This file is under the MIT licence of the Broad Institute, not GPL-3.0 — see [`NOTICE.md`](NOTICE.md).
 ```bash
 Open a local copy of the file using your favorite web browser to use it
 ```
@@ -273,9 +273,9 @@ The facilitating bash script **[pb_STARlong.sh](general-tools/pb_STARlong.sh)** 
 
 <hr>
 
-![Licence: mixed content — none asserted](https://img.shields.io/badge/Licence-mixed%20content%20%E2%80%94%20none%20asserted-red.svg)
+![Licence: GPL-3.0](https://img.shields.io/badge/Licence-GPL--3.0-blue.svg)
 
-**Mixed content — no licence asserted.** This repository contains material from more than
-one copyright holder. VIB Nucleomics Core claims no ownership of the third-party files and
-asserts no licence over the repository as a whole. See [`NOTICE.md`](NOTICE.md) for exactly
-which paths belong to whom, and contact us before reusing anything.
+**GPL-3.0, with four exceptions.** The code written by VIB Nucleomics Core is licensed under
+the [GNU General Public License v3.0](LICENSE). Four files are adapted from third-party code
+and keep their upstream licence: three R scripts under BSD-3-Clause (Pacific Biosciences) and
+one HTML page under MIT (Broad Institute). See [`NOTICE.md`](NOTICE.md) for the exact paths.
