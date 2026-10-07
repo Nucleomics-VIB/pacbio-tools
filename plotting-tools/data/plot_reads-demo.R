@@ -3,6 +3,11 @@
 # script: plot_reads-demo.R (SP:NC 2014-07-26)
 # Aim: plot read size distributions from the created reads.db files
 # adapted from http://pb-falcon.readthedocs.io/en/latest/Rhists.html?highlight=preads.stats.txt
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2019, Pacific Biosciences (the adapted code, from the pb-falcon docs)
+# The full licence text is in LICENSES/BSD-3-Clause_PacBio.txt at the repository root.
+# This file is NOT covered by the repository's GPL-3.0 licence. See NOTICE.md.
 
 raw <- read.table("raw_reads.stats.txt", header=T)
 colnames(raw) <- c("Bin","Count","% Reads","% Bases","Average")
